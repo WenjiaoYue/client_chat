@@ -54,10 +54,10 @@
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
 	const prompts = {
-		'Image Style': ['Oil paiting', 'Van gogh'],
+		'Image Style': ['Simple drawing', 'Van gogh', 'Stone Sculpture'],
 		Time: ['2022', 'March 6th', 'April 28, 2023'],
 		Location: ['Shanghai', 'China', 'United States'],
-		Person: ['Person name'],
+		Person: ['Name'],
 	};
 	const fullPromptMap = (word: string) => ({
 		'Image Style': `Covert to ${word} Style`,
@@ -271,7 +271,7 @@
 			{/if}
 
 			<div
-				class="relative flex w-full flex-col items-center justify-between bg-white p-2 shadow-inner fixed z-40 bottom-16"
+				class="relative flex w-full flex-col items-center justify-between bg-white p-2  shadow-inner fixed z-40 bottom-20"
 			>
 				{#if uploadProgress}
 					<Progressbar

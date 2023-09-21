@@ -35,7 +35,7 @@
 		<!-- <h1 class="stroke-orange-50 text-xl font-semibold leading-none">
 			Neural Chat
 		</h1> -->
-		<p class="font-bold">Talking with your photos</p>
+		<p class="font-bold">TalkingPhotos</p>
 
 		</a
 	>
