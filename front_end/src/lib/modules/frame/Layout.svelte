@@ -3,7 +3,6 @@
 	import { page } from "$app/stores";
 	import { browser } from "$app/environment";
 	import { open } from "$lib/shared/stores/common/Store";
-	import { Svroller } from "svrollbar";
 	import TopNavigation from "$lib/modules/frame/TopNavigation.svelte";
 	import SideNavigation from "$lib/modules/frame/SideNavigation.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
@@ -24,10 +23,10 @@
 	}
 </script>
 
-<div bind:this={root} class='h-screen overflow-hidden relative'>
-	<div class="flex items-start">
+<div bind:this={root} class='h-full overflow-hidden relative'>
+	<div class="h-full flex items-start">
 		<SideNavigation />
-		<div class='relative flex flex-col h-screen pl-0 w-full lg:pl-64 bg-white'>
+		<div class='relative flex flex-col h-full pl-0 w-full lg:pl-64 bg-white'>
 			<TopNavigation />
 			<Scrollbar className="h-0 grow max-sm:mt-16 mb-2" classLayout="h-full" alwaysVisible={false}>
 				<slot />

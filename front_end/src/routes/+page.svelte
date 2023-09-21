@@ -271,7 +271,7 @@
 			{/if}
 
 			<div
-				class="relative flex w-full flex-col items-center justify-between bg-white p-2  shadow-inner fixed z-40 bottom-[4.5rem]"
+				class="relative flex w-full flex-col items-center justify-between bg-white p-2  shadow-inner fixed z-40"
 			>
 				{#if uploadProgress}
 					<Progressbar
