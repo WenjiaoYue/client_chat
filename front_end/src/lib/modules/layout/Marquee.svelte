@@ -7,23 +7,23 @@
   
 	const interval = 3000;
   
-	// const updateContent = async () => {  
-	//   const result = await trafficHint();
-	//   if (result && result > 1) {
-	// 	content = result + ` people ahead of you. Please wait a moment!`; 
-	//   }
+	const updateContent = async () => {  
+	  const result = await trafficHint();
+	  if (result && result > 20) {
+		content = result + ` people ahead of you. Please wait a moment!`; 
+	  }
   
-	//   setTimeout(updateContent, interval);
-	// };
+	  setTimeout(updateContent, interval);
+	};
   
-	// onMount(() => {
-	//   setTimeout(updateContent, interval);
-	// });
+	onMount(() => {
+	  setTimeout(updateContent, interval);
+	});
   </script>
   
-  <!-- {#if content != ''} -->
+  {#if content != ''}
 	<Alert color="yellow" class='-mb-3'>
-	  5 people ahead of you. Please wait a moment!
+	  {content}
 	</Alert>
-  <!-- {/if} -->
+  {/if}
   
