@@ -11,7 +11,7 @@
 	let root: HTMLElement
 	onMount(() => {
 		document.getElementsByTagName("body").item(0)!.removeAttribute("tabindex");
-		root.style.height = document.documentElement.clientHeight + 'px'
+		// root.style.height = document.documentElement.clientHeight + 'px'
 	});
 
 	if (browser) {
