@@ -63,7 +63,7 @@
 		Person: ['Name'],
 	};
 	const fullPromptMap = (word: string) => ({
-		'Image Style': `Covert to ${word} Style`,
+		'Image Style': `Covert to ${word} style`,
 		Time: `Give me photos taken on ${word}`,
 		Location: `Give me photos taken in ${word}`,
 		Person: `Give me ${word}'s photos`,
@@ -259,8 +259,9 @@
 				classLayout="flex flex-col gap-1"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
 			>
+			<!-- Upload Your Images, Let’s talking with them! 🎉 -->
 				<ChatMessage
-					msg={{ role: MessageRole.Assistant, content: 'Upload Your Images, Let’s talking with them! 🎉', type: MessageType.Text, time: 0}}
+					msg={{ role: MessageRole.Assistant, content: '', type: MessageType.Text, time: 0}}
 				/>
 				{#each chatMessages as message, i}
 					<ChatMessage
