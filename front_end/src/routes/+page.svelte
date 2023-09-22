@@ -33,6 +33,7 @@
 	import ArrowRight from "$lib/assets/chat/svelte/ArrowRight.svelte";
 	import { fetchAudioStream, fetchAudioText } from "$lib/network/chat/Network";
 	import VoiceButton from "$lib/shared/components/talkbot/VoiceButton.svelte";
+	import LoadingAnimation from '$lib/shared/components/loading/Loading.svelte';
 	import { browser } from "$app/environment";
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import { driver } from "driver.js";
@@ -267,15 +268,7 @@
 			</Scrollbar>
 			<!-- Loading text -->
 			{#if loading}
-				<div
-					class="mb-6 flex items-center justify-center self-center bg-white text-sm text-gray-500"
-				>
-					<div class="inset-y-0 left-0 pl-2">
-						<LoadingButtonSpinnerIcon />
-					</div>
-
-					<div>Generating...</div>
-				</div>
+				<LoadingAnimation/>
 			{/if}
 
 			{#if $isLoading}
