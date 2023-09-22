@@ -4,9 +4,10 @@ import { SSE } from "sse.js";
 
 const BASE_URL = env.BASE_URL;
 const AUDIO_URL = env.AUDIO_URL;
+const TALKING_URL = env.TALKING_URL;
 
 export async function fetchAudioText(file) {
-	const url = `${AUDIO_URL}/asr`
+	const url = `${TALKING_URL}/asr`
 	const formData = new FormData()
 	formData.append('file', file)
     const init: RequestInit = {
