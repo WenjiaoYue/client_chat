@@ -9,6 +9,7 @@
 	import ChatResponse from "$lib/network/chat/ChatResponse";
 	import LoadingButtonSpinnerIcon from "$lib/assets/chat/svelte/LoadingButtonSpinnerIcon.svelte";
 	import {
+	countDown,
 		ifStoreMsg,
 		imageList,
 		isLoading,
@@ -87,7 +88,7 @@
 		});
 
 		// Only triggers the first time
-		if(window.name === ""){
+		if($countDown === 0){
 			window.name = "loaded";
 			driverObj.drive();
 		}
