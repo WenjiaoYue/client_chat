@@ -86,7 +86,11 @@
 			]
 		});
 
-		driverObj.drive();
+		// Only triggers the first time
+		if(window.name === ""){
+			window.name = "loaded";
+			driverObj.drive();
+		}
 	});
 
 	function storeMessages() {
