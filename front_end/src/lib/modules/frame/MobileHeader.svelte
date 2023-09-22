@@ -42,7 +42,7 @@
 	<Button
 		color="light"
 		outline={true}
-		class="border-none m-2 text-3xl active:border-none">≡</Button
+		class="border-none m-2 text-3xl active:border-none nav-btn">≡</Button
 	>
 	<Dropdown {activeUrl}>
 		{#each data as item, i (item.title)}

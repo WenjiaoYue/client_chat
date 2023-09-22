@@ -35,6 +35,8 @@
 	import VoiceButton from "$lib/shared/components/talkbot/VoiceButton.svelte";
 	import { browser } from "$app/environment";
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
+	import { driver } from "driver.js";
+	import "driver.js/dist/driver.css";
 
 	let query: string = "";
 
@@ -72,6 +74,18 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+
+		const driverObj = driver({
+			showProgress: true,
+			steps: [
+				{ element: '.image-btn', popover: { title: 'Image', description: 'Upload your images' } },
+				{ element: '.nav-btn', popover: { title: 'Click to photo', description: 'Edit your photo info' } },
+				{ element: '.input-btn', popover: { title: 'Talking & Chat', description: 'Talking with your photos' } },
+				{ element: '.hint-btn', popover: { title: 'Hint', description: 'Use hint examples ' } },
+			]
+		});
+
+		driverObj.drive();
 	});
 
 	function storeMessages() {
@@ -282,15 +296,15 @@
 					/>
 				{/if}
 				<div class="flex w-full flex-row items-center justify-between gap-3 pt-2">
-					<VoiceButton
-						on:done={(e) => {
-							handleAudioSubmit(e.detail);
-						}}
-					/>
 					<!-- Textarea -->
 					<div
-						class="relative focus:ring-link flex max-h-60 w-full flex-row items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
+						class="input-btn relative focus:ring-link flex max-h-60 w-full flex-row items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
 					>
+						<VoiceButton
+							on:done={(e) => {
+								handleAudioSubmit(e.detail);
+							}}
+						/>
 						<textarea
 							rows="2"
 							class="focus:none inline-block w-full resize-none border-none text-sm text-gray-600 focus:ring-0 p-0 px-2"
@@ -317,7 +331,10 @@
 							<PaperAirplane />
 						</button>
 					</div>
+
+					<!-- hint -->
 					<button
+						class="hint-btn"
 						on:click={() => {
 							showBottomPrompt = !showBottomPrompt;
 							showBottomImages = false;
@@ -330,8 +347,10 @@
 							} w-5 h-5 rotate-90`}
 						/>
 					</button>
+
+					<!-- image -->
 					<button
-						class="h-full sm:hidden"
+						class="h-full sm:hidden image-btn"
 						on:click={() => {
 							showBottomImages = !showBottomImages;
 							showBottomPrompt = false;
