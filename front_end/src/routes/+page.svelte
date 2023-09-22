@@ -57,7 +57,7 @@
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
 	const prompts = {
-		'Image Style': ['simple drawing', 'van gogh', 'stone Sculpture'],
+		'Image Style': ['simple drawing', 'van gogh', 'stone sculpture'],
 		Time: ['2022', 'March 6th', 'April 28, 2023'],
 		Location: ['Shanghai', 'China', 'United States'],
 		Person: ['Name'],
