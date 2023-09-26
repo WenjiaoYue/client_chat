@@ -9,7 +9,7 @@
 	import ChatResponse from "$lib/network/chat/ChatResponse";
 	import LoadingButtonSpinnerIcon from "$lib/assets/chat/svelte/LoadingButtonSpinnerIcon.svelte";
 	import {
-	countDown,
+		countDown,
 		ifStoreMsg,
 		imageList,
 		isLoading,
@@ -23,7 +23,7 @@
 		MessageRole,
 		MessageType,
 		type Message,
-		isImage
+		isImage,
 	} from "$lib/shared/constant/Interface";
 	import {
 		fromTimeStampToTime,
@@ -34,43 +34,70 @@
 	import ArrowRight from "$lib/assets/chat/svelte/ArrowRight.svelte";
 	import { fetchAudioStream, fetchAudioText } from "$lib/network/chat/Network";
 	import VoiceButton from "$lib/shared/components/talkbot/VoiceButton.svelte";
-	import LoadingAnimation from '$lib/shared/components/loading/Loading.svelte';
+	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import { browser } from "$app/environment";
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import { driver } from "driver.js";
 	import "driver.js/dist/driver.css";
+	import {
+		checkProcessingImage,
+		getTypeList,
+	} from "$lib/network/image/getTypeLists.js";
 
 	let query: string = "";
 
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
-
+	let done: boolean = false;
 	let uploadProgress = 0;
 	let uploadHandle: number;
-
+	let typeList: { [index: string]: { [index: string]: string } } = {};
 	let showBottomImages = false;
 	let showBottomPrompt = false;
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 
-	$: placeholder = (chatMessages.length && chatMessages[chatMessages.length - 1].role === MessageRole.User
-						&& isImage(chatMessages[chatMessages.length - 1].type) ?
-						"Upload more images/Ask me about..." : "Upload images/Ask me about...");
+	$: placeholder =
+		chatMessages.length &&
+		chatMessages[chatMessages.length - 1].role === MessageRole.User &&
+		isImage(chatMessages[chatMessages.length - 1].type)
+			? "Upload more images/Ask me about..."
+			: "Upload images/Ask me about...";
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
-	const prompts = {
-		'Image Style': ['simple drawing', 'van gogh', 'stone sculpture'],
-		Time: ['2022', 'March 6th', 'April 28, 2023'],
-		Location: ['Shanghai', 'China', 'United States'],
-		Person: ['Name'],
+	let prompts = {
+		"Image Style": ["simple drawing", "van gogh", "stone sculpture"],
+		// Time: ['2022', 'March 6th', 'April 28, 2023'],
+		// Location: ['Shanghai', 'China', 'United States'],
+		// Person: ['Name'],
 	};
-	const fullPromptMap = (word: string) => ({
-		'Image Style': `Covert to ${word} style`,
-		Time: `Give me photos taken on ${word}`,
-		Location: `Give me photos taken in ${word}`,
-		Person: `Give me ${word}'s photos`,
-	} as {[index: string]: string})
+	const fullPromptMap = (word: string) =>
+		({
+			"Image Style": `Covert to ${word} style`,
+			Time: `Give me photos taken on ${word}`,
+			Location: `Give me photos taken in ${word}`,
+			Person: `Give me ${word}'s photos`,
+		} as { [index: string]: string });
 
 	onMount(async () => {
+		[done, typeList] = await checkProcessingImage();
+		if (!done) {
+			setTimeout(async () => {
+				await checkProcessingImage(), 500;
+			});
+		}
+		for (const [currentKey, value] of Object.entries(typeList)) {	
+			let key = currentKey.charAt(0).toUpperCase() + currentKey.slice(1);	
+			if (!Array.isArray(value)) {
+				const currentObj = {
+					[key]: [],
+				};
+				for (const classifyKey of Object.keys(value)) {
+					currentObj[key].push(classifyKey);
+				}
+				prompts = { ...prompts, ...currentObj };
+				console.log(prompts);
+			}
+		}
 		const res = await fetchImageList();
 		if (res) imageList.set(res);
 		scrollToDiv = document
@@ -80,15 +107,33 @@
 		const driverObj = driver({
 			showProgress: true,
 			steps: [
-				{ element: '.image-btn', popover: { title: 'Image', description: 'Upload your images' } },
-				{ element: '.nav-btn', popover: { title: 'Click to photo', description: 'Edit your photo info' } },
-				{ element: '.input-btn', popover: { title: 'Talking & Chat', description: 'Talking with your photos' } },
-				{ element: '.hint-btn', popover: { title: 'Hint', description: 'Use hint examples ' } },
-			]
+				{
+					element: ".image-btn",
+					popover: { title: "Image", description: "Upload your images" },
+				},
+				{
+					element: ".nav-btn",
+					popover: {
+						title: "Click to photo",
+						description: "Edit your photo info",
+					},
+				},
+				{
+					element: ".input-btn",
+					popover: {
+						title: "Talking & Chat",
+						description: "Talking with your photos",
+					},
+				},
+				{
+					element: ".hint-btn",
+					popover: { title: "Hint", description: "Use hint examples " },
+				},
+			],
 		});
 
 		// Only triggers the first time
-		if($countDown === 0){
+		if ($countDown === 0) {
 			window.name = "loaded";
 			driverObj.drive();
 		}
@@ -112,10 +157,9 @@
 		};
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
-		storeMessages()
+		storeMessages();
 	}
 
-	
 	function handleImageListSubmit() {
 		const checkedItems = $imageList.filter((_, i) => currentDragImageList[i]);
 
@@ -131,7 +175,7 @@
 
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
-		storeMessages()
+		storeMessages();
 	}
 
 	const handleTextSubmit = async () => {
@@ -145,20 +189,20 @@
 		};
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
-		storeMessages()
+		storeMessages();
 		query = "";
 
 		// todo
 		let res = await ChatResponse.chatMessage(chatMessages);
 
 		if (res) {
-			let type = MessageType.Text
+			let type = MessageType.Text;
 			if (Array.isArray(res)) {
 				if (res.length === 1) {
-					res = res[0]
-					type = MessageType.SingleImage
+					res = res[0];
+					type = MessageType.SingleImage;
 				} else {
-					type = MessageType.ImageList
+					type = MessageType.ImageList;
 				}
 			}
 			chatMessages = [
@@ -171,7 +215,7 @@
 				},
 			];
 			scrollToBottom(scrollToDiv);
-			storeMessages()
+			storeMessages();
 		}
 
 		loading = false;
@@ -179,20 +223,23 @@
 
 	const handleAudioSubmit = (audioBlob: Blob) => {
 		console.log(audioBlob);
-		
+
 		loading = true;
-		let fileReader = new FileReader()
+		let fileReader = new FileReader();
 		fileReader.onloadend = async () => {
-			let readerRes = (fileReader.result as string).split(';')
-			
-			chatMessages = [...chatMessages, {
-				role: MessageRole.User,
-				type: MessageType.SingleAudio,
-				content: readerRes[0] + ';' + readerRes[2],
-				time: getCurrentTimeStamp()
-			}]
+			let readerRes = (fileReader.result as string).split(";");
+
+			chatMessages = [
+				...chatMessages,
+				{
+					role: MessageRole.User,
+					type: MessageType.SingleAudio,
+					content: readerRes[0] + ";" + readerRes[2],
+					time: getCurrentTimeStamp(),
+				},
+			];
 			scrollToBottom(scrollToDiv);
-			storeMessages()
+			storeMessages();
 
 			const voice = "default";
 			const knowledge = "default";
@@ -211,16 +258,18 @@
 					const audioUrl = "data:audio/wav;base64," + currentMsg.slice(2, -1);
 
 					if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-						chatMessages = [...chatMessages,
+						chatMessages = [
+							...chatMessages,
 							{
 								role: MessageRole.Assistant,
 								type: MessageType.AudioList,
-								content: [audioUrl, ],
-								time: getCurrentTimeStamp()
+								content: [audioUrl],
+								time: getCurrentTimeStamp(),
 							},
 						];
 					} else {
-						let content = chatMessages[chatMessages.length - 1].content as string[];
+						let content = chatMessages[chatMessages.length - 1]
+							.content as string[];
 						chatMessages[chatMessages.length - 1].content = [
 							...content,
 							audioUrl,
@@ -229,14 +278,15 @@
 
 					scrollToBottom(scrollToDiv);
 				} else if (currentMsg === "[DONE]") {
-					let content = chatMessages[chatMessages.length - 1].content as string[];
+					let content = chatMessages[chatMessages.length - 1]
+						.content as string[];
 					chatMessages[chatMessages.length - 1].content = [...content, "done"];
-					storeMessages()
+					storeMessages();
 				}
 			});
 			eventSource.stream();
-		}
-		fileReader.readAsDataURL(audioBlob)
+		};
+		fileReader.readAsDataURL(audioBlob);
 	};
 
 	function handleUploadBegin() {
@@ -260,21 +310,27 @@
 				classLayout="flex flex-col gap-1"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
 			>
-			<!-- Upload Your Images, Let’s talking with them! 🎉 -->
+				<!-- Upload Your Images, Let’s talking with them! 🎉 -->
 				<ChatMessage
-					msg={{ role: MessageRole.Assistant, content: '', type: MessageType.Text, time: 0}}
+					msg={{
+						role: MessageRole.Assistant,
+						content: "",
+						type: MessageType.Text,
+						time: 0,
+					}}
 				/>
 				{#each chatMessages as message, i}
 					<ChatMessage
 						msg={message}
 						time={i === 0 || message.time - chatMessages[i - 1].time > 60
-							? fromTimeStampToTime(message.time) : ""}
+							? fromTimeStampToTime(message.time)
+							: ""}
 					/>
 				{/each}
 			</Scrollbar>
 			<!-- Loading text -->
 			{#if loading}
-				<LoadingAnimation/>
+				<LoadingAnimation />
 			{/if}
 
 			{#if $isLoading}
@@ -284,7 +340,7 @@
 			{/if}
 
 			<div
-				class="relative flex w-full flex-col items-center justify-between bg-white p-2  shadow-inner fixed z-40"
+				class="fixed relative z-40 flex w-full flex-col items-center justify-between bg-white p-2 shadow-inner"
 			>
 				{#if uploadProgress}
 					<Progressbar
@@ -294,10 +350,12 @@
 						class="mb-2"
 					/>
 				{/if}
-				<div class="flex w-full flex-row items-center justify-between gap-3 pt-2">
+				<div
+					class="flex w-full flex-row items-center justify-between gap-3 pt-2"
+				>
 					<!-- Textarea -->
 					<div
-						class="input-btn relative focus:ring-link flex max-h-60 w-full flex-row items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
+						class="input-btn focus:ring-link relative flex max-h-60 w-full flex-row items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
 					>
 						<VoiceButton
 							on:done={(e) => {
@@ -306,7 +364,7 @@
 						/>
 						<textarea
 							rows="2"
-							class="focus:none inline-block w-full resize-none border-none text-sm text-gray-600 focus:ring-0 p-0 px-2"
+							class="focus:none inline-block w-full resize-none border-none p-0 px-2 text-sm text-gray-600 focus:ring-0"
 							{placeholder}
 							disabled={loading}
 							maxlength="1200"
@@ -319,7 +377,7 @@
 							}}
 						/>
 						<button
-							class="absolute right-1 bottom-1"
+							class="absolute bottom-1 right-1"
 							on:click={() => {
 								if (query) {
 									handleTextSubmit(false);
@@ -349,7 +407,7 @@
 
 					<!-- image -->
 					<button
-						class="h-full sm:hidden image-btn"
+						class="image-btn h-full sm:hidden"
 						on:click={() => {
 							showBottomImages = !showBottomImages;
 							showBottomPrompt = false;
@@ -382,10 +440,13 @@
 						{#each Object.entries(prompts) as [k, v]}
 							<p class="text-sm font-semibold text-[#15325f]">{k}</p>
 							{#each v as badge}
-								<button class="mr-2" on:click={() => (query = fullPromptMap(badge)[k])}>
+								<button
+									class="mr-2"
+									on:click={() => (query = fullPromptMap(badge)[k])}
+								>
 									<Badge
 										color="blue"
-										class="mt-1 mb-2 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
+										class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
 									>
 										{badge}
 									</Badge>

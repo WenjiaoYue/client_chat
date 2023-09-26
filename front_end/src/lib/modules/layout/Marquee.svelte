@@ -16,7 +16,7 @@
 	const updateContent = async () => {
 		const result = await trafficHint();
 		if (result) {
-			let count = result / 5;
+			let count = result;
 			if (count > 5) {
 				closeAfterDelay();
 				if (count < 10) {
