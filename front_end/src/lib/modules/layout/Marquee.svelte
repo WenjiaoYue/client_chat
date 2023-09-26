@@ -63,7 +63,7 @@
 	{:else}
 		<button
 			on:click={openAlert}
-			class="absolute right-0 top-2 z-20 rounded border p-1.5 shadow"
+			class="absolute left-0 top-2 z-20 rounded border p-1.5 shadow"
 			><ArrowUp /></button
 		>
 	{/if}

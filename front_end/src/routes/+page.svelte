@@ -39,6 +39,7 @@
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import { driver } from "driver.js";
 	import "driver.js/dist/driver.css";
+	import "$lib/assets/layout/css/driver.css";
 	import {
 		checkProcessingImage,
 		getTypeList,
@@ -103,13 +104,16 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+			
 
 		const driverObj = driver({
 			showProgress: true,
+			popoverClass: 'test-theme',
 			steps: [
 				{
 					element: ".image-btn",
 					popover: { title: "Image", description: "Upload your images" },
+					
 				},
 				{
 					element: ".nav-btn",
@@ -131,9 +135,10 @@
 				},
 			],
 		});
-
+		console.log($countDown);
+		
 		// Only triggers the first time
-		if ($countDown === 0) {
+		if ($countDown >= 1790) {
 			window.name = "loaded";
 			driverObj.drive();
 		}
@@ -311,14 +316,14 @@
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
 			>
 				<!-- Upload Your Images, Let’s talking with them! 🎉 -->
-				<ChatMessage
+				<!-- <ChatMessage
 					msg={{
 						role: MessageRole.Assistant,
 						content: "",
 						type: MessageType.Text,
 						time: 0,
 					}}
-				/>
+				/> -->
 				{#each chatMessages as message, i}
 					<ChatMessage
 						msg={message}
@@ -469,3 +474,7 @@
 		/>
 	</div>
 </DropZone>
+
+<style>
+
+</style>
