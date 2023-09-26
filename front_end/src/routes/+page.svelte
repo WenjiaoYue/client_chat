@@ -81,6 +81,8 @@
 
 	onMount(async () => {
 		[done, typeList] = await checkProcessingImage();
+		console.log('typeList', typeList);
+		
 		if (!done) {
 			setTimeout(async () => {
 				await checkProcessingImage(), 500;
@@ -88,7 +90,9 @@
 		}
 		for (const [currentKey, value] of Object.entries(typeList)) {	
 			let key = currentKey.charAt(0).toUpperCase() + currentKey.slice(1);	
-			if (!Array.isArray(value)) {
+			console.log(value);
+			
+			if (!Array.isArray(value) && Object.keys(value).length !== 0) {
 				const currentObj = {
 					[key]: [],
 				};

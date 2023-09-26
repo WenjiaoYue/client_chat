@@ -16,7 +16,8 @@
 
 .driver-popover-title, .driver-popover-description {
     display: block;
-    background: #4D7DFD;
+    background: radial-gradient(ellipse(150% 70%) at center, #007bff 0%, #0000ff 100%);
+
     padding: 15px;
     border: none;
 }
