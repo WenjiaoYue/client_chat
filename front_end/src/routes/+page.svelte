@@ -81,6 +81,8 @@
 
 	onMount(async () => {
 		[done, typeList] = await checkProcessingImage();
+		console.log('typeList', typeList);
+		
 		if (!done) {
 			setTimeout(async () => {
 				await checkProcessingImage(), 500;
