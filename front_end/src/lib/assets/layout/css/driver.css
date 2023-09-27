@@ -1,9 +1,25 @@
-.test-theme {
+.driverjs-theme {
     background: transparent;
-        color: #fff;
+    color: #fff;
     box-shadow: none;
     padding: 0;
 }
+
+.driver-popover.driverjs-theme .driver-popover-arrow-side-left.driver-popover-arrow {
+    border-left-color: #478dfd;
+  }
+  
+  .driver-popover.driverjs-theme .driver-popover-arrow-side-right.driver-popover-arrow {
+    border-right-color: #478dfd;
+  }
+  
+  .driver-popover.driverjs-theme .driver-popover-arrow-side-top.driver-popover-arrow {
+    border-top-color: #478dfd;
+  }
+  
+  .driver-popover.driverjs-theme .driver-popover-arrow-side-bottom.driver-popover-arrow {
+    border-bottom-color: #478dfd;
+  }
 
 .driver-popover-footer {
     background: transparent;
@@ -16,13 +32,23 @@
 
 .driver-popover-title, .driver-popover-description {
     display: block;
-    background: #4D7DFD;
-    padding: 15px;
+    padding: 15px 15px 7px 15px;
+    background: #478dfd;
+    /* background: radial-gradient(at 0% 0%, #478dfd, #d5bdff); */
     border: none;
 }
+/* 
+.driver-popover-title {
+    border: 2px solid #fff;
+} */
+
 
 .driver-popover-close-btn {
     color: #fff
+}
+
+.driver-popover-footer button:hover, .driver-popover-footer button:focus {
+    background: transparent;
 }
 
 .driver-popover-description {
@@ -47,11 +73,14 @@
     color: #fff;
 }
 
-.driver-popover-navigation-btns button+button {
+.driver-popover-navigation-btns button+button   {
     margin-left: 10px;
 }
-.driver-popover-title, .driver-popover-description {
-    background: #4D7DFD;
+.driver-popover-title {
+    /* background: url("../png/bg.png") center center no-repeat; 设置背景图片的路径和位置 */
+    /* background-size: cover; 让背景图片自动伸缩以填满整个div */
+    /* width: 100%; 确保div宽度100%以填满父容器 */
+    /* background: #4D7DFD; */
     /* background: url("../png/driverPopoverBg.png"); */
 
 }

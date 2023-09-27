@@ -75,7 +75,7 @@
 		({
 			"Image Style": `Covert to ${word} style`,
 			Time: `Give me photos taken on ${word}`,
-			Location: `Give me photos taken in ${word}`,
+			Address: `Give me photos taken in ${word}`,
 			Person: `Give me ${word}'s photos`,
 		} as { [index: string]: string });
 
@@ -88,7 +88,7 @@
 		}
 		for (const [currentKey, value] of Object.entries(typeList)) {	
 			let key = currentKey.charAt(0).toUpperCase() + currentKey.slice(1);	
-			if (!Array.isArray(value)) {
+			if (!Array.isArray(value) && Object.keys(value).length !== 0) {
 				const currentObj = {
 					[key]: [],
 				};
@@ -108,7 +108,8 @@
 
 		const driverObj = driver({
 			showProgress: true,
-			popoverClass: 'test-theme',
+			allowClose: false,
+			popoverClass: 'driverjs-theme',
 			steps: [
 				{
 					element: ".image-btn",
@@ -447,7 +448,9 @@
 							{#each v as badge}
 								<button
 									class="mr-2"
-									on:click={() => (query = fullPromptMap(badge)[k])}
+									on:click={() => {
+										(query = fullPromptMap(badge)[k])
+									}}
 								>
 									<Badge
 										color="blue"
