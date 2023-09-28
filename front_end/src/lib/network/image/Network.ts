@@ -6,7 +6,9 @@ export async function uploadImages(image_list) {
 	const url = `${BASE_URL}/uploadImages`;
 	const init: RequestInit = {
 		method: "POST",
-		mode: "cors",
+		headers: {
+    'X-Ignore-Certificate': 'true'
+  },
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ image_list }),
 	};
@@ -26,7 +28,9 @@ export async function fetchUploadProgress(images) {
 	const url = `${BASE_URL}/progress`;
 	const init: RequestInit = {
 		method: "GET",
-		mode: "cors",
+		headers: {
+    'X-Ignore-Certificate': 'true'
+  },
 	};
 
 	try {
@@ -92,7 +96,9 @@ export async function fetchImageList() {
 	const url = `${env.BASE_URL}/getAllImages`
 	const init: RequestInit = {
 		method: "POST",
-		mode: "cors",
+		headers: {
+    'X-Ignore-Certificate': 'true'
+  },
 	}
 	try {
 		let response = await fetch(url, init);
@@ -252,7 +258,9 @@ export async function updateImageInfo(image_id, payload, urlSuffix) {
 
 	const init: RequestInit = {
 		method: "POST",
-		mode: "cors",
+		headers: {
+    'X-Ignore-Certificate': 'true'
+  },
 		body: JSON.stringify(extractedObject),
 	};
 
@@ -272,7 +280,9 @@ async function sendPostRequest(url: string, payload: Object = {}) {
 	try {
 		const response = await fetch(url, {
 			method: "POST",
-			mode: "cors",
+			headers: {
+    'X-Ignore-Certificate': 'true'
+  },
 			body: JSON.stringify(payload),
 		});
 
