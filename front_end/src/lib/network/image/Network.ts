@@ -6,6 +6,7 @@ export async function uploadImages(image_list) {
 	const url = `${BASE_URL}/uploadImages`;
 	const init: RequestInit = {
 		method: "POST",
+		mode: "cors",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ image_list }),
 	};
@@ -25,7 +26,7 @@ export async function fetchUploadProgress(images) {
 	const url = `${BASE_URL}/progress`;
 	const init: RequestInit = {
 		method: "GET",
-		// mode: 'no-cors',
+		mode: "cors",
 	};
 
 	try {
@@ -91,6 +92,7 @@ export async function fetchImageList() {
 	const url = `${env.BASE_URL}/getAllImages`
 	const init: RequestInit = {
 		method: "POST",
+		mode: "cors",
 	}
 	try {
 		let response = await fetch(url, init);
@@ -250,7 +252,7 @@ export async function updateImageInfo(image_id, payload, urlSuffix) {
 
 	const init: RequestInit = {
 		method: "POST",
-		// mode: 'no-cors',
+		mode: "cors",
 		body: JSON.stringify(extractedObject),
 	};
 
@@ -268,9 +270,9 @@ export async function updateImageInfo(image_id, payload, urlSuffix) {
 
 async function sendPostRequest(url: string, payload: Object = {}) {
 	try {
-		let response = await fetch(url, {
+		const response = await fetch(url, {
 			method: "POST",
-			// mode: 'no-cors',
+			mode: "cors",
 			body: JSON.stringify(payload),
 		});
 
