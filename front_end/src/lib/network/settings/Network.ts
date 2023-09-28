@@ -11,9 +11,7 @@ export async function onCountdownEnd() {
 	const url = `${BASE_URL}/deleteUser`
     const init: RequestInit = {
         method: "POST",
-		headers: {
-    'X-Ignore-Certificate': 'true'
-  },
+		
     };
 	
 	try {

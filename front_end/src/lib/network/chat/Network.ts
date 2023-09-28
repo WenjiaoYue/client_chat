@@ -12,9 +12,7 @@ export async function fetchAudioText(file) {
 	formData.append('file', file)
     const init: RequestInit = {
         method: "POST",
-		headers: {
-    'X-Ignore-Certificate': 'true'
-  },
+		
         body: formData,
     };
 	
@@ -40,9 +38,7 @@ export async function fetchUploadProgress(images) {
 	const url = `${BASE_URL}/progress`;
 	const init: RequestInit = {
 		method: "GET",
-		headers: {
-    'X-Ignore-Certificate': 'true'
-  },
+		
 	};
 
 	try {
