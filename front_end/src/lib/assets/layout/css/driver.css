@@ -5,6 +5,17 @@
     padding: 0;
 }
 
+.driver-popover-arrow {
+    border: 10px solid transparent;
+    animation: blink 1s 3 steps(1);
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
 .driver-popover.driverjs-theme .driver-popover-arrow-side-left.driver-popover-arrow {
     border-left-color: #478dfd;
   }
