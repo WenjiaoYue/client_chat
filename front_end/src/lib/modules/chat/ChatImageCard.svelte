@@ -13,6 +13,12 @@
 	const dispatch = createEventDispatcher();
 
 	export let extraClass = "";
+
+	function refreshImages(idx, imgSrc) {
+		console.log(idx, imageList);
+		$imageList[idx].image_path = imgSrc;
+
+	}
 </script>
 
 <div
@@ -56,6 +62,7 @@
 						on:error={() => {
 							image.image_path =
 								"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
+							refreshImages(idx, image.image_path)
 						}}
 					/>
 				</Draggable>
