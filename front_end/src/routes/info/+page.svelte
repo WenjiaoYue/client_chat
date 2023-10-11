@@ -129,6 +129,12 @@
 		}
 	}
 
+	function refreshImages(idx, imgSrc) {
+		setTimeout(function () {
+			$imageList[idx].image_path = imgSrc;
+		}, 2000);
+	}
+
 	async function selectImage(image_id: string) {
 		imgInfo = await getImageDetail(image_id);
 		modelEl.showModal();
@@ -242,8 +248,9 @@
 								on:error={() => {
 									image.image_path =
 										"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
-									image.image_id = "";
+									refreshImages(idx, image.image_path);
 								}}
+								
 							/>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<button
@@ -279,7 +286,7 @@
 								on:error={() => {
 									image.image_path =
 										"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
-									image.image_id = "";
+									refreshImages(idx, image.image_path);
 								}}
 							/>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->

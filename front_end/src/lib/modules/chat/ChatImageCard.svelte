@@ -15,9 +15,9 @@
 	export let extraClass = "";
 
 	function refreshImages(idx, imgSrc) {
-		console.log(idx, imageList);
-		$imageList[idx].image_path = imgSrc;
-
+		setTimeout(function () {
+			$imageList[idx].image_path = imgSrc;
+		}, 2000);
 	}
 </script>
 
@@ -62,7 +62,7 @@
 						on:error={() => {
 							image.image_path =
 								"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
-							refreshImages(idx, image.image_path)
+							refreshImages(idx, image.image_path);
 						}}
 					/>
 				</Draggable>

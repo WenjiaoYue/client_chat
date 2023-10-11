@@ -79,7 +79,7 @@
 			Person: `Give me ${word}'s photos`,
 		} as { [index: string]: string });
 
-	onMount(async () => {
+	onMount(async () => {		
 		[done, typeList] = await checkProcessingImage();
 		console.log('typeList', typeList);
 		
@@ -111,7 +111,11 @@
 		const driverObj = driver({
 			showProgress: true,
 			allowClose: false,
+			overlayOpacity: 0,
 			popoverClass: 'driverjs-theme',
+			nextBtnText: '>',
+ 			prevBtnText: '<',
+			doneBtnText: 'X',
 			steps: [
 				{
 					element: ".image-btn",
@@ -141,7 +145,7 @@
 		console.log($countDown);
 		
 		// Only triggers the first time
-		if ($countDown >= 1790) {
+		if ($countDown >= 1790 &&  window.deviceType === 'mobile') {
 			window.name = "loaded";
 			driverObj.drive();
 		}
@@ -188,7 +192,8 @@
 
 	const handleTextSubmit = async () => {
 		loading = true;
-
+		showBottomPrompt = false;
+		showBottomImages = false;
 		const newMessage = {
 			role: MessageRole.User,
 			type: MessageType.Text,

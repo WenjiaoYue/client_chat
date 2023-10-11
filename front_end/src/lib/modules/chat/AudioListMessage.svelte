@@ -3,13 +3,21 @@
 	import TranslateIcon from "$lib/assets/chat/svelte/TranslateIcon.svelte";
 	import { Spinner } from "flowbite-svelte";
 	import { fetchAudioText } from "$lib/network/chat/Network";
+	import { scrollToBottom } from "$lib/shared/Utils";
 
     export let content: string[]
     
     let playIdx = 0;
+	let scrollToDiv: HTMLDivElement;
+	console.log('content', content);
+	
 	let autoPlay = content.length > 0 && content[content.length - 1] !== "done"
 	let showTranslateText = false;
 	let imgPromise: Promise<any>;
+
+	scrollToDiv = document
+		.querySelector(".chat-scrollbar")
+		?.querySelector(".svlr-viewport")!;
 
     function handlePlayEnded() {
 		playIdx++;
@@ -21,7 +29,7 @@
 	}
 
 	async function translateToText(audio: string) {
-		console.log(showTranslateText);
+		scrollToBottom(scrollToDiv);
 
 		if (showTranslateText == true) {
 			showTranslateText = false;
@@ -39,7 +47,7 @@
 </script>
 
 <ChatAudio src={content[0]} {autoPlay} on:ended={handlePlayEnded} />
-<div class="absolute -top-5 right-0 hidden h-5 group-hover:flex">
+<div class="absolute -top-5 right-0 hidden h-5 group-hover:flex z-10">
     <button
         class="opacity-40"
         on:click={() => {
