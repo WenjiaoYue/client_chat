@@ -129,7 +129,7 @@
 		}
 	}
 
-	function refreshImages(idx, imgSrc) {
+	function refreshImages(idx: number, imgSrc: string) {
 		setTimeout(function () {
 			$imageList[idx].image_path = imgSrc;
 		}, 2000);
