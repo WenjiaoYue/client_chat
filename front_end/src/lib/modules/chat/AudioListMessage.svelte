@@ -9,9 +9,10 @@
     
     let playIdx = 0;
 	let scrollToDiv: HTMLDivElement;
-	console.log('content', content);
 	
 	let autoPlay = content.length > 0 && content[content.length - 1] !== "done"
+	console.log('content', content, autoPlay);
+
 	let showTranslateText = false;
 	let imgPromise: Promise<any>;
 

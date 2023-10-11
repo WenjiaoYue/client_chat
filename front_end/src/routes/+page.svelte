@@ -110,7 +110,7 @@
 
 		const driverObj = driver({
 			showProgress: true,
-			allowClose: false,
+			allowClose: true,
 			overlayOpacity: 0,
 			popoverClass: 'driverjs-theme',
 			nextBtnText: '>',

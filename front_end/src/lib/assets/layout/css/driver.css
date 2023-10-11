@@ -79,7 +79,9 @@
     border-radius: 50%;
     text-shadow: none;
 }
-
+.driver-popover-close-btn:hover, .driver-popover-close-btn:focus {
+    color: #fff;
+}
 .driver-popover-navigation-btns button+button   {
     margin-left: 10px;
 }
