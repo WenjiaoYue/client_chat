@@ -40,55 +40,6 @@ export async function fetchUploadProgress(images) {
 }
 
 export async function fetchImageList() {
-	// return [
-	// 	{
-	// 		image_id: 27,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	// 	},
-
-	// 	{
-	// 		image_id: 28,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04183253788089.jpg",
-	// 	},
-
-	// 	{
-	// 		image_id: 34,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230911T06131561872402.jpg",
-	// 	},
-
-	// 	{
-	// 		image_id: 46,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 	},
-	// 	{
-	// 		image_id: 28,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04183253788089.jpg",
-	// 	},
-
-	// 	{
-	// 		image_id: 34,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230911T06131561872402.jpg",
-	// 	},
-
-	// 	{
-	// 		image_id: 46,
-
-	// 		image_path:
-	// 			"http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 	},
-	// ];
 	const url = `${env.BASE_URL}/getAllImages`
 	const init: RequestInit = {
 		method: "POST",
@@ -110,56 +61,6 @@ export async function fetchMsg(suffix, payload) {
 }
 
 export async function fetchTypeList() {
-	// return {
-
-
-
-
-	// 	"type_list": {
-	
-	// 		"address": {},
-	
-	// 		"time": {
-	
-	// 			"2022-10-01": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"2023-08-21": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 			"2022-10-02": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"2023-08-22": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg"
-	
-	// 		},
-	
-	// 		"person": {
-	
-	// 			"Anna": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"person26": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 			"Anna1": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"person27": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 			"Anna22": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"person226": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg",
-	// 			"Anna12": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg",
-	
-	// 			"person227": "http://54.147.152.170/ai_photos/user192.55.54.51/20230912T02424874392762.jpg"
-	
-	// 		}
-	
-	// 	},
-	
-	// 	"process_status": {
-	
-	// 		"total_image": 4,
-	
-	// 		"processing_image": 0,
-	
-	// 		"status": "done"
-	
-	// 	}
-	
-	// }
 	const url = `${env.BASE_URL}/getTypeList`;
 	return sendPostRequest(url);
 }
@@ -170,58 +71,6 @@ export async function fetchImageDetail(image_id: string) {
 }
 
 export async function fetchImagesByType(type, subtype) {
-	// return [
-
-	// 	{
-	
-	// 		"image_id": 27,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg"
-	
-	// 	},
-	
-	// 	{
-	
-	// 		"image_id": 28,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04183253788089.jpg"
-	
-	// 	},
-	
-	// 	{
-	
-	// 		"image_id": 34,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T06131561872402.jpg"
-	
-	// 	},
-
-
-	// 	{
-	
-	// 		"image_id": 27,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04172357736633.jpg"
-	
-	// 	},
-	
-	// 	{
-	
-	// 		"image_id": 28,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T04183253788089.jpg"
-	
-	// 	},
-	
-	// 	{
-	
-	// 		"image_id": 34,
-	
-	// 		"image_path": "http://54.147.152.170/ai_photos/user192.55.54.51/20230911T06131561872402.jpg"
-	
-	// 	}
-	
-	// ]
 	const url = `${BASE_URL}/getImageByType`;
 	return sendPostRequest(url, { type, subtype });
 }

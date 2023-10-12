@@ -81,7 +81,7 @@
 	function intervalFunction() {
 		let intervalHandle = setInterval(async () => {
 			[done, typeList] = await checkProcessingImage();
-			let res = await fetchImageList()
+			let res = await fetchImageList();
 			if (res) imageList.set(res);
 
 			if (done) {
@@ -96,7 +96,7 @@
 			setTimeout(intervalFunction, 500);
 		}
 
-		let res = await fetchImageList()
+		let res = await fetchImageList();
 		if (res) imageList.set(res);
 	});
 
@@ -130,6 +130,9 @@
 	}
 
 	function refreshImages(idx: number, imgSrc: string) {
+		$imageList[idx].image_path =
+			"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
+
 		setTimeout(function () {
 			$imageList[idx].image_path = imgSrc;
 		}, 2000);
@@ -154,7 +157,6 @@
 			removeAfter: 1000,
 		});
 		typeList = await getTypeList();
-		
 	}
 
 	function handleDeleteTag(idx: number) {
@@ -246,11 +248,8 @@
 									selectImage(image.image_id);
 								}}
 								on:error={() => {
-									image.image_path =
-										"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
 									refreshImages(idx, image.image_path);
 								}}
-								
 							/>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<button
@@ -284,8 +283,6 @@
 									selectImage(image.image_id);
 								}}
 								on:error={() => {
-									image.image_path =
-										"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
 									refreshImages(idx, image.image_path);
 								}}
 							/>
