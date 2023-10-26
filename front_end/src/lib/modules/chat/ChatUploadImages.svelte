@@ -34,7 +34,6 @@
 		newUploadNum.set(1);
 		dispatch("uploadBegin");
 	}
-
 </script>
 
 <!-- {#if $hintUploadImg}
@@ -63,6 +62,23 @@
 			<UploadImageBlobs on:upload={handleUploadClick} />
 		</div>
 		<Add extraClass="h-7 w-7" />
-		<p class="text-xs font-bold text-gray-500">Upload</p>
 	</div>
 </div>
+<!-- <div class="relative bg-gray-300 p-4 opacity-95 sm:p-6">
+	<div class="h-full w-full" >
+		<div class="absolute h-full w-full opacity-0">
+			<UploadImageBlobs on:upload={handleUploadClick} />
+		</div>
+		<Add extraClass="h-7 w-7" />	
+	</div>
+</div> -->
+
+<!-- <div class="relative bg-gray-300 p-4 opacity-95 sm:p-6 flex items-center justify-center">
+	<div class="h-full w-full">
+	  <div class="absolute h-full w-full opacity-0">
+		<UploadImageBlobs on:upload={handleUploadClick} />
+	  </div>
+	  <Add extraClass="h-7 w-7" />
+	</div>
+  </div>
+   -->

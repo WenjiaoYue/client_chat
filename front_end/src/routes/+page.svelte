@@ -73,9 +73,7 @@
 	$: {
 		if (group.length > 0) {
 			query = generateQuery(group);
-		} else {
-			query = "";
-		}
+		} 
 	}
 
 	function generateQuery(selectedItems: string[]) {
@@ -148,10 +146,10 @@
 		console.log($countDown);
 
 		// Only triggers the first time
-		if ($countDown >= 1790 && window.deviceType === "mobile") {
-			window.name = "loaded";
-			driverObj.drive();
-		}
+		// if ($countDown >= 1790 && window.deviceType === "mobile") {
+		// 	window.name = "loaded";
+		// 	driverObj.drive();
+		// }
 	});
 
 	function storeMessages() {
@@ -382,7 +380,7 @@
 							rows="2"
 							class="focus:none inline-block w-full resize-none border-none p-0 px-2 text-sm text-gray-600 focus:ring-0"
 							{placeholder}
-							disabled={loading}
+						
 							maxlength="1200"
 							bind:value={query}
 							on:keydown={(event) => {
