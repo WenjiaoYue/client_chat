@@ -55,6 +55,33 @@ export async function fetchImageList() {
 	}
 }
 
+export async function tmpVideo(query, imageBlob) {
+	const url = 'http://10.165.57.68:9001/v1/talkingbot/face_animation'
+	const formData = new FormData()
+	formData.append('image', imageBlob, 'remote-image.jpg');
+	formData.append('text', query);
+	formData.append('mode', "fast");
+	formData.append('voice', "wei");
+
+	const init: RequestInit = {
+		method: "POST",
+		body: formData,
+	};
+
+	try {
+		const response = await fetch(url, init);
+		if (!response.ok) throw response.status
+		const videoData = await response.blob();
+		console.log('videoData', videoData);
+
+		const videoUrl = URL.createObjectURL(videoData);
+		return videoUrl;
+	} catch (error) {
+		console.error('network error: ', error);
+		return undefined
+	}
+}
+
 export async function fetchMsg(suffix, payload) {
 	const url = `${env.BASE_URL}` + suffix;
 	return sendPostRequest(url, payload);

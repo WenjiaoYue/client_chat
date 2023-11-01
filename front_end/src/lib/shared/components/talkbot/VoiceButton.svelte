@@ -74,9 +74,9 @@
 <!-- Voice button -->
 <button type="submit" on:click={toggleRecording}>
 	{#if isRecording}
-		<img src={stopRecordingIcon} class="h-10 w-10" alt="" />
+		<img src={stopRecordingIcon} class="h-7 w-7" alt="" />
 	{:else}
-		<VoiceButton />
+		<div class="h-7 w-7"><VoiceButton /></div>
 	{/if}
 </button>
 

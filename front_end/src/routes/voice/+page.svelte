@@ -1,88 +1,178 @@
 <script lang="ts">
-    import { CollectionType, TalkingVoiceCustom, currentVoice } from '$lib/shared/stores/common/Store';
-    import { TalkingVoiceLibrary } from '$lib/shared/constant/Data';
-	import { getNotificationsContext } from 'svelte-notifications';
-	import RecordVoice from '$lib/modules/voice/RecordVoice.svelte';
-	import UploadVoice from '$lib/modules/voice/UploadVoice.svelte';
-	import TalkingVoiceCard from '$lib/modules/voice/TalkingVoiceCard.svelte';
-
+	import {
+		CollectionType,
+		TalkingVoiceCustom,
+		currentVoice,
+	} from "$lib/shared/stores/common/Store";
+	import { TalkingVoiceLibrary } from "$lib/shared/constant/Data";
+	import { getNotificationsContext } from "svelte-notifications";
+	import RecordVoice from "$lib/modules/voice/RecordVoice.svelte";
+	import UploadVoice from "$lib/modules/voice/UploadVoice.svelte";
+	import TalkingVoiceCard from "$lib/modules/voice/TalkingVoiceCard.svelte";
+	import FloatButton from "$lib/shared/components/float-button/FloatButton.svelte";
+	import { fetchAudioEmbedding } from "$lib/network/talkbot/Network";
+	import Fast from "$lib/assets/customize/svelte/Fast.svelte";
+	import Diamond from "$lib/assets/customize/svelte/Diamond.svelte";
+	import { Spinner } from "flowbite-svelte";
+	import Notification from "$lib/assets/image-info/svelte/notification.svelte";
 
 	const { addNotification } = getNotificationsContext();
+	const customNum = $TalkingVoiceCustom.length;
+	let loading = false;
+	let activeClass = true;
+	const btnStyle = {
+		init: `flex rounded-lg bg-indigo-600 px-4 py-3 text-center text-[0.8rem] font-semibold text-white  max-sm:p-2 `,
+		inactive: ``,
+		active: `outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-indigo-200`,
+	};
 
-
-    function handleVoiceUpload(e: CustomEvent<any>) {
-		TalkingVoiceCustom.update(options => {
-			return [{ name: e.detail.fileName, audio: e.detail.src }, ...options];
+	async function handleVoiceUpload(e: CustomEvent<any>) {
+		loading = true;
+		let spk_id = "";
+		try {
+			const blob = await fetch(e.detail.src).then((r) => r.blob());
+			const res = await fetchAudioEmbedding(blob);
+			spk_id = res.spk_id ? res.spk_id : "default";
+		} catch {
+			spk_id = "default";
+		}
+		TalkingVoiceCustom.update((options) => {
+			return [
+				{ name: e.detail.fileName, audio: e.detail.src, id: spk_id },
+				...options,
+			];
+		});
+		loading = false;
+		addNotification({
+			text: "Uploaded successfully",
+			position: "bottom-center",
+			type: "success",
+			removeAfter: 3000,
 		});
 	}
 
-	function handleVoiceRecord(e: CustomEvent<any>) {
-		TalkingVoiceCustom.update(options => {
-			return [{ name: 'New Record', audio: e.detail.src }, ...options];
+	async function handleVoiceRecord(e: CustomEvent<any>) {
+		loading = true;
+		let spk_id = "";
+		try {
+			const blob = await fetch(e.detail.src).then((r) => r.blob());
+			const res = await fetchAudioEmbedding(blob);
+			spk_id = res.spk_id ? res.spk_id : "default";
+		} catch {
+			spk_id = "default";
+		}
+		TalkingVoiceCustom.update((options) => {
+			return [
+				{ name: "New Record", audio: e.detail.src, id: spk_id },
+				...options,
+			];
 		});
-		
+		loading = false;
 	}
 
-    function handleVoiceDelete(i :number) {
-		TalkingVoiceCustom.update(options => {
-			options.splice(i, 1)
+	function handleVoiceDelete(i: number) {
+		TalkingVoiceCustom.update((options) => {
+			options.splice(i, 1);
 			return options;
 		});
 	}
-    
-    function handleRecordFail() {
+
+	function handleRecordFail() {
 		addNotification({
-			text: 'At least 10s required!',
-			position: 'bottom-center',
-			type: 'warning',
+			text: "At least 10s required!",
+			position: "bottom-center",
+			type: "warning",
 			removeAfter: 3000,
 		});
 	}
 </script>
 
 <div class="flex h-full">
-	<div
-		class="h-full w-full sm:mx-5 xl:mx-20 p-5 mt-4"
-	>
-        <div class="flex flex-wrap flex-row mb-1 sm:mb-0 justify-between w-full">
-            <h2 class="text-md leading-tight md:pr-0 mb-6 font-medium text-[#051F61]">My Voices</h2>
-        </div>
-        {#if $TalkingVoiceCustom.length === 0}
-            <div class="flex p-2 gap-7">
-                <RecordVoice on:done={handleVoiceRecord} on:fail={handleRecordFail} />
-                <UploadVoice on:upload={handleVoiceUpload} />
-            </div>
-        {:else}
-            <div class="flex gap-7 text-[#0F172A] py-4">
-                <RecordVoice on:done={handleVoiceRecord} on:fail={handleRecordFail} />
-                <UploadVoice on:upload={handleVoiceUpload} />
-            </div>
-			<div class="flex overflow-auto gap-7">
-				{#each $TalkingVoiceCustom as opt, i}
-					<button
-						class="m-2 rounded"
-						class:ring={$currentVoice.collection === CollectionType.Custom && $currentVoice.id === i}
-						on:click={() => { currentVoice.set({collection: CollectionType.Custom, id: i}) }}
-					>
-						<TalkingVoiceCard {...opt} on:delete={() => handleVoiceDelete(i)}/>
-					</button>
-				{/each}
-			</div>
-        {/if}
-        
-        <div class="flex flex-wrap flex-row mb-1 sm:mb-0 justify-between w-full mt-4">
-            <h2 class="text-md leading-tight md:pr-0 mb-6 font-medium text-[#051F61]">Voice Library</h2>
-        </div>
-        <div class="flex gap-7 text-[#0F172A] overflow-auto py-4 px-2 w-full">
-            {#each TalkingVoiceLibrary as opt, i}
-                <button
-					class="rounded"
-                    class:ring={$currentVoice.collection === CollectionType.Library && $currentVoice.id === i}
-                    on:click={() => { currentVoice.set({collection: CollectionType.Library, id: i}) }}
-                >
-                    <TalkingVoiceCard {...opt} on:delete={() => handleVoiceDelete(i)}/>
-                </button>
-            {/each}
-        </div>
+	<div class="mt-4 w-full p-5 sm:mx-5 xl:mx-20">
+		<p
+			class="mb-8 text-[1.3rem] font-medium leading-tight text-[#051F61] md:pr-0"
+		>
+			My Voices
+		</p>
+		<div
+			class="mb-[3.5rem] flex flex-row items-end gap-7 max-sm:mb-12 max-sm:gap-4"
+		>
+			<button
+				type="button"
+				class={`${btnStyle.init}  ${
+					activeClass ? btnStyle.active : btnStyle.inactive
+				}`}
+				on:focus={() => {
+					activeClass = true;
+				}}
+			>
+				<Fast />
+				&nbsp; Create fast voice
+			</button>
+			<button
+				type="button"
+				class={`${btnStyle.init} ${
+					activeClass ? btnStyle.inactive : btnStyle.active
+				}`}
+				on:focus={() => {
+					activeClass = false;
+				}}
+			>
+				<Diamond />
+				&nbsp;Create high quality voice</button
+			>
+		</div>
+		<div class="flex flex-wrap items-center gap-10 text-[#0F172A] max-sm:gap-5">
+			<RecordVoice on:done={handleVoiceRecord} on:fail={handleRecordFail} />
+			<UploadVoice on:upload={handleVoiceUpload} />
+			{#if loading}
+				<Spinner color="blue" size="10" />
+			{/if}
+			{#each $TalkingVoiceCustom as opt, i}
+				<button
+					class="aspect-square h-24 rounded"
+					class:ring={$currentVoice.collection === CollectionType.Custom &&
+						$currentVoice.id === i}
+					on:click={() => {
+						currentVoice.set({ collection: CollectionType.Custom, id: i });
+					}}
+				>
+					<TalkingVoiceCard
+						audio={opt.audio}
+						bind:name={opt.name}
+						needChangeName={i >= customNum}
+						notLibrary
+						on:delete={() => handleVoiceDelete(i)}
+					/>
+				</button>
+			{/each}
+		</div>
+
+		<div class="mb-1 flex w-full flex-row flex-wrap justify-between sm:mb-0" />
+
+		<div
+			class="mb-1 mt-14 flex w-full flex-row flex-wrap justify-between sm:mb-0"
+		>
+			<p
+				class="mb-6 text-[1.3rem] font-medium leading-tight text-[#051F61] md:pr-0"
+			>
+				Voice Library
+			</p>
+		</div>
+		<div class="flex h-24 w-full gap-7 overflow-auto p-1 text-[#0F172A]">
+			{#each TalkingVoiceLibrary as opt, i}
+				<button
+					class="aspect-square h-full rounded"
+					class:ring={$currentVoice.collection === CollectionType.Library &&
+						$currentVoice.id === i}
+					on:click={() => {
+						currentVoice.set({ collection: CollectionType.Library, id: i });
+					}}
+				>
+					<TalkingVoiceCard {...opt} on:delete={() => handleVoiceDelete(i)} />
+				</button>
+			{/each}
+		</div>
 	</div>
+	<!-- <FloatButton destination="go to chat" url="/" /> -->
 </div>

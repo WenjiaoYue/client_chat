@@ -1,7 +1,7 @@
 <script lang="ts">
 	import stopRecordingIcon from "$lib/assets/chat/svg/StopRecording.svg";
 	import EditIcon from "$lib/assets/voice/svelte/Edit.svelte";
-	import DeleteIcon from "$lib/assets/voice/svelte/Edit.svelte";
+	import DeleteIcon from "$lib/assets/voice/svelte/Delete.svelte";
 	import { afterUpdate, createEventDispatcher, onMount } from "svelte";
 	import VoiceButton from "$lib/assets/chat/svelte/VoiceButton.svelte";
 	export let name: string;
@@ -51,17 +51,17 @@
 </script>
 
 <div
-	class="relative flex h-28 w-28 flex-col items-center rounded-xl pt-4 shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
+	class="relative flex h-full w-full flex-col items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div
-		class="flex items-center justify-center"
+		class="flex items-center justify-center h-2/3 aspect-square"
 		on:click|stopPropagation={() => {
 			handleAudioPlayer();
 		}}
 	>
 		{#if play}
-			<img class="my-1 h-11 w-11" src={stopRecordingIcon} alt="" />
+			<img class="my-1  h-[2rem] w-[2rem]" src={stopRecordingIcon} alt="" />
 		{:else}
 			<VoiceButton />
 		{/if}
@@ -75,11 +75,11 @@
 			type="text"
 			bind:value={name}
 			bind:this={inputEl}
-			class="mt-2 w-full text-center text-sm text-gray-600 focus-visible:outline-[#ccc] dark:text-gray-400 "
+			class="w-4/5 p-0 text-center text-sm text-gray-600 focus-visible:outline-[#ccc] dark:text-gray-400 "
 		/>
 	{:else}
 		<span
-			class="relative mt-2 w-9/12 text-sm text-gray-600 dark:text-gray-400 text-ellipsis"
+			class="relative text-sm text-gray-600 dark:text-gray-400 text-ellipsis"
 			on:dblclick|capture={changeName}
 		>
 			{name}

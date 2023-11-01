@@ -41,21 +41,48 @@ export let ifStoreMsg = writable(true)
 export const resetControl = writable(false);
 
 
+export const TalkingPhotoCustom = writable<{
+  name: string;
+  avatar: string;
+}[]>([])
+
 export const TalkingVoiceCustom = writable<{
   name: string;
   audio: string;
+  id: string;
+}[]>([])
+
+export const TalkingKnowledgeCustom = writable<{
+  name: string;
+  src: string;
+  id: string;
 }[]>([])
 
 
 export enum CollectionType {
-  Custom, Library, TemplateCustom, TemplateLibrary
+  Custom, Library
 }
 
+export let currentAvaTar = writable<{
+  collection: CollectionType,
+  id: number
+}>({
+  collection: CollectionType.Library,
+  id: 0
+});
 
 export let currentVoice = writable<{
   collection: CollectionType,
   id: number
 }>({
-  collection: CollectionType.TemplateLibrary,
+  collection: CollectionType.Library,
+  id: 0
+});
+
+export let currentKnowledge = writable<{
+  collection: CollectionType,
+  id: number
+}>({
+  collection: CollectionType.Library,
   id: 0
 });

@@ -2,19 +2,24 @@
 	export let data;
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import HintIcon from "$lib/assets/chat/svelte/HintIcon.svelte";
+	import Close from "$lib/assets/chat/svelte/Close.svelte";
 	import ImageIcon from "$lib/assets/chat/svelte/ImageIcon.svelte";
 
 	import DropZone from "$lib/shared/components/drag-drop/DropZone.svelte";
 	import ChatResponse from "$lib/network/chat/ChatResponse";
 	import LoadingButtonSpinnerIcon from "$lib/assets/chat/svelte/LoadingButtonSpinnerIcon.svelte";
 	import {
+	CollectionType,
+		TalkingKnowledgeCustom,
+		TalkingVoiceCustom,
 		countDown,
+		currentKnowledge,
+		currentVoice,
 		ifStoreMsg,
 		imageList,
 		isLoading,
 	} from "$lib/shared/stores/common/Store";
-	import { Badge, Checkbox, Progressbar } from "flowbite-svelte";
+	import { Badge, Button, Checkbox, Progressbar } from "flowbite-svelte";
 	import { onMount } from "svelte";
 	import { fetchImageList } from "$lib/network/image/Network";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
@@ -44,6 +49,10 @@
 		checkProcessingImage,
 		getTypeList,
 	} from "$lib/network/image/getTypeLists.js";
+	import Add from "$lib/assets/chat/svelte/Add.svelte";
+	import ChatToolsCard from "$lib/modules/chat/ChatToolsCard.svelte";
+	import ChatVideoCard from "$lib/modules/chat/ChatVideoCard.svelte";
+	import { TalkingVoiceLibrary } from "$lib/shared/constant/Data.js";
 
 	let query: string = "";
 
@@ -56,17 +65,26 @@
 	let promptList: { [key: string]: any[] } = {};
 	let showBottomImages = false;
 	let showBottomPrompt = false;
+	let showTools = false;
+	let toolTile = "";
+	let uploadedImageToVideo = false
+
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
 		"Image Style": ["simple drawing", "van gogh", "stone sculpture"],
 	};
 	let group: string[] = [];
+	const voice = ($currentVoice.collection === CollectionType.Custom ? $TalkingVoiceCustom[$currentVoice.id].id 
+					: ($currentVoice.collection === CollectionType.Library ? TalkingVoiceLibrary[$currentVoice.id].identify : "default")
+					)
+	const knowledge = ($currentKnowledge.collection === CollectionType.Custom ?
+					$TalkingKnowledgeCustom[$currentKnowledge.id].id : 'default')
 
 	$: placeholder =
 		chatMessages.length &&
 		chatMessages[chatMessages.length - 1].role === MessageRole.User &&
 		isImage(chatMessages[chatMessages.length - 1].type)
-			? "Upload more images/Ask me about..."
+			? "Ask me about..."
 			: "Upload images/Ask me about...";
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
@@ -76,6 +94,18 @@
 		} 
 	}
 
+	function handelCloseTool() {
+		console.log("coming");
+
+		showTools = !showTools;
+		toolTile = "";
+	}
+
+	function handelShowTool(e: any) {
+		toolTile = e.detail;
+		showBottomImages = false;
+		showTools = false;
+	}
 	function generateQuery(selectedItems: string[]) {
 		return `Give me photos taken in ${selectedItems.join(", ")}`;
 	}
@@ -87,6 +117,10 @@
 		} as { [index: string]: string });
 
 	onMount(async () => {
+		scrollToDiv = document
+			.querySelector(".chat-scrollbar")
+			?.querySelector(".svlr-viewport")!;
+
 		[done, typeList, promptList] = await checkProcessingImage();
 		console.log("typeList", typeList);
 
@@ -106,9 +140,6 @@
 		prompts = { ...prompts, ...capitalizedKeys };
 		const res = await fetchImageList();
 		if (res) imageList.set(res);
-		scrollToDiv = document
-			.querySelector(".chat-scrollbar")
-			?.querySelector(".svlr-viewport")!;
 
 		const driverObj = driver({
 			showProgress: true,
@@ -191,26 +222,28 @@
 		storeMessages();
 	}
 
-	const handleTextSubmit = async () => {
-		loading = true;
-		showBottomPrompt = false;
-		showBottomImages = false;
-		const newMessage = {
-			role: MessageRole.User,
-			type: MessageType.Text,
-			content: query,
-			time: getCurrentTimeStamp(),
-		};
-		chatMessages = [...chatMessages, newMessage];
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-		query = "";
+	const callGeneralMsg = async (query: string) => {
+		// split imageList
+		let i = chatMessages.length - 2
+		for (; i >= 0; i--) {
+			if (!(chatMessages[i].role === MessageRole.User && isImage(chatMessages[i].type))) break;
+		}
 
-		// todo
-		let res = await ChatResponse.chatMessage(chatMessages);
+		type img = {imgSrc: string;imgId: string;}
+		let imageListBetween: img[] = []
+		for (let item of chatMessages.slice(i + 1, chatMessages.length - 1)) {
+			if (item.type === MessageType.SingleImage) imageListBetween = [...imageListBetween, item.content as img]
+			else imageListBetween = [...imageListBetween, ...(item.content as img[])]
+		}
 
+		// network
+		let res = await ChatResponse.chatMessage(query, voice, knowledge, imageListBetween, uploadedImageToVideo);
 		if (res) {
 			let type = MessageType.Text;
+			if (typeof res === "object" && res.type === "video") {
+				type = MessageType.singleVideo;
+				res = res.url
+			}
 			if (Array.isArray(res)) {
 				if (res.length === 1) {
 					res = res[0];
@@ -228,16 +261,75 @@
 					time: getCurrentTimeStamp(),
 				},
 			];
-			scrollToBottom(scrollToDiv);
-			storeMessages();
 		}
+	}
 
+	const callAudioStream = async (query: string) => {
+		const eventSource = await fetchAudioStream(
+			query,
+			voice,
+			knowledge
+		);
+
+		eventSource.addEventListener("message", (e: any) => {
+			loading = false;
+			let currentMsg = e.data;
+			if (currentMsg.startsWith("b'")) {
+				const audioUrl = "data:audio/wav;base64," + currentMsg.slice(2, -1);
+
+				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
+					chatMessages = [
+						...chatMessages,
+						{
+							role: MessageRole.Assistant,
+							type: MessageType.AudioList,
+							content: [audioUrl],
+							time: getCurrentTimeStamp(),
+						},
+					];
+				} else {
+					let content = chatMessages[chatMessages.length - 1]
+						.content as string[];
+					chatMessages[chatMessages.length - 1].content = [
+						...content,
+						audioUrl,
+					];
+				}
+
+				scrollToBottom(scrollToDiv);
+			} else if (currentMsg === "[DONE]") {
+				let content = chatMessages[chatMessages.length - 1]
+					.content as string[];
+				chatMessages[chatMessages.length - 1].content = [...content, "done"];
+				storeMessages();
+			}
+		});
+		eventSource.stream();
+	}
+	const handleTextSubmit = async () => {
+		loading = true;
+		showBottomPrompt = false;
+		showBottomImages = false;
+		const newMessage = {
+			role: MessageRole.User,
+			type: MessageType.Text,
+			content: query,
+			time: getCurrentTimeStamp(),
+		};
+		chatMessages = [...chatMessages, newMessage];
+		scrollToBottom(scrollToDiv);
+		storeMessages();
+		query = "";
+
+		await callGeneralMsg(newMessage.content)
+
+		scrollToBottom(scrollToDiv);
+		storeMessages();
 		loading = false;
+		uploadedImageToVideo = false;
 	};
 
 	const handleAudioSubmit = (audioBlob: Blob) => {
-		console.log(audioBlob);
-
 		loading = true;
 		let fileReader = new FileReader();
 		fileReader.onloadend = async () => {
@@ -255,53 +347,39 @@
 			scrollToBottom(scrollToDiv);
 			storeMessages();
 
-			const voice = "default";
-			const knowledge = "default";
-
 			const res = await fetchAudioText(audioBlob);
-			const eventSource = await fetchAudioStream(
-				res.asr_result,
-				voice,
-				knowledge
-			);
-
-			eventSource.addEventListener("message", (e: any) => {
-				loading = false;
-				let currentMsg = e.data;
-				if (currentMsg.startsWith("b'")) {
-					const audioUrl = "data:audio/wav;base64," + currentMsg.slice(2, -1);
-
-					if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-						chatMessages = [
-							...chatMessages,
-							{
-								role: MessageRole.Assistant,
-								type: MessageType.AudioList,
-								content: [audioUrl],
-								time: getCurrentTimeStamp(),
-							},
-						];
-					} else {
-						let content = chatMessages[chatMessages.length - 1]
-							.content as string[];
-						chatMessages[chatMessages.length - 1].content = [
-							...content,
-							audioUrl,
-						];
-					}
-
-					scrollToBottom(scrollToDiv);
-				} else if (currentMsg === "[DONE]") {
-					let content = chatMessages[chatMessages.length - 1]
-						.content as string[];
-					chatMessages[chatMessages.length - 1].content = [...content, "done"];
-					storeMessages();
-				}
-			});
-			eventSource.stream();
+			if (uploadedImageToVideo) {
+				await callGeneralMsg(res.asr_result)
+				uploadedImageToVideo = false;
+			} else {
+				await callAudioStream(res.asr_result)
+			}
 		};
 		fileReader.readAsDataURL(audioBlob);
 	};
+
+	function handleVideoSubmit(idx: number) {
+		const checkedItem = $imageList[idx]
+
+		const newMessage = {
+			role: MessageRole.User,
+			type: MessageType.SingleImage,
+			content: {
+				imgSrc: checkedItem.image_path,
+				imgId: checkedItem.image_id,
+			},
+			time: getCurrentTimeStamp(),
+		};
+
+		console.log('newMessage', newMessage);
+		
+
+		chatMessages = [...chatMessages, newMessage];
+		scrollToBottom(scrollToDiv);
+		storeMessages();
+
+		uploadedImageToVideo = true
+	}
 
 	function handleUploadBegin() {
 		uploadHandle = setInterval(() => {
@@ -378,9 +456,9 @@
 						/>
 						<textarea
 							rows="2"
-							class="focus:none inline-block w-full resize-none border-none p-0 px-2 text-sm text-gray-600 focus:ring-0"
+							class="focus:none inline-block w-full resize-none border-none p-0 mx-2 mr-6 text-sm text-gray-600 focus:ring-0 placeholder:translate-y-2"
 							{placeholder}
-						
+							disabled={loading}
 							maxlength="1200"
 							bind:value={query}
 							on:keydown={(event) => {
@@ -391,7 +469,7 @@
 							}}
 						/>
 						<button
-							class="absolute bottom-1 right-1"
+							class="absolute bottom-3 right-1"
 							on:click={() => {
 								if (query) {
 									handleTextSubmit(false);
@@ -402,9 +480,39 @@
 							<PaperAirplane />
 						</button>
 					</div>
-
-					<!-- hint -->
+					<!-- image -->
 					<button
+						class="image-btn h-full sm:hidden"
+						on:click={() => {
+							showBottomImages = !showBottomImages;
+							showTools = false;
+							toolTile = "";
+						}}
+					>
+						<ImageIcon extraClass={showBottomImages ? "hidden" : ""} />
+						<ArrowRight
+							extraClass={`${
+								!showBottomImages ? "hidden" : ""
+							} w-5 h-5 rotate-90`}
+						/>
+					</button>
+
+					<!-- tools -->
+					<button
+						class="image-btn h-full"
+						on:click={() => {
+							showBottomImages = false;
+							showTools = !showTools;
+							toolTile = "";
+						}}
+					>
+						<Add extraClass={showTools ? "hidden" : ""} />
+						<ArrowRight
+							extraClass={`${!showTools ? "hidden" : ""} w-5 h-5 rotate-90`}
+						/>
+					</button>
+					<!-- hint -->
+					<!-- <button
 						class="hint-btn"
 						on:click={() => {
 							showBottomPrompt = !showBottomPrompt;
@@ -417,23 +525,7 @@
 								!showBottomPrompt ? "hidden" : ""
 							} w-5 h-5 rotate-90`}
 						/>
-					</button>
-
-					<!-- image -->
-					<button
-						class="image-btn h-full sm:hidden"
-						on:click={() => {
-							showBottomImages = !showBottomImages;
-							showBottomPrompt = false;
-						}}
-					>
-						<ImageIcon extraClass={showBottomImages ? "hidden" : ""} />
-						<ArrowRight
-							extraClass={`${
-								!showBottomImages ? "hidden" : ""
-							} w-5 h-5 rotate-90`}
-						/>
-					</button>
+					</button> -->
 				</div>
 				<!-- under moible mode -->
 				{#if showBottomImages}
@@ -449,42 +541,57 @@
 					/>
 				{/if}
 
-				{#if showBottomPrompt}
-					<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
-						{#each Object.entries(prompts) as [k, v]}
-							<p class="text-sm font-semibold text-[#15325f]">{k}</p>
-							{#if k === "Address"}
-								<div class="flex flex-wrap max-h-20 overflow-auto pl-2">
+				{#if showTools}
+					<ChatToolsCard  on:showTool={handelShowTool} />
+				{/if}
+				{#if toolTile === "Hint"}
+					<div class="relative w-full">
+						<button
+							class="absolute right-0 top-0 z-[500] rounded-full bg-[#eeeeeec7] p-1"
+							on:click={handelCloseTool}><Close /></button
+						>
+						<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
+							{#each Object.entries(prompts) as [k, v]}
+								<p class="text-sm font-semibold text-[#15325f]">{k}</p>
+
+								{#if k === "Address"}
+									<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
+										{#each v as badge}
+											<Checkbox class="mr-2" bind:group value={badge}>
+												<Badge
+													color="blue"
+													class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
+												>
+													{badge}
+												</Badge>
+											</Checkbox>
+										{/each}
+									</div>
+								{:else}
 									{#each v as badge}
-										<Checkbox class="mr-2" bind:group value={badge}>
+										<button
+											class="mr-2"
+											on:click={() => {
+												query = fullPromptMap(badge)[k];
+											}}
+										>
 											<Badge
 												color="blue"
 												class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
 											>
 												{badge}
 											</Badge>
-										</Checkbox>
+										</button>
 									{/each}
-								</div>
-							{:else}
-								{#each v as badge}
-									<button
-										class="mr-2"
-										on:click={() => {
-											query = fullPromptMap(badge)[k];
-										}}
-									>
-										<Badge
-											color="blue"
-											class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
-										>
-											{badge}
-										</Badge>
-									</button>
-								{/each}
-							{/if}
-						{/each}
-					</Scrollbar>
+								{/if}
+							{/each}
+						</Scrollbar>
+					</div>
+				{:else if toolTile === "Video"}
+					<ChatVideoCard
+						on:closeTool={handelCloseTool}
+						on:clickVideoImage={(e) => handleVideoSubmit(e.detail)}
+					/>
 				{/if}
 			</div>
 		</div>

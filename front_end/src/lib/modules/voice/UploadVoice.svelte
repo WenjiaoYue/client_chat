@@ -22,11 +22,11 @@
 	}
 </script>
 
-<label for="audio" class="h-full text-center">
+<label for="audio" class=" h-[5rem] text-center">
 	<div
-		class="flex h-28 w-28 cursor-pointer flex-col justify-center rounded-md"
+		class="flex h-full cursor-pointer flex-col justify-center rounded-md"
 	>
-	<img class="h-32 swap-on" src={uploadFile} alt=""/>
+	<img class="h-full swap-on" src={uploadFile} alt=""/>
 		<svg
 			class="mx-auto h-10 w-10"
 			viewBox="0 0 1024 1024"
@@ -41,7 +41,7 @@
 		>
 	</div>
 
-	<p class="text-sm mt-4">Upload Voice</p>
+	<p class="text-sm text-gray-500">Upload Voice</p>
 
 </label>
 
