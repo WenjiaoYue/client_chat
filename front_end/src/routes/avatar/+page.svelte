@@ -1,6 +1,5 @@
 <script lang="ts">
-	import portraits from "$lib/components/talkbot/imgs/portraits.png";
-	import Warning from "$lib/assets/chat/svelte/warning.svelte";
+	import Warning from "$lib/assets/chat/svelte/Warning.svelte";
 	import {
 		CollectionType,
 		TalkingPhotoCustom,
