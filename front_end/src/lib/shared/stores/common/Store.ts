@@ -40,6 +40,11 @@ export let ifStoreMsg = writable(true)
 
 export const resetControl = writable(false);
 
+export let currentMode = writable("Text");
+
+export let videoMode = writable("input");
+
+export let photoMode = writable("photoChat");
 
 export const TalkingPhotoCustom = writable<{
   name: string;
@@ -86,3 +91,6 @@ export let currentKnowledge = writable<{
   collection: CollectionType.Library,
   id: 0
 });
+
+export const popupModal = writable(false);
+

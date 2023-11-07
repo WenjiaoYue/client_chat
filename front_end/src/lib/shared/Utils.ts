@@ -3,8 +3,6 @@ import { env } from "$env/dynamic/public";
 const TRAFFIC_URL = env.TRAFFIC_URL;
 
 export function scrollToBottom(scrollToDiv: HTMLElement) {
-    console.log(scrollToDiv);
-    
     if (scrollToDiv) {
         setTimeout(
             () =>

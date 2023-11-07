@@ -18,6 +18,7 @@
 	const { addNotification } = getNotificationsContext();
 	import {
 		countDown,
+		currentMode,
 		ifStoreMsg,
 		resetControl,
 	} from "$lib/shared/stores/common/Store";
@@ -58,6 +59,7 @@
 
 	function deleteAccount() {
 		localStorage.setItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, "[]");
+		currentMode.set("Text");
 
 		resetControl.set(true);
 		addNotification({

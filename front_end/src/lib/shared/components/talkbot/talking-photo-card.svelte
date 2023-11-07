@@ -32,12 +32,12 @@
 </script>
 
 <div class="relative flex h-full w-full flex-col items-center">
-	<div class="relative">
-		<span class="relative block">
+	<div class="relative w-full h-full">
+		<span class="relative block w-full h-full">
 			<img
 				alt={name}
 				src={avatar}
-				class="mx-auto h-9/12 w-9/12 rounded object-cover hover:border"
+				class="mx-auto w-full h-full rounded object-cover hover:border"
 			/>
 			{#if notLibrary}
 				<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />

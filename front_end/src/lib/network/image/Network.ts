@@ -87,6 +87,12 @@ export async function fetchMsg(suffix, payload) {
 	return sendPostRequest(url, payload);
 }
 
+// chat/knowldge 
+export async function fetchTextMsg(suffix, payload) {
+	const url = `${env.KNOWLEDGE_BASE_URL}` + suffix;
+	return sendPostRequest(url, payload);
+}
+
 export async function fetchTypeList() {
 	const url = `${env.BASE_URL}/getTypeList`;
 	return sendPostRequest(url);
@@ -148,6 +154,9 @@ async function sendPostRequest(url: string, payload: Object = {}) {
 	try {
 		const response = await fetch(url, {
 			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
 			body: JSON.stringify(payload),
 		});
 

@@ -8,18 +8,29 @@
 	import DropZone from "$lib/shared/components/drag-drop/DropZone.svelte";
 	import ChatResponse from "$lib/network/chat/ChatResponse";
 	import LoadingButtonSpinnerIcon from "$lib/assets/chat/svelte/LoadingButtonSpinnerIcon.svelte";
+
 	import {
-	CollectionType,
+		CollectionType,
 		TalkingKnowledgeCustom,
 		TalkingVoiceCustom,
 		countDown,
 		currentKnowledge,
+		currentMode,
 		currentVoice,
 		ifStoreMsg,
 		imageList,
 		isLoading,
+		photoMode,
+		videoMode,
 	} from "$lib/shared/stores/common/Store";
-	import { Badge, Button, Checkbox, Progressbar } from "flowbite-svelte";
+	import {
+		Badge,
+		Button,
+		Checkbox,
+		Indicator,
+		Modal,
+		Progressbar,
+	} from "flowbite-svelte";
 	import { onMount } from "svelte";
 	import { fetchImageList } from "$lib/network/image/Network";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
@@ -37,7 +48,11 @@
 	} from "$lib/shared/Utils";
 	import ChatImageCard from "$lib/modules/chat/ChatImageCard.svelte";
 	import ArrowRight from "$lib/assets/chat/svelte/ArrowRight.svelte";
-	import { fetchAudioStream, fetchAudioText } from "$lib/network/chat/Network";
+	import {
+		fetchAudioStream,
+		fetchAudioText,
+		fetchTextStream,
+	} from "$lib/network/chat/Network";
 	import VoiceButton from "$lib/shared/components/talkbot/VoiceButton.svelte";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import { browser } from "$app/environment";
@@ -53,9 +68,20 @@
 	import ChatToolsCard from "$lib/modules/chat/ChatToolsCard.svelte";
 	import ChatVideoCard from "$lib/modules/chat/ChatVideoCard.svelte";
 	import { TalkingVoiceLibrary } from "$lib/shared/constant/Data.js";
+	import FloatImageList from "$lib/modules/chat/FloatImageList.svelte";
+	import HintIcon from "$lib/assets/chat/svelte/HintIcon.svelte";
+	import UploadImageBlobs from "$lib/shared/components/upload/UploadImageBlobs.svelte";
+	import ChatUploadImages from "$lib/modules/chat/ChatUploadImages.svelte";
+	import ColorImg from "$lib/assets/chat/svelte/ColorImg.svelte";
+	import ToolList from "$lib/modules/chat/ToolList.svelte";
+	import PictureEnlarge from "$lib/shared/components/images/PictureEnlarge.svelte";
+	import PopImageList from "$lib/modules/chat/popImageList.svelte";
+	import Notification from "$lib/assets/image-info/svelte/notification.svelte";
+	import { getNotificationsContext } from "svelte-notifications";
+	import KnowledgeAccess from "$lib/modules/chat/KnowledgeAccess.svelte";
 
 	let query: string = "";
-
+	const { addNotification } = getNotificationsContext();
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	let done: boolean = false;
@@ -67,18 +93,24 @@
 	let showBottomPrompt = false;
 	let showTools = false;
 	let toolTile = "";
-	let uploadedImageToVideo = false
+	let uploadedImageToVideo = false;
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
-		"Image Style": ["simple drawing", "van gogh", "stone sculpture"],
+		"Image Style": ["pencil sketch", "disney cartoon", "illustration", "pixar"],
 	};
 	let group: string[] = [];
-	const voice = ($currentVoice.collection === CollectionType.Custom ? $TalkingVoiceCustom[$currentVoice.id].id 
-					: ($currentVoice.collection === CollectionType.Library ? TalkingVoiceLibrary[$currentVoice.id].identify : "default")
-					)
-	const knowledge = ($currentKnowledge.collection === CollectionType.Custom ?
-					$TalkingKnowledgeCustom[$currentKnowledge.id].id : 'default')
+	const voice =
+		$currentVoice.collection === CollectionType.Custom
+			? $TalkingVoiceCustom[$currentVoice.id].id
+			: $currentVoice.collection === CollectionType.Library
+			? TalkingVoiceLibrary[$currentVoice.id].identify
+			: "default";
+	const knowledge =
+		$currentKnowledge.collection === CollectionType.Custom
+			? $TalkingKnowledgeCustom[$currentKnowledge.id].id
+			: "default";
+	let showFloatImg = false;
 
 	$: placeholder =
 		chatMessages.length &&
@@ -86,32 +118,41 @@
 		isImage(chatMessages[chatMessages.length - 1].type)
 			? "Ask me about..."
 			: "Upload images/Ask me about...";
+
 	$: currentDragImageList = new Array($imageList.length).fill(false);
+
+	console.log("new Array($imageList.length)", $imageList.length);
+	console.log("currentDragImageList", currentDragImageList);
+
+	$: $currentMode !== "Photo" ? (showFloatImg = true) : (showFloatImg = false);
 
 	$: {
 		if (group.length > 0) {
 			query = generateQuery(group);
-		} 
+		}
+	}
+
+	function refreshImages(idx: number, imgSrc: string) {
+		$imageList[idx].image_path =
+			"https://img.zcool.cn/community/0131565aeff3c5a801219b7f6906a7.gif";
+
+		setTimeout(function () {
+			$imageList[idx].image_path = imgSrc;
+		}, 2000);
 	}
 
 	function handelCloseTool() {
-		console.log("coming");
-
-		showTools = !showTools;
-		toolTile = "";
-	}
-
-	function handelShowTool(e: any) {
-		toolTile = e.detail;
+		currentMode.set("Text");
 		showBottomImages = false;
-		showTools = false;
 	}
+
 	function generateQuery(selectedItems: string[]) {
 		return `Give me photos taken in ${selectedItems.join(", ")}`;
 	}
+
 	const fullPromptMap = (word: string) =>
 		({
-			"Image Style": `Covert to ${word} style`,
+			"Image Style": `Transform it to ${word} style`,
 			Time: `Give me photos taken on ${word}`,
 			Person: `Give me ${word}'s photos`,
 		} as { [index: string]: string });
@@ -192,84 +233,109 @@
 		}
 	}
 
-	function handleImageSubmit(e: CustomEvent) {
-		const newMessage = {
-			role: MessageRole.User,
-			type: MessageType.SingleImage,
-			content: { imgId: e.detail.id, imgSrc: e.detail.src },
-			time: getCurrentTimeStamp(),
-		};
-		chatMessages = [...chatMessages, newMessage];
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-	}
-
-	function handleImageListSubmit() {
-		const checkedItems = $imageList.filter((_, i) => currentDragImageList[i]);
-
-		const newMessage = {
-			role: MessageRole.User,
-			type: MessageType.ImageList,
-			content: checkedItems.map((image) => ({
-				imgSrc: image.image_path,
-				imgId: image.image_id,
-			})),
-			time: getCurrentTimeStamp(),
-		};
-
-		chatMessages = [...chatMessages, newMessage];
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-	}
-
 	const callGeneralMsg = async (query: string) => {
-		// split imageList
-		let i = chatMessages.length - 2
-		for (; i >= 0; i--) {
-			if (!(chatMessages[i].role === MessageRole.User && isImage(chatMessages[i].type))) break;
-		}
-
-		type img = {imgSrc: string;imgId: string;}
-		let imageListBetween: img[] = []
-		for (let item of chatMessages.slice(i + 1, chatMessages.length - 1)) {
-			if (item.type === MessageType.SingleImage) imageListBetween = [...imageListBetween, item.content as img]
-			else imageListBetween = [...imageListBetween, ...(item.content as img[])]
-		}
-
+		const checkedItems = $imageList
+			.filter((_, i) => currentDragImageList[i])
+			.map((item) => ({
+				imgSrc: item.image_path,
+				imgId: item.image_id,
+			}));
 		// network
-		let res = await ChatResponse.chatMessage(query, voice, knowledge, imageListBetween, uploadedImageToVideo);
-		if (res) {
-			let type = MessageType.Text;
-			if (typeof res === "object" && res.type === "video") {
-				type = MessageType.singleVideo;
-				res = res.url
-			}
-			if (Array.isArray(res)) {
-				if (res.length === 1) {
-					res = res[0];
-					type = MessageType.SingleImage;
-				} else {
-					type = MessageType.ImageList;
+		console.log("11.6 --", checkedItems.length, $currentMode);
+		if ($currentMode === "Video" && checkedItems.length !== 1) {
+			addNotification({
+				text: "Please select one photo!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
+		} else if ($photoMode === "styleTransfer" && checkedItems.length === 0) {
+			addNotification({
+				text: "Please select photos!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
+		} else {
+			let res = await ChatResponse.chatMessage(
+				query,
+				voice,
+				knowledge,
+				checkedItems,
+				uploadedImageToVideo,
+				$currentMode,
+				$videoMode,
+				$photoMode
+			);
+
+			if (res) {
+				let type: MessageType;
+				if ($currentMode === "Video") {
+					type = MessageType.singleVideo;
+					res = res.url;
 				}
+				if ($currentMode === "Photo") {
+					if (Array.isArray(res)) {
+						if (res.length === 1) {
+							res = res[0];
+							type = MessageType.SingleImage;
+						} else {
+							type = MessageType.ImageList;
+						}
+					}
+				}
+
+				chatMessages = [
+					...chatMessages,
+					{
+						role: MessageRole.Assistant,
+						type,
+						content: res,
+						time: getCurrentTimeStamp(),
+					},
+				];
 			}
-			chatMessages = [
-				...chatMessages,
-				{
-					role: MessageRole.Assistant,
-					type,
-					content: res,
-					time: getCurrentTimeStamp(),
-				},
-			];
 		}
-	}
+		loading = false;
+	};
+
+	const callTextStream = async (query: string) => {
+		console.log("1");
+
+		const eventSource = await fetchTextStream(query, knowledge);
+
+		eventSource.addEventListener("message", (e: any) => {
+			console.log("e", e);
+
+			let currentMsg = e.data;
+			if (currentMsg == "[DONE]") {
+				loading = false;
+				storeMessages();
+			} else {
+				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
+					chatMessages = [
+						...chatMessages,
+						{
+							role: MessageRole.Assistant,
+							type: MessageType.Text,
+							content: currentMsg,
+							time: getCurrentTimeStamp(),
+						},
+					];
+				} else {
+					let content = chatMessages[chatMessages.length - 1].content as string;
+					chatMessages[chatMessages.length - 1].content =
+						content + " " + currentMsg;
+				}
+				scrollToBottom(scrollToDiv);
+			}
+		});
+		eventSource.stream();
+		console.log("2");
+	};
 
 	const callAudioStream = async (query: string) => {
-		const eventSource = await fetchAudioStream(
-			query,
-			voice,
-			knowledge
-		);
+		const eventSource = await fetchAudioStream(query, voice, knowledge);
 
 		eventSource.addEventListener("message", (e: any) => {
 			loading = false;
@@ -298,14 +364,13 @@
 
 				scrollToBottom(scrollToDiv);
 			} else if (currentMsg === "[DONE]") {
-				let content = chatMessages[chatMessages.length - 1]
-					.content as string[];
+				let content = chatMessages[chatMessages.length - 1].content as string[];
 				chatMessages[chatMessages.length - 1].content = [...content, "done"];
 				storeMessages();
 			}
 		});
 		eventSource.stream();
-	}
+	};
 	const handleTextSubmit = async () => {
 		loading = true;
 		showBottomPrompt = false;
@@ -321,11 +386,14 @@
 		storeMessages();
 		query = "";
 
-		await callGeneralMsg(newMessage.content)
+		if ($currentMode === "Text") {
+			await callTextStream(newMessage.content);
+		} else {
+			await callGeneralMsg(newMessage.content);
+		}
 
 		scrollToBottom(scrollToDiv);
 		storeMessages();
-		loading = false;
 		uploadedImageToVideo = false;
 	};
 
@@ -349,17 +417,17 @@
 
 			const res = await fetchAudioText(audioBlob);
 			if (uploadedImageToVideo) {
-				await callGeneralMsg(res.asr_result)
+				await callGeneralMsg(res.asr_result);
 				uploadedImageToVideo = false;
 			} else {
-				await callAudioStream(res.asr_result)
+				await callAudioStream(res.asr_result);
 			}
 		};
 		fileReader.readAsDataURL(audioBlob);
 	};
 
 	function handleVideoSubmit(idx: number) {
-		const checkedItem = $imageList[idx]
+		const checkedItem = $imageList[idx];
 
 		const newMessage = {
 			role: MessageRole.User,
@@ -371,14 +439,13 @@
 			time: getCurrentTimeStamp(),
 		};
 
-		console.log('newMessage', newMessage);
-		
+		console.log("newMessage", newMessage);
 
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
 		storeMessages();
 
-		uploadedImageToVideo = true
+		uploadedImageToVideo = true;
 	}
 
 	function handleUploadBegin() {
@@ -395,60 +462,54 @@
 	}
 </script>
 
-<DropZone on:drop={handleImageSubmit}>
-	<div class="h-full items-center gap-5 sm:flex sm:px-20 sm:pb-2">
-		<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-2/3">
-			<Scrollbar
-				classLayout="flex flex-col gap-1"
-				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
-			>
-				<!-- Upload Your Images, Let’s talking with them! 🎉 -->
-				<!-- <ChatMessage
-					msg={{
-						role: MessageRole.Assistant,
-						content: "",
-						type: MessageType.Text,
-						time: 0,
-					}}
-				/> -->
-				{#each chatMessages as message, i}
-					<ChatMessage
-						msg={message}
-						time={i === 0 || message.time - chatMessages[i - 1].time > 60
-							? fromTimeStampToTime(message.time)
-							: ""}
-					/>
-				{/each}
-			</Scrollbar>
-			<!-- Loading text -->
-			{#if loading}
-				<LoadingAnimation />
-			{/if}
+<!-- <DropZone on:drop={handleImageSubmit}> -->
+<div class="h-full items-center gap-5 sm:flex sm:px-20 sm:pb-2">
+	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-2/3">
+		<Scrollbar
+			classLayout="flex flex-col gap-1"
+			className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
+		>
+			{#each chatMessages as message, i}
+				<ChatMessage
+					msg={message}
+					time={i === 0 || message.time - chatMessages[i - 1].time > 60
+						? fromTimeStampToTime(message.time)
+						: ""}
+				/>
+			{/each}
+		</Scrollbar>
+		<!-- Loading text -->
+		{#if loading}
+			<LoadingAnimation />
+		{/if}
 
-			{#if $isLoading}
-				<span class="mb-2 ml-4 text-sm text-gray-500"
-					>Uploading, please wait...</span
-				>
+		<ToolList
+			on:closeTool={handelCloseTool}
+			on:clickVideoImage={(e) => handleVideoSubmit(e.detail)}
+			on:clickImage={(e) => {
+				const idx = e.detail;
+				currentDragImageList[idx] = !currentDragImageList[idx];
+			}}
+			on:uploadBegin={handleUploadBegin}
+			on:uploadEnd={handleUploadEnd}
+		/>
+		<div
+			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 shadow-inner"
+		>
+			{#if uploadProgress}
+				<Progressbar
+					progress={uploadProgress.toString()}
+					size="h-1"
+					color="blue"
+					class="mb-2"
+				/>
 			{/if}
-
-			<div
-				class="fixed relative z-40 flex w-full flex-col items-center justify-between bg-white p-2 shadow-inner"
-			>
-				{#if uploadProgress}
-					<Progressbar
-						progress={uploadProgress.toString()}
-						size="h-1"
-						color="blue"
-						class="mb-2"
-					/>
-				{/if}
+			<div class="flex w-full flex-row items-center justify-between gap-3 pt-2">
+				<!-- Textarea -->
 				<div
-					class="flex w-full flex-row items-center justify-between gap-3 pt-2"
+					class="input-btn focus:ring-link relative flex max-h-60 w-full flex-col items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
 				>
-					<!-- Textarea -->
-					<div
-						class="input-btn focus:ring-link relative flex max-h-60 w-full flex-row items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
-					>
+					<div class="flex flex-row w-full">
 						<VoiceButton
 							on:done={(e) => {
 								handleAudioSubmit(e.detail);
@@ -456,7 +517,7 @@
 						/>
 						<textarea
 							rows="2"
-							class="focus:none inline-block w-full resize-none border-none p-0 mx-2 mr-6 text-sm text-gray-600 focus:ring-0 placeholder:translate-y-2"
+							class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0"
 							{placeholder}
 							disabled={loading}
 							maxlength="1200"
@@ -480,55 +541,37 @@
 							<PaperAirplane />
 						</button>
 					</div>
-					<!-- image -->
-					<button
-						class="image-btn h-full sm:hidden"
-						on:click={() => {
-							showBottomImages = !showBottomImages;
-							showTools = false;
-							toolTile = "";
-						}}
-					>
-						<ImageIcon extraClass={showBottomImages ? "hidden" : ""} />
-						<ArrowRight
-							extraClass={`${
-								!showBottomImages ? "hidden" : ""
-							} w-5 h-5 rotate-90`}
-						/>
-					</button>
-
-					<!-- tools -->
-					<button
-						class="image-btn h-full"
-						on:click={() => {
-							showBottomImages = false;
-							showTools = !showTools;
-							toolTile = "";
-						}}
-					>
-						<Add extraClass={showTools ? "hidden" : ""} />
-						<ArrowRight
-							extraClass={`${!showTools ? "hidden" : ""} w-5 h-5 rotate-90`}
-						/>
-					</button>
-					<!-- hint -->
-					<!-- <button
-						class="hint-btn"
-						on:click={() => {
-							showBottomPrompt = !showBottomPrompt;
-							showBottomImages = false;
-						}}
-					>
-						<HintIcon extraClass={showBottomPrompt ? "hidden" : ""} />
-						<ArrowRight
-							extraClass={`${
-								!showBottomPrompt ? "hidden" : ""
-							} w-5 h-5 rotate-90`}
-						/>
-					</button> -->
+					<KnowledgeAccess />
 				</div>
-				<!-- under moible mode -->
-				{#if showBottomImages}
+				<!-- hint -->
+				<button
+					class="hint-btn"
+					on:click={() => {
+						showBottomPrompt = !showBottomPrompt;
+						showBottomImages = false;
+						toolTile = "Hint";
+					}}
+				>
+					<HintIcon extraClass={showBottomPrompt ? "hidden" : ""} />
+					<ArrowRight
+						extraClass={`${
+							!showBottomPrompt ? "hidden" : ""
+						} w-5 h-5 rotate-90`}
+					/>
+				</button>
+				<PopImageList
+					on:closeTool={handelCloseTool}
+					on:clickVideoImage={(e) => handleVideoSubmit(e.detail)}
+					on:clickImage={(e) => {
+						const idx = e.detail;
+						currentDragImageList[idx] = !currentDragImageList[idx];
+					}}
+					on:uploadBegin={handleUploadBegin}
+					on:uploadEnd={handleUploadEnd}
+				/>
+			</div>
+			<!-- under moible mode -->
+			<!-- {#if showBottomImages}
 					<ChatImageCard
 						extraClass="sm:hidden"
 						on:clickSend={handleImageListSubmit}
@@ -539,63 +582,48 @@
 						on:uploadBegin={handleUploadBegin}
 						on:uploadEnd={handleUploadEnd}
 					/>
-				{/if}
+				{/if} -->
 
-				{#if showTools}
-					<ChatToolsCard  on:showTool={handelShowTool} />
-				{/if}
-				{#if toolTile === "Hint"}
-					<div class="relative w-full">
-						<button
-							class="absolute right-0 top-0 z-[500] rounded-full bg-[#eeeeeec7] p-1"
-							on:click={handelCloseTool}><Close /></button
-						>
-						<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
-							{#each Object.entries(prompts) as [k, v]}
-								<p class="text-sm font-semibold text-[#15325f]">{k}</p>
-
-								{#if k === "Address"}
-									<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
-										{#each v as badge}
-											<Checkbox class="mr-2" bind:group value={badge}>
-												<Badge
-													color="blue"
-													class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
-												>
-													{badge}
-												</Badge>
-											</Checkbox>
-										{/each}
-									</div>
-								{:else}
-									{#each v as badge}
-										<button
-											class="mr-2"
-											on:click={() => {
-												query = fullPromptMap(badge)[k];
-											}}
+			{#if showBottomPrompt}
+				<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
+					{#each Object.entries(prompts) as [k, v]}
+						<p class="text-sm font-semibold text-[#15325f]">{k}</p>
+						{#if k === "Address"}
+							<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
+								{#each v as badge}
+									<Checkbox class="mr-2" bind:group value={badge}>
+										<Badge
+											color="blue"
+											class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
 										>
-											<Badge
-												color="blue"
-												class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
-											>
-												{badge}
-											</Badge>
-										</button>
-									{/each}
-								{/if}
+											{badge}
+										</Badge>
+									</Checkbox>
+								{/each}
+							</div>
+						{:else}
+							{#each v as badge}
+								<button
+									class="mr-2"
+									on:click={() => {
+										query = fullPromptMap(badge)[k];
+									}}
+								>
+									<Badge
+										color="blue"
+										class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
+									>
+										{badge}
+									</Badge>
+								</button>
 							{/each}
-						</Scrollbar>
-					</div>
-				{:else if toolTile === "Video"}
-					<ChatVideoCard
-						on:closeTool={handelCloseTool}
-						on:clickVideoImage={(e) => handleVideoSubmit(e.detail)}
-					/>
-				{/if}
-			</div>
+						{/if}
+					{/each}
+				</Scrollbar>
+			{/if}
 		</div>
-		<ChatImageCard
+	</div>
+	<!-- <ChatImageCard
 			extraClass="max-sm:hidden"
 			on:clickSend={handleImageListSubmit}
 			on:clickImage={(e) => {
@@ -604,9 +632,12 @@
 			}}
 			on:uploadBegin={handleUploadBegin}
 			on:uploadEnd={handleUploadEnd}
-		/>
-	</div>
-</DropZone>
+		/> -->
+</div>
+
+<!-- </DropZone> -->
+
+<!-- <ChatUploadImages on:uploadBegin on:uploadEnd />	 -->
 
 <style>
 </style>

@@ -4,6 +4,8 @@
 
 	import { Button, Dropdown, DropdownDivider, DropdownItem } from "flowbite-svelte";
 	import { page } from "$app/stores";
+	import Setting from "$lib/assets/frame/svelte/Setting.svelte";
+	import { hoursToSeconds } from "date-fns";
 	$: activeUrl = $page.url.pathname;
 	let activeClass =
 		"text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-500";
@@ -39,6 +41,9 @@
 
 		</a
 	>
+	<!-- <a href="/settings">
+		<Setting />
+	</a> -->
 	<Button
 		color="light"
 		outline={true}
@@ -49,7 +54,7 @@
 			<DropdownItem href={item.link}>{item.title}</DropdownItem>
 			<DropdownDivider />
 
-		{/each}
+		{/each}	
 	</Dropdown>
 
 </header>

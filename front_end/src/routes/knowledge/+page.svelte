@@ -10,7 +10,10 @@
 	import { fetchKnowledgeBaseId } from "$lib/network/talkbot/Network";
 	import Warning from "$lib/assets/chat/svelte/Warning.svelte";
 	import FloatButton from "$lib/shared/components/float-button/FloatButton.svelte";
-
+	import { Spinner } from "flowbite-svelte";
+	import { getNotificationsContext } from "svelte-notifications";
+	
+	const { addNotification } = getNotificationsContext();
 	const customNum = $TalkingKnowledgeCustom.length;
 	let loading = false;
 
@@ -19,13 +22,20 @@
 		let knowledge_id = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
-			const res = await fetchKnowledgeBaseId(blob);
-			knowledge_id = res.knowledge_id ? res.knowledge_id : "default";
+			const fileName = e.detail.fileName;
+			const res = await fetchKnowledgeBaseId(blob, fileName);
+			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
 		} catch {
 			knowledge_id = "default";
 		}
 
 		loading = false;
+		addNotification({
+			text: "Uploaded successfully",
+			position: "bottom-center",
+			type: "success",
+			removeAfter: 3000,
+		});
 
 		TalkingKnowledgeCustom.update((options) => {
 			return [
@@ -72,14 +82,14 @@
 				</div>
 			</div>
 		{:else}
-			<div class="flex flex-wrap gap-2 text-[#0F172A]">
+			<div class="flex flex-wrap gap-5 text-[#0F172A]">
 				<UploadKnowledge on:upload={handleKnowledgeUpload} />
-				<span
-					class="loading loading-bars loading-md text-[#8c75ff]"
-					class:hidden={!loading}
-				/>
+				{#if loading}
+				<Spinner color="blue" size="10" />
+				{/if}
 				{#each $TalkingKnowledgeCustom as opt, i (opt.name + i)}
 					<button
+						class="relative"
 						class:ring={$currentKnowledge.collection ===
 							CollectionType.Custom && $currentKnowledge.id === i}
 						on:click={() => {

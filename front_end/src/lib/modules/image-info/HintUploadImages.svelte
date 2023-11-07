@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { handleImageUpload } from "$lib/network/image/UploadImage"
 	import UploadImageBlobs from "$lib/shared/components/upload/UploadImageBlobs.svelte";
+	import { currentMode } from "$lib/shared/stores/common/Store";
 	import { Progressbar } from "flowbite-svelte";
 
 	let uploadProgress = 0
@@ -15,7 +16,8 @@
 	}
 
 	function handleUploadEnd() {
-		uploadProgress = 0
+		uploadProgress = 0;
+		currentMode.set('Photo');
 		clearInterval(uploadHandle)
 	}
 

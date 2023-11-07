@@ -19,7 +19,7 @@
 	const { addNotification } = getNotificationsContext();
 	const customNum = $TalkingVoiceCustom.length;
 	let loading = false;
-	let activeClass = true;
+	let qualityMode = true;
 	const btnStyle = {
 		init: `flex rounded-lg bg-indigo-600 px-4 py-3 text-center text-[0.8rem] font-semibold text-white  max-sm:p-2 `,
 		inactive: ``,
@@ -31,8 +31,10 @@
 		let spk_id = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
-			const res = await fetchAudioEmbedding(blob);
-			spk_id = res.spk_id ? res.spk_id : "default";
+			const res = await fetchAudioEmbedding(blob, qualityMode);
+			spk_id = res.voice_id ? res.voice_id : "default";
+			console.log('spk_id', spk_id);
+			
 		} catch {
 			spk_id = "default";
 		}
@@ -56,7 +58,7 @@
 		let spk_id = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
-			const res = await fetchAudioEmbedding(blob);
+			const res = await fetchAudioEmbedding(blob, qualityMode);
 			spk_id = res.spk_id ? res.spk_id : "default";
 		} catch {
 			spk_id = "default";
@@ -100,10 +102,10 @@
 			<button
 				type="button"
 				class={`${btnStyle.init}  ${
-					activeClass ? btnStyle.active : btnStyle.inactive
+					qualityMode ? btnStyle.active : btnStyle.inactive
 				}`}
 				on:focus={() => {
-					activeClass = true;
+					qualityMode = true;
 				}}
 			>
 				<Fast />
@@ -112,10 +114,10 @@
 			<button
 				type="button"
 				class={`${btnStyle.init} ${
-					activeClass ? btnStyle.inactive : btnStyle.active
+					qualityMode ? btnStyle.inactive : btnStyle.active
 				}`}
 				on:focus={() => {
-					activeClass = false;
+					qualityMode = false;
 				}}
 			>
 				<Diamond />

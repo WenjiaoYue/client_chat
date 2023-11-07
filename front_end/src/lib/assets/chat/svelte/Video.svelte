@@ -5,8 +5,8 @@
 	version="1.1"
 	xmlns="http://www.w3.org/2000/svg"
 	p-id="6432"
-	width="16"
-	height="16"
+	width="18"
+	height="18"
 	><path
 		d="M80 34.4h864v960H80z"
 		fill="#1f63ea"

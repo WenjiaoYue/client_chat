@@ -41,7 +41,7 @@
 			<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />
 		{/if}
 		<span
-			class="relative w-9/12 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-600"
+			class="relative w-5/12 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-600"
 		>
 			{name}
 		</span>
