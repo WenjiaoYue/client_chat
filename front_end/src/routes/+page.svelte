@@ -95,7 +95,7 @@
 	let showTools = false;
 	let toolTile = "";
 	let uploadedImageToVideo = false;
-	let knowledgeAccess = false
+	let knowledgeAccess = true;
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
@@ -106,11 +106,16 @@
 		$currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].identify
 			: TalkingTemplateLibrary[$currentTemplate.id].identify;
+
+				
 	$: knowledge = knowledgeAccess ? (
 		$currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].knowledge
 			: TalkingTemplateLibrary[$currentTemplate.id].knowledge
 	) : "default"
+
+	$: console.log('knowledge', knowledge);
+	
 		
 	let showFloatImg = false;
 
@@ -123,9 +128,6 @@
 
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
-
-	console.log("new Array($imageList.length)", $imageList.length);
-	console.log("currentDragImageList", currentDragImageList);
 
 	$: $currentMode !== "Photo" ? (showFloatImg = true) : (showFloatImg = false);
 
@@ -303,6 +305,7 @@
 	};
 
 	const callTextStream = async (query: string) => {
+		console.log('knowledge', knowledge);
 
 		const eventSource = await fetchTextStream(query, knowledge);
 

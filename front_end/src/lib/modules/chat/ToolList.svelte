@@ -24,13 +24,16 @@
 		inactive: ``,
 		active: `outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-indigo-200`,
 	};
+	$: {
+		if (photoChecked) {
+			photoMode.set(photoChecked);
+		}
+	}
+
 	function exchangeMode(mode: string) {
 		currentMode.set(mode);
 		if (mode === "Video") {
 			videoMode.set(videoChecked);
-		} 
-		if (mode === "Photo") {
-			photoMode.set(photoChecked)
 		}
 	}
 </script>

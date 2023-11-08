@@ -13,6 +13,11 @@
 			return options;
 		});
 	}
+
+    console.log('currentTemplate', $currentTemplate);
+    console.log('currentTemplate', $currentTemplate.collection);
+    
+    
 </script>
 
 <div class="flex h-full">

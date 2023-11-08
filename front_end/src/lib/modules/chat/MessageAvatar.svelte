@@ -10,7 +10,10 @@
 		[CollectionType.Custom]: $TemplateCustom,
 		[CollectionType.Library]: TalkingTemplateLibrary,
 	}
-	$: src = map[$currentTemplate.collection][$currentTemplate.id].avatar ? map[$currentTemplate.collection][$currentTemplate.id].avatar : "";
+
+	$: console.log('$currentTemplate', $currentTemplate, $currentTemplate.collection, map[$currentTemplate.collection][$currentTemplate.id]);
+	
+	$: src = map[$currentTemplate.collection][$currentTemplate.id] ?.avatar;
 </script>
 
 {#if role === MessageRole.User}
