@@ -1,5 +1,5 @@
 <svg
-	class="h-[3rem] w-[3rem]"
+	class="h-[2rem] w-[2rem]"
 	viewBox="0 0 1024 1024"
 	version="1.1"
 	xmlns="http://www.w3.org/2000/svg"

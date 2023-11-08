@@ -6,6 +6,7 @@
 	import { onMount } from "svelte";
 	import Timer from "$lib/modules/settings/Timer.svelte";
 	import Marquee from "$lib/modules/layout/Marquee.svelte";
+	import SidePage from "$lib/modules/side-page/SidePage.svelte";
 
 	onMount(() => {
 		window.deviceType = window.innerWidth > 640 ? "pc" : "mobile";
@@ -30,5 +31,6 @@
 				<slot />
 			</div>
 		</div>
+		<SidePage />
 	</Layout>
 </Notifications>

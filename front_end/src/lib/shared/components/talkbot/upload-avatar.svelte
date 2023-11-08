@@ -18,12 +18,12 @@
 	}
 </script>
 
-<div class="h-20 w-20">
+<div class="aspect-square w-full">
 	<label for="image" class="h-full w-full text-center">
 		<slot>
 			<div class="flex h-full w-full cursor-pointer flex-col justify-center rounded-md border-2">
 				<svg
-					class="mx-auto h-8 w-8"
+					class="mx-auto h-7 w-7"
 					viewBox="0 0 1024 1024"
 					version="1.1"
 					xmlns="http://www.w3.org/2000/svg"

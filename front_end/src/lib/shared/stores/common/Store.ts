@@ -24,6 +24,8 @@ export interface ImgListPiece {
 
 export let open = writable(true);
 
+export let showSidePage = writable(false)
+
 export let imageList = writable<Array<ImgListPiece>>([]);
 
 export let droppedObj = writable({});
@@ -54,7 +56,7 @@ export const TalkingPhotoCustom = writable<{
 export const TalkingVoiceCustom = writable<{
   name: string;
   audio: string;
-  id: string;
+  identify: string;
 }[]>([])
 
 export const TalkingKnowledgeCustom = writable<{
@@ -63,12 +65,23 @@ export const TalkingKnowledgeCustom = writable<{
   id: string;
 }[]>([])
 
+export const TemplateCustom = writable<{
+  name: string;
+  avatar: string;
+  audio: string;
+  identify: string;
+  knowledge: string;
+  avatar_name: string;
+  voice_name: string;
+  knowledge_name: string;
+}[]>([])
+
 
 export enum CollectionType {
   Custom, Library
 }
 
-export let currentAvaTar = writable<{
+export let currentTemplate = writable<{
   collection: CollectionType,
   id: number
 }>({
@@ -76,13 +89,21 @@ export let currentAvaTar = writable<{
   id: 0
 });
 
-export let currentVoice = writable<{
-  collection: CollectionType,
-  id: number
-}>({
-  collection: CollectionType.Library,
-  id: 0
-});
+// export let currentAvaTar = writable<{
+//   collection: CollectionType,
+//   id: number
+// }>({
+//   collection: CollectionType.Library,
+//   id: 0
+// });
+
+// export let currentVoice = writable<{
+//   collection: CollectionType,
+//   id: number
+// }>({
+//   collection: CollectionType.Library,
+//   id: 0
+// });
 
 export let currentKnowledge = writable<{
   collection: CollectionType,

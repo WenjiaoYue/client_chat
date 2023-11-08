@@ -2,10 +2,19 @@
 	import HeaderIcon from "$lib/assets/frame/svelte/headerTitle.svelte";
 	import { data } from "$lib/shared/constant/Data";
 
-	import { Button, Dropdown, DropdownDivider, DropdownItem } from "flowbite-svelte";
+	import {
+		Button,
+		Dropdown,
+		DropdownDivider,
+		DropdownItem,
+	} from "flowbite-svelte";
 	import { page } from "$app/stores";
-	import Setting from "$lib/assets/frame/svelte/Setting.svelte";
-	import { hoursToSeconds } from "date-fns";
+	import ChatIcon from "$lib/assets/layout/svelte/ChatIcon.svelte";
+	import BotIcon from "$lib/assets/layout/svelte/BotIcon.svelte";
+	import { showSidePage } from "$lib/shared/stores/common/Store";
+	import SettingIcon from "$lib/assets/chat/svelte/Setting.svelte";
+	import { goto } from "$app/navigation";
+
 	$: activeUrl = $page.url.pathname;
 	let activeClass =
 		"text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-500";
@@ -27,7 +36,6 @@
 <header
 	class="fixed left-0 top-0 z-30 flex w-full flex-row items-center justify-between bg-white px-4 shadow-md sm:hidden"
 >
-	
 	<a class="flex flex-row items-center justify-center" href="/"
 		><div
 			class="logo svelte-1a6f506 mr-3 flex h-12 w-12 items-center justify-center"
@@ -38,13 +46,25 @@
 			Neural Chat
 		</h1> -->
 		<p class="font-bold">TalkingPhotos</p>
+	</a>
 
-		</a
-	>
-	<!-- <a href="/settings">
-		<Setting />
-	</a> -->
-	<Button
+	<div class="right-0 flex flex-row gap-5">
+		<button
+			on:click={() => {
+				showSidePage.set(true);
+				goto("/");
+			}}
+		>
+			<BotIcon />
+		</button>
+		<button>
+			<a href="/settings">
+				<SettingIcon />
+			</a>
+		</button>
+	</div>
+
+	<!-- <Button
 		color="light"
 		outline={true}
 		class="border-none m-2 text-3xl active:border-none nav-btn">≡</Button
@@ -53,8 +73,6 @@
 		{#each data as item, i (item.title)}
 			<DropdownItem href={item.link}>{item.title}</DropdownItem>
 			<DropdownDivider />
-
-		{/each}	
-	</Dropdown>
-
+		{/each}
+	</Dropdown> -->
 </header>

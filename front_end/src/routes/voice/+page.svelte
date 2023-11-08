@@ -6,9 +6,9 @@
 	} from "$lib/shared/stores/common/Store";
 	import { TalkingVoiceLibrary } from "$lib/shared/constant/Data";
 	import { getNotificationsContext } from "svelte-notifications";
-	import RecordVoice from "$lib/modules/voice/RecordVoice.svelte";
-	import UploadVoice from "$lib/modules/voice/UploadVoice.svelte";
-	import TalkingVoiceCard from "$lib/modules/voice/TalkingVoiceCard.svelte";
+	import RecordVoice from "$lib/shared/components/talkbot/RecordVoice.svelte";
+	import UploadVoice from "$lib/shared/components/talkbot/UploadVoice.svelte";
+	import TalkingVoiceCard from "$lib/shared/components/talkbot/TalkingVoiceCard.svelte";
 	import FloatButton from "$lib/shared/components/float-button/FloatButton.svelte";
 	import { fetchAudioEmbedding } from "$lib/network/talkbot/Network";
 	import Fast from "$lib/assets/customize/svelte/Fast.svelte";

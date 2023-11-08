@@ -18,6 +18,14 @@ import EmmaBergerAvatar from "$lib/assets/avatar/img/Emma-Berger-Avatar.jpg";
 import EricYatesAvatar from "$lib/assets/avatar/img/Eric-Yates-Avatar.jpg";
 import ShylaBandhuAvatar from "$lib/assets/avatar/img/Shyla-Bandhu-Avatar.jpg";
 
+import HumaVoice from "$lib/assets/voice/audio/welcome_huma.wav"
+import PatVoice from "$lib/assets/voice/audio/mid-age-man.mp3"
+import WeiVoice from "$lib/assets/voice/audio/welcome_wei.wav"
+
+import humaAvatar from "$lib/assets/customize/img/huma.jpg";
+import JohnAvatar from "$lib/assets/customize/img/John-Avatar.jpg";
+import annAvatar from "$lib/assets/customize/img/wei.jpg";
+
 // sidebar ----------
 interface MenuItem {
   title: string;
@@ -103,9 +111,16 @@ export const TalkingVoiceLibrary = [
 ]
 
 export const TalkingKnowledgeLibrary = [
-  { name: 'Wikipedia', },
-  { name: 'Intel Neural Compressor', },
+  { name: 'Wikipedia', id: "default" },
+  { name: 'Intel Neural Compressor', id: "default" },
 ]
+
+export const TalkingTemplateLibrary = [
+  { name: "John", avatar: JohnAvatar, audio: PatVoice, identify: "default_male", knowledge: "default" },
+  { name: "Ann", avatar: annAvatar, audio: WeiVoice, identify: "wei", knowledge: "default" },
+  { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default" },
+  // { name: "Andy Grove", avatar: andyAvatar, audio: AndyVoice, knowledge: 'Young_Andy', identify: "andy" },
+];
 
 export const toolList = [
   {

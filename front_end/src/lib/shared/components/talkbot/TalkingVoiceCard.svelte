@@ -4,6 +4,7 @@
 	import DeleteIcon from "$lib/assets/voice/svelte/Delete.svelte";
 	import { afterUpdate, createEventDispatcher, onMount } from "svelte";
 	import VoiceButton from "$lib/assets/chat/svelte/VoiceButton.svelte";
+	import StopRecording from "$lib/assets/voice/svelte/StopRecording.svelte";
 	export let name: string;
 	export let audio: string;
 	export let notLibrary: boolean = false;
@@ -51,21 +52,22 @@
 </script>
 
 <div
-	class="relative flex h-full w-full flex-col items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
+	class="relative flex flex-col justify-center items-center h-full w-full flex-col items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
 >
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div
-		class="flex items-center justify-center h-2/3 aspect-square"
-		on:click|stopPropagation={() => {
+	<button
+		class="flex items-center justify-center"
+		on:click|stopPropagation={(e) => {
+			console.log(e);
+			
 			handleAudioPlayer();
 		}}
 	>
 		{#if play}
-			<img class="my-1  h-[2rem] w-[2rem]" src={stopRecordingIcon} alt="" />
+			<StopRecording extraClass="h-10 w-10"/>
 		{:else}
 			<VoiceButton />
 		{/if}
-	</div>
+	</button>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	{#if notLibrary}
 		<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />
@@ -79,7 +81,7 @@
 		/>
 	{:else}
 		<span
-			class="relative text-sm text-gray-600 dark:text-gray-400 text-ellipsis"
+			class="relative text-xs text-gray-600 dark:text-gray-400 text-ellipsis"
 			on:dblclick|capture={changeName}
 		>
 			{name}

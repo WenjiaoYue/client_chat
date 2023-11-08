@@ -12,15 +12,16 @@
 	import {
 		CollectionType,
 		TalkingKnowledgeCustom,
-		TalkingVoiceCustom,
+		TemplateCustom,
 		countDown,
 		currentKnowledge,
 		currentMode,
-		currentVoice,
+		currentTemplate,
 		ifStoreMsg,
 		imageList,
 		isLoading,
 		photoMode,
+		showSidePage,
 		videoMode,
 	} from "$lib/shared/stores/common/Store";
 	import {
@@ -67,7 +68,7 @@
 	import Add from "$lib/assets/chat/svelte/Add.svelte";
 	import ChatToolsCard from "$lib/modules/chat/ChatToolsCard.svelte";
 	import ChatVideoCard from "$lib/modules/chat/ChatVideoCard.svelte";
-	import { TalkingVoiceLibrary } from "$lib/shared/constant/Data.js";
+	import { TalkingTemplateLibrary, TalkingVoiceLibrary } from "$lib/shared/constant/Data.js";
 	import FloatImageList from "$lib/modules/chat/FloatImageList.svelte";
 	import HintIcon from "$lib/assets/chat/svelte/HintIcon.svelte";
 	import UploadImageBlobs from "$lib/shared/components/upload/UploadImageBlobs.svelte";
@@ -94,6 +95,7 @@
 	let showTools = false;
 	let toolTile = "";
 	let uploadedImageToVideo = false;
+	let knowledgeAccess = false
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
@@ -101,15 +103,15 @@
 	};
 	let group: string[] = [];
 	const voice =
-		$currentVoice.collection === CollectionType.Custom
-			? $TalkingVoiceCustom[$currentVoice.id].id
-			: $currentVoice.collection === CollectionType.Library
-			? TalkingVoiceLibrary[$currentVoice.id].identify
-			: "default";
-	const knowledge =
-		$currentKnowledge.collection === CollectionType.Custom
-			? $TalkingKnowledgeCustom[$currentKnowledge.id].id
-			: "default";
+		$currentTemplate.collection === CollectionType.Custom
+			? $TemplateCustom[$currentTemplate.id].identify
+			: TalkingTemplateLibrary[$currentTemplate.id].identify;
+	$: knowledge = knowledgeAccess ? (
+		$currentTemplate.collection === CollectionType.Custom
+			? $TemplateCustom[$currentTemplate.id].knowledge
+			: TalkingTemplateLibrary[$currentTemplate.id].knowledge
+	) : "default"
+		
 	let showFloatImg = false;
 
 	$: placeholder =
@@ -118,6 +120,7 @@
 		isImage(chatMessages[chatMessages.length - 1].type)
 			? "Ask me about..."
 			: "Upload images/Ask me about...";
+
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
@@ -300,12 +303,10 @@
 	};
 
 	const callTextStream = async (query: string) => {
-		console.log("1");
 
 		const eventSource = await fetchTextStream(query, knowledge);
 
 		eventSource.addEventListener("message", (e: any) => {
-			console.log("e", e);
 
 			let currentMsg = e.data;
 			if (currentMsg == "[DONE]") {
@@ -331,7 +332,6 @@
 			}
 		});
 		eventSource.stream();
-		console.log("2");
 	};
 
 	const callAudioStream = async (query: string) => {
@@ -525,7 +525,7 @@
 							on:keydown={(event) => {
 								if (event.key === "Enter" && !event.shiftKey && query) {
 									event.preventDefault();
-									handleTextSubmit(false);
+									handleTextSubmit();
 								}
 							}}
 						/>
@@ -533,7 +533,7 @@
 							class="absolute bottom-3 right-1"
 							on:click={() => {
 								if (query) {
-									handleTextSubmit(false);
+									handleTextSubmit();
 								}
 							}}
 							type="submit"
@@ -541,7 +541,10 @@
 							<PaperAirplane />
 						</button>
 					</div>
-					<KnowledgeAccess />
+					<KnowledgeAccess on:change={(e) => {
+						knowledgeAccess = e.target.checked
+						if (knowledgeAccess) showSidePage.set(true)
+					}}/>
 				</div>
 				<!-- hint -->
 				<button
