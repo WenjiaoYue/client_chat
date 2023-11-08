@@ -116,9 +116,9 @@ export const TalkingKnowledgeLibrary = [
 ]
 
 export const TalkingTemplateLibrary = [
+  { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default" },
   { name: "John", avatar: JohnAvatar, audio: PatVoice, identify: "default_male", knowledge: "default" },
   { name: "Ann", avatar: annAvatar, audio: WeiVoice, identify: "wei", knowledge: "default" },
-  { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default" },
   // { name: "Andy Grove", avatar: andyAvatar, audio: AndyVoice, knowledge: 'Young_Andy', identify: "andy" },
 ];
 

@@ -69,6 +69,14 @@
 				triggeredBy="#photoChoose"
 				class="w-[10rem] max-w-sm divide-y divide-gray-100 rounded px-1 shadow"
 			>
+				<button
+					on:click={() => {
+						popupModal.set(true);
+					}}
+					class="text-primary-600 px-1 text-center text-[0.8rem] font-bold"
+				>
+					{"Photo Album ->"}
+				</button>
 				<li class="rounded p-1 hover:bg-gray-100">
 					<Radio
 						name="photoChecked"

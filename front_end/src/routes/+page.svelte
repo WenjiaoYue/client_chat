@@ -261,6 +261,13 @@
 				type: "warning",
 				removeAfter: 3000,
 			});
+		} else if ($photoMode === "photoChat"  && $imageList.length === 0) {
+			addNotification({
+				text: "Please upload photos!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
 		} else {
 			let res = await ChatResponse.chatMessage(
 				query,

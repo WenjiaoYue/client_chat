@@ -55,15 +55,13 @@
 	class="relative flex flex-col justify-center items-center h-full w-full flex-col items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
 >
 	<button
-		class="flex items-center justify-center"
+		class="w-7 h-7"
 		on:click|stopPropagation={(e) => {
-			console.log(e);
-			
 			handleAudioPlayer();
 		}}
 	>
 		{#if play}
-			<StopRecording extraClass="h-10 w-10"/>
+			<StopRecording extraClass="h-7 w-7"/>
 		{:else}
 			<VoiceButton />
 		{/if}
