@@ -89,13 +89,13 @@ export let currentTemplate = writable<{
   id: 0
 });
 
-// export let currentAvaTar = writable<{
-//   collection: CollectionType,
-//   id: number
-// }>({
-//   collection: CollectionType.Library,
-//   id: 0
-// });
+export let currentAvaTar = writable<{
+  collection: CollectionType,
+  id: number
+}>({
+  collection: CollectionType.Library,
+  id: 0
+});
 
 // export let currentVoice = writable<{
 //   collection: CollectionType,
