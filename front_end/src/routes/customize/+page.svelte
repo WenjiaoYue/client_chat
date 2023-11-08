@@ -3,22 +3,22 @@
 
 	const tabs = [
 		{
-			background: "bg-[url('$lib/assets/customize/photo.png')]",
+			background: "bg-[url('$lib/assets/customize/img/photo.png')]",
 			title: "Photo",
 			link: "/info",
 		},
 		{
-			background: "bg-[url('$lib/assets/customize/avatar.jpg')]",
+			background: "bg-[url('$lib/assets/customize/img/avatar.jpg')]",
 			title: "Avatars",
 			link: "/avatar",
 		},
 		{
-			background: "bg-[url('$lib/assets/customize/voice.png')]",
+			background: "bg-[url('$lib/assets/customize/img/voice.png')]",
 			title: "Voices",
 			link: "/voice",
 		},
 		{
-			background: "bg-[url('$lib/assets/customize/knowledge.jpg')]",
+			background: "bg-[url('$lib/assets/customize/img/knowledge.jpg')]",
 			title: "Knowledge Bases",
 			link: "/knowledge",
 		},
