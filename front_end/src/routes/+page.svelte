@@ -125,14 +125,14 @@
 
 	$: placeholder =
 		$currentMode === "Text"
-			? "Message chatbot ..."
+			? "Message chatbot to start a conversation ..."
 			: $currentMode === "Search"
-			? "Pick up your photos based on time/location/ ..."
+			? "Message chatbot to search photos by time/location ..."
 			: $currentMode === "Photo"
-			? "Stylize your Photos ..."
+			? "Message chatbot to stylize your photos ..."
 			: $currentMode === "Video" && $videoMode === "input"
-			? "Create talking avatar from your text/voice ..."
-			: "Chat with Avatar from your text/voice ...";
+			? "Message chatbot to create talking avatar for input ..."
+			: "Message chatbot to create talking avatar for response ...";
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
