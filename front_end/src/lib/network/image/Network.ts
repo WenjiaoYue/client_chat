@@ -56,7 +56,7 @@ export async function fetchImageList() {
 }
 
 export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: string | Blob) {
-	const url = `$env.VIDEO_URL}`
+	const url = `${env.VIDEO_URL}`;
 	const formData = new FormData()
 	formData.append('image', imageBlob, 'remote-image.jpg');
 	formData.append('text', query);
