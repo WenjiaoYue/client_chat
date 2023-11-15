@@ -131,8 +131,8 @@
 			: $currentMode === "Photo"
 			? "Stylize your Photos ..."
 			: $currentMode === "Video" && $videoMode === "input"
-			? "Create talking avatar based on your input[text/voice] ..."
-			: "Chat with Avatar based on your input[text/voice] ...";
+			? "Create talking avatar from your text/voice ..."
+			: "Chat with Avatar from your text/voice ...";
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
