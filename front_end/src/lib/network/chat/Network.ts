@@ -27,9 +27,10 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 			"query": query,
 			"domain": "test",
 			"stream": true,
-			"max_new_tokens": 256
+			"max_new_tokens": 256,
+			"knowledge_base_id": "default"
 		}
-		url = `https://198.175.88.26:443/v1/textchat/chat`;
+		url = `https://198.175.88.26:443/v1/askdoc/chat`;
 	}
 
 	return new SSE(url, {
@@ -56,10 +57,11 @@ export async function fetchVideoText(query: string, knowledge_base_id: string) {
 		payload = {
 			"query": query,
 			"domain": "test",
-			"stream": false,
-			"max_new_tokens": 256
+			"knowledge_base_id": "default",
+			"max_new_tokens": 256,
+			"stream": false
 		}
-		url = `https://198.175.88.26:443/v1/textchat/chat`;
+		url = `https://198.175.88.26:443/v1/askdoc/chat`;
 	}
 
 
