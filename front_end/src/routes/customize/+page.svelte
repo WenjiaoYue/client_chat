@@ -64,8 +64,7 @@
 				<div class="block shrink-0">
 					<div
 						class="rounded-2xl sm:w-[15rem]"
-						class:ring={$currentTemplate.collection === CollectionType.Custom &&
-							$currentTemplate.id === i}
+						class:ring={ $currentTemplate.id === i}
 					>
 						<BotTemplateCard
 							{...opt}
