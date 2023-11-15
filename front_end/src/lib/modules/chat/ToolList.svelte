@@ -1,28 +1,35 @@
 <script lang="ts">
-	import PictureEnlarge from "$lib/shared/components/images/PictureEnlarge.svelte";
 	import {
 		currentMode,
 		imageList,
+		knowledgeAccess,
 		photoMode,
 		popupModal,
 		videoMode,
 	} from "$lib/shared/stores/common/Store";
 	import { createEventDispatcher } from "svelte";
-	import Close from "$lib/assets/chat/svelte/Close.svelte";
-	import { Dropdown, DropdownItem, Modal, Radio } from "flowbite-svelte";
+	import { Button, Dropdown, Popover, Radio, Tooltip } from "flowbite-svelte";
 	import Video from "$lib/assets/chat/svelte/Video.svelte";
 	import Text from "$lib/assets/chat/svelte/Text.svelte";
-	import ChatUploadImages from "./ChatUploadImages.svelte";
-	import Warning from "$lib/assets/chat/svelte/Warning.svelte";
 	import ColorImg from "$lib/assets/chat/svelte/ColorImg.svelte";
+	import KnowledgeAccess from "$lib/assets/chat/svelte/KnowledgeAccess.svelte";
+	import TextIcon from "$lib/assets/chat/svelte/TextIcon.svelte";
+	import SearchPhoto from "$lib/assets/chat/svelte/SearchPhoto.svelte";
+	import PhotoTransfer from "$lib/assets/chat/svelte/PhotoTransfer.svelte";
+	import VideoChat from "$lib/assets/chat/svelte/VideoChat.svelte";
+	import VideoIcon from "$lib/assets/chat/svelte/VideoIcon.svelte";
 
 	const dispatch = createEventDispatcher();
-	let videoChecked = "input";
 	let photoChecked = "photoChat";
 	const toolStyle = {
 		init: `group mx-1 inline-flex flex-col items-center justify-center rounded-full rounded-r-full bg-white p-1 px-2 hover:bg-gray-50`,
 		inactive: ``,
 		active: `outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-indigo-200`,
+	};
+	const hintStyle = {
+		init: `group mx-1 inline-flex flex-col items-center justify-center rounded-full rounded-r-full bg-white p-1 px-2 hover:bg-gray-50`,
+		inactive: ``,
+		active: `outline-none ring-2 ring-purple-500 ring-offset-2 ring-offset-purple-200`,
 	};
 	$: {
 		if (photoChecked) {
@@ -32,10 +39,8 @@
 
 	function exchangeMode(mode: string) {
 		currentMode.set(mode);
-		if (mode === "Video") {
-			videoMode.set(videoChecked);
-		}
 	}
+	let type = "";
 </script>
 
 <div class="m-1 flex inline-flex p-1">
@@ -43,100 +48,136 @@
 		<div class="mx-auto flex h-full">
 			<button
 				type="button"
+				id="type-Chat with Text"
 				class={`${toolStyle.init}  ${
 					$currentMode === "Text" ? toolStyle.active : toolStyle.inactive
 				}`}
-				on:click={() => exchangeMode("Text")}
+				on:click={() => {
+					exchangeMode("Text");
+					dispatch("showPrompt", false);
+				}}
 			>
 				<Text />
-				<!-- <span class="text-[0.5rem] text-gray-400">Text Mode</span> -->
 			</button>
+
+			
 			<button
 				type="button"
-				id="photoChoose"
+				id="type-Upload Photos"
+				class={`${toolStyle.init}  ${
+					$currentMode === "Search" ? toolStyle.active : toolStyle.inactive
+				}`}
+				on:click={() => {
+					if ($imageList.length === 0) {
+						popupModal.set(true);
+					}
+					exchangeMode("Search");
+					dispatch("showPrompt", true);
+				}}
+			>
+				<SearchPhoto />
+			</button>
+
+			<button
+				type="button"
+				id="type-Stylize Photos"
 				class={`${toolStyle.init}  ${
 					$currentMode === "Photo" ? toolStyle.active : toolStyle.inactive
 				}`}
 				on:click={() => {
+					popupModal.set(true);
+					dispatch("showPrompt", true);
 					exchangeMode("Photo");
 				}}
 			>
-				<ColorImg />
-				<!-- <span class="text-[0.5rem] text-gray-400">Photo Mode</span> -->
+				<PhotoTransfer />
 			</button>
-
-			<Dropdown
-				triggeredBy="#photoChoose"
-				class="w-[10rem] max-w-sm divide-y divide-gray-100 rounded px-1 shadow"
-			>
-				<button
-					on:click={() => {
-						popupModal.set(true);
-					}}
-					class="text-primary-600 px-1 text-center text-[0.8rem] font-bold"
-				>
-					{"Photo Album ->"}
-				</button>
-				<li class="rounded p-1 hover:bg-gray-100">
-					<Radio
-						name="photoChecked"
-						bind:group={photoChecked}
-						value={"photoChat"}
-					>
-						<p class="text-xs">Chat with Photos</p></Radio
-					>
-				</li>
-				<li class="rounded p-1 hover:bg-gray-100">
-					<Radio
-						name="photoChecked"
-						bind:group={photoChecked}
-						value={"styleTransfer"}
-						on:click={() => {
-							popupModal.set(true);
-						}}
-						><p class="text-xs">Photo Style Transfer</p>
-					</Radio>
-				</li>
-			</Dropdown>
 
 			<button
 				type="button"
-				id="videoChoose"
+				id="type-Create Talking Avatar"
 				class={`${toolStyle.init}  ${
-					$currentMode === "Video" ? toolStyle.active : toolStyle.inactive
+					$currentMode === "Video" && $videoMode === "input"
+						? toolStyle.active
+						: toolStyle.inactive
 				}`}
-				on:click={() => exchangeMode("Video")}
+				on:click={() => {
+					popupModal.set(true);
+					exchangeMode("Video");
+					videoMode.set("input");
+					dispatch("showPrompt", false);
+				}}
 			>
 				<Video />
-				<!-- <span class="text-[0.5rem] text-gray-400">Video Mode</span> -->
 			</button>
 
-			<Dropdown
-				triggeredBy="#videoChoose"
-				class="w-[10rem] max-w-sm divide-y divide-gray-100 rounded px-1 shadow"
+			<button
+				type="button"
+				id="type-Chat with Avatar"
+				class={`${toolStyle.init}  ${
+					$currentMode === "Video" && $videoMode === "output"
+						? toolStyle.active
+						: toolStyle.inactive
+				}`}
+				on:click={() => {
+					popupModal.set(true);
+					exchangeMode("Video");
+					videoMode.set("output");
+					dispatch("showPrompt", false);
+				}}
 			>
-				<button
-					on:click={() => {
-						popupModal.set(true);
-					}}
-					class="text-primary-600 px-1 text-center text-[0.8rem] font-bold"
-				>
-					{"Choose one photo ->"}
-				</button>
+				<VideoChat />
+			</button>
+			<Tooltip
+				placement="top"
+				color={"yellow"}
+				{type}
+				triggeredBy="[id^='type-']"
+				on:show={(ev) => (type = ev.target.id.split("-")[1])}
+				class="px-2 py-1 text-[0.7rem]">{type}</Tooltip
+			>
 
-				<li class="rounded p-1 hover:bg-gray-100">
-					<Radio name="videoChecked" bind:group={videoChecked} value={"input"}
-						>Input</Radio
+			<!-- <Dropdown
+				placement="right"
+				triggeredBy="#videoChoose"
+				class=" max-w-sm divide-y divide-gray-100 rounded p-2 shadow"
+			>
+				<div class="flex flex-col gap-3">
+					<button
+						id="type-generate video"
+						on:click={() => {
+							videoMode.set("input");
+						}}
+						class={`${hintStyle.init}  ${
+							$videoMode === "input" ? hintStyle.active : hintStyle.inactive
+						}`}
 					>
-					<p class="text-[0.67rem] text-gray-400">Generate Video from Input</p>
-				</li>
-				<li class="rounded p-1 hover:bg-gray-100">
-					<Radio name="videoChecked" bind:group={videoChecked} value={"output"}
-						>output</Radio
+						<Video />
+					</button>
+
+					<button
+						id="type-video chat"
+						on:click={() => {
+							videoMode.set("output");
+						}}
+						class={`${hintStyle.init}  ${
+							$videoMode === "output" ? hintStyle.active : hintStyle.inactive
+						}`}
 					>
-					<p class="text-[0.67rem] text-gray-400">Generate Video from Output</p>
-				</li>
-			</Dropdown>
+						<VideoChat />
+					</button>
+					<Dropdown
+						class="inline-flex w-[6rem]  items-center justify-center 
+						rounded-lg bg-gray-400 p-1 text-center text-[0.7rem] text-white"
+						{type}
+						placement="right"
+						triggeredBy="[id^='type-']"
+						on:show={(ev) => {
+							type = ev.target.id.split("-")[1];
+						}}>{type}</Dropdown
+					>
+				</div>
+			</Dropdown> -->
 		</div>
 	</div>
 </div>

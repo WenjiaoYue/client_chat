@@ -3,9 +3,9 @@
 	import { Popover } from "flowbite-svelte";
 </script>
 
-<div class="mt-3 flex w-full flex-row items-start gap-1.5 pl-1">
+<div class="flex w-full flex-row items-start gap-1.5 pl-1">
 	<KnowledgeAccess />
-	<span class="text-xs text-[#611fec]">knowledge Access</span>
+	<span class="text-xs text-[#611fec]">knowledge</span>
 	<label class="relative inline-flex cursor-pointer items-center">
 		<input type="checkbox" value="" class="peer sr-only" checked on:change />
 		<div

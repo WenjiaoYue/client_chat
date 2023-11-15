@@ -86,7 +86,6 @@
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const res = await fetchAudioEmbedding(blob, qualityMode);
 			spk_id = res.voice_id ? res.voice_id : "default";
-			console.log('spk_id', spk_id);
 			
 		} catch {
 			spk_id = "default";
@@ -238,7 +237,7 @@
         </div>
     </div>
 	<div class="mt-10 flex justify-end gap-10 px-10">
-		<GradientButton color="blue" on:click={() => {selectAvatar = selectVoice = selectKnowledge = -1;insertModal.close()}}>Cancel</GradientButton>
+		<GradientButton color="blue" on:click={() => {insertModal.close()}}>Cancel</GradientButton>
 		<GradientButton color="blue" on:click={() => {editTemplate();insertModal.close()}}>Confirm</GradientButton>
     </div>
 </dialog>

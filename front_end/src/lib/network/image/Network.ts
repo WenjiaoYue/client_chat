@@ -55,13 +55,13 @@ export async function fetchImageList() {
 	}
 }
 
-export async function tmpVideo(query, imageBlob) {
+export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: string | Blob) {
 	const url = 'http://10.165.57.68:9001/v1/talkingbot/face_animation'
 	const formData = new FormData()
 	formData.append('image', imageBlob, 'remote-image.jpg');
 	formData.append('text', query);
 	formData.append('mode', "fast");
-	formData.append('voice', "wei");
+	formData.append('voice', voice_id);
 
 	const init: RequestInit = {
 		method: "POST",
@@ -72,7 +72,6 @@ export async function tmpVideo(query, imageBlob) {
 		const response = await fetch(url, init);
 		if (!response.ok) throw response.status
 		const videoData = await response.blob();
-		console.log('videoData', videoData);
 
 		const videoUrl = URL.createObjectURL(videoData);
 		return videoUrl;

@@ -24,6 +24,10 @@ export interface ImgListPiece {
 
 export let open = writable(true);
 
+export let knowledgeAccess = writable(true);
+
+export let showTemplate = writable(false)
+
 export let showSidePage = writable(false)
 
 export let imageList = writable<Array<ImgListPiece>>([]);
@@ -48,6 +52,7 @@ export let videoMode = writable("input");
 
 export let photoMode = writable("photoChat");
 
+// upload
 export const TalkingPhotoCustom = writable<{
   name: string;
   avatar: string;
@@ -65,6 +70,7 @@ export const TalkingKnowledgeCustom = writable<{
   id: string;
 }[]>([])
 
+// create template
 export const TemplateCustom = writable<{
   name: string;
   avatar: string;
@@ -89,29 +95,6 @@ export let currentTemplate = writable<{
   id: 0
 });
 
-export let currentAvaTar = writable<{
-  collection: CollectionType,
-  id: number
-}>({
-  collection: CollectionType.Library,
-  id: 0
-});
-
-export let currentVoice = writable<{
-  collection: CollectionType,
-  id: number
-}>({
-  collection: CollectionType.Library,
-  id: 0
-});
-
-export let currentKnowledge = writable<{
-  collection: CollectionType,
-  id: number
-}>({
-  collection: CollectionType.Library,
-  id: 0
-});
 
 export const popupModal = writable(false);
 

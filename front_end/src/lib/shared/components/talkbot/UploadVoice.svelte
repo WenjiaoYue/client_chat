@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Upload from "$lib/assets/handel/Upload.svelte";
 	import { createEventDispatcher } from "svelte";
-	import uploadFile from '$lib/assets/voice/svg/uploadFile.svg';
 
 	const dispatch = createEventDispatcher();
 
@@ -8,8 +8,6 @@
 
 	function handleInput(event: Event) {
 		const file = (event.target as HTMLInputElement).files![0];
-        console.log(file);
-
 		if (!file) return;
 
 		const reader = new FileReader();
@@ -22,10 +20,8 @@
 	}
 </script>
 
-<label for="audio" class="flex flex-col items-center justify-center w-full aspect-square shadow-[0_2px_30px_0_rgba(0,0,0,0.1)] rounded-xl text-center">
-	<img class="h-10 swap-on" src={uploadFile} alt=""/>
-	<p class="text-xs text-gray-500">Upload</p>
-</label>
+<Upload type="audio" />
+
 
 <input
 	id="audio"

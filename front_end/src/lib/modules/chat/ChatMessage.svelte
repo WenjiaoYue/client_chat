@@ -48,7 +48,7 @@
 			{:else if msg.type === MessageType.singleVideo}
 				<VideoMessage src={convertTypeString(msg.content)}/>
 			{:else}
-				<p class="max-w-[60vw] whitespace-pre-line text-sm">{@html msg.content}</p>
+				<p class="sm:max-w-[32rem] max-w-[60vw] whitespace-pre-line text-[0.8rem] break-keep leading-5">{@html msg.content}</p>
 			{/if}
 		</div>
 	</div>

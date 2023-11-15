@@ -6,12 +6,10 @@
 	import { CollectionType, TemplateCustom, currentTemplate } from "$lib/shared/stores/common/Store";
 	export let role: MessageRole;
 
-	const map: {[key: number]: {avatar: string}[]} = {
+	$: map = {
 		[CollectionType.Custom]: $TemplateCustom,
 		[CollectionType.Library]: TalkingTemplateLibrary,
 	}
-
-	$: console.log('$currentTemplate', $currentTemplate, $currentTemplate.collection, map[$currentTemplate.collection][$currentTemplate.id]);
 	
 	$: src = map[$currentTemplate.collection][$currentTemplate.id] ?.avatar;
 </script>

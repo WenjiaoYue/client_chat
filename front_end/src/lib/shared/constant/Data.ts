@@ -13,14 +13,15 @@ import indiaYouthVoice from '$lib/assets/voice/audio/scottish_women.mp3'
 import MavisBarryAvatar from "$lib/assets/avatar/img/Mavis-Barry-Avatar.jpg";
 import LawrenceAvatar from "$lib/assets/avatar/img/Lawrence-Avatar.jpg";
 import RichardJosephAvatar from "$lib/assets/avatar/img/Richard-Joseph-Avatar.jpg";
+import DeeparkAvatar from "$lib/assets/avatar/img/DeeparkAvatar-Avatar.png";
 import TishaNortonAvatar from "$lib/assets/avatar/img/Tisha-Norton-Avatar.jpg";
 import EmmaBergerAvatar from "$lib/assets/avatar/img/Emma-Berger-Avatar.jpg";
 import EricYatesAvatar from "$lib/assets/avatar/img/Eric-Yates-Avatar.jpg";
 import ShylaBandhuAvatar from "$lib/assets/avatar/img/Shyla-Bandhu-Avatar.jpg";
 
-import HumaVoice from "$lib/assets/voice/audio/welcome_huma.wav"
-import PatVoice from "$lib/assets/voice/audio/mid-age-man.mp3"
-import WeiVoice from "$lib/assets/voice/audio/welcome_wei.wav"
+import HumaVoice from "$lib/assets/voice/audio/huma.wav"
+import WeiVoice from "$lib/assets/voice/audio/li_wei.wav"
+import DeepakVoice from "$lib/assets/voice/audio/deepak.wav"
 
 import humaAvatar from "$lib/assets/customize/img/huma.jpg";
 import JohnAvatar from "$lib/assets/customize/img/John-Avatar.jpg";
@@ -47,8 +48,9 @@ export const data: MenuItem[] = [
   // {
   //   title: 'Photo',
   //   icon: Info,
-  //   link: '/info'
+  //   link: '/classify'
   // },
+  
   // {
   //   title: 'Voice',
   //   icon: Info,
@@ -107,7 +109,7 @@ export const TalkingPhotoLibrary = [
 
 export const TalkingVoiceLibrary = [
   { name: 'Woman', audio: indiaYouthVoice, identify: "default" },
-  { name: 'Man', audio: midAgeMantVoice, identify: "default_male" },
+  { name: 'Man', audio: midAgeMantVoice, identify: "male" },
 ]
 
 export const TalkingKnowledgeLibrary = [
@@ -116,10 +118,9 @@ export const TalkingKnowledgeLibrary = [
 ]
 
 export const TalkingTemplateLibrary = [
+  { name: "Wei", avatar: annAvatar, audio: WeiVoice, identify: "wei", knowledge: "default" },
+  { name: "Deepak", avatar: DeeparkAvatar, audio: DeepakVoice, identify: "deepak", knowledge: "default" },
   { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default" },
-  { name: "John", avatar: JohnAvatar, audio: PatVoice, identify: "default_male", knowledge: "default" },
-  { name: "Ann", avatar: annAvatar, audio: WeiVoice, identify: "wei", knowledge: "default" },
-  // { name: "Andy Grove", avatar: andyAvatar, audio: AndyVoice, knowledge: 'Young_Andy', identify: "andy" },
 ];
 
 export const toolList = [

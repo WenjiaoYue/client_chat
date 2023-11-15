@@ -10,8 +10,6 @@
 	const dispatch = createEventDispatcher();
 
 	const setPlacement = (title: string) => {
-		console.log("placement", title);
-
 		id = `${title}`;
 		open = !open;
 	};

@@ -26,12 +26,6 @@
 			handleImageUpload(e, resolve);
 		}).then(() => {
 			isLoading.set(false);
-			addNotification({
-				text: "Uploaded successfully",
-				position: "bottom-center",
-				type: "success",
-				removeAfter: 1000,
-			});
 			dispatch("uploadEnd");
 		});
 		newUploadNum.set(1);

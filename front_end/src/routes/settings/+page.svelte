@@ -75,7 +75,7 @@
 	}
 </script>
 
-<div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+<div class="container mx-auto px-4 py-8 sm:px-6 sm:py-20 lg:px-8">
 	<h2 class="text-center text-2xl font-bold">Settings</h2>
 	<div
 		class="relative mx-auto max-w-xl rounded-3xl px-12 px-6 py-6 shadow-[20px_34px_74px_0_#15156107] max-sm:px-2"

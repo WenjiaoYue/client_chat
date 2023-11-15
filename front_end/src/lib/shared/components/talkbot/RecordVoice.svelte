@@ -49,7 +49,6 @@
 						chunks = []
 						voiceTimer = 0;
 					});
-					console.log("recordOK");
 					recordOK = true;
 				})
 				.catch((error) => {
@@ -89,7 +88,7 @@
 	});
 </script>
 
-<div class="relative w-full aspect-square flex flex-col justify-center items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]">
+<div class="relative w-full aspect-square flex flex-col justify-center items-center rounded-xl shadow-[0_2px_30px_0_rgba(0,0,0,0.1)] sm:w-[5rem] sm:h-[5rem] ">
 	<!-- Voice button -->
 	<span class="absolute -top-3 text-[#6578aa] text-sm">{displayTimer(voiceTimer)}</span>
 	<label class="swap">

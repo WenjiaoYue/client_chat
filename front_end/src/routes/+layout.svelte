@@ -19,6 +19,7 @@
 				window.scrollTo(0, 1);
 			}, 0);
 		});
+
 	});
 </script>
 
@@ -27,7 +28,7 @@
 		<div class="flex h-full flex-col">
 			<Marquee />
 			<Timer />
-			<div class="h-0 grow">
+			<div class="h-0 grow bg-white  lg:rounded-tl-3xl sm:ml-10">
 				<slot />
 			</div>
 		</div>

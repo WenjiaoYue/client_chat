@@ -24,6 +24,27 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	}
 }
 
+export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {	
+	const url = `${KNOWLEDGE_BASE_URL}/upload_link`
+	const data = {
+		"link_list": pasteUrlList,
+	}
+	const init: RequestInit = {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	};
+
+	try {
+		const response = await fetch(url, init);
+		if (!response.ok) throw response.status
+		return await response.json();
+	} catch (error) {
+		console.error('network error: ', error);
+		return undefined
+	}
+}
+
 export async function fetchAudioEmbedding(audio: string | Blob, qualityMode: boolean) {
 	const url = qualityMode ? `${VOICE_FAST_URL}/create_embed` : `${VOICE_HIGH_QUALITY_URL}/create_embed`
 	const formData = new FormData()

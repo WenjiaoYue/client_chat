@@ -14,7 +14,6 @@
 		TalkingKnowledgeCustom,
 		TemplateCustom,
 		countDown,
-		currentKnowledge,
 		currentMode,
 		currentTemplate,
 		ifStoreMsg,
@@ -33,7 +32,7 @@
 		Progressbar,
 	} from "flowbite-svelte";
 	import { onMount } from "svelte";
-	import { fetchImageList } from "$lib/network/image/Network";
+	import { fetchImageList, fetchTypeList } from "$lib/network/image/Network";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import {
 		LOCAL_STORAGE_KEY,
@@ -68,8 +67,10 @@
 	import Add from "$lib/assets/chat/svelte/Add.svelte";
 	import ChatToolsCard from "$lib/modules/chat/ChatToolsCard.svelte";
 	import ChatVideoCard from "$lib/modules/chat/ChatVideoCard.svelte";
-	import { TalkingTemplateLibrary, TalkingVoiceLibrary } from "$lib/shared/constant/Data.js";
-	import FloatImageList from "$lib/modules/chat/FloatImageList.svelte";
+	import {
+		TalkingTemplateLibrary,
+		TalkingVoiceLibrary,
+	} from "$lib/shared/constant/Data.js";
 	import HintIcon from "$lib/assets/chat/svelte/HintIcon.svelte";
 	import UploadImageBlobs from "$lib/shared/components/upload/UploadImageBlobs.svelte";
 	import ChatUploadImages from "$lib/modules/chat/ChatUploadImages.svelte";
@@ -79,15 +80,14 @@
 	import PopImageList from "$lib/modules/chat/popImageList.svelte";
 	import Notification from "$lib/assets/image-info/svelte/notification.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
-	import KnowledgeAccess from "$lib/modules/chat/KnowledgeAccess.svelte";
+	import KnowledgeAccess from "$lib/modules/chat/KnowledgeAccessPage.svelte";
+	import KnowledgeAccessPage from "$lib/modules/chat/KnowledgeAccessPage.svelte";
 
 	let query: string = "";
 	const { addNotification } = getNotificationsContext();
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	let done: boolean = false;
-	let uploadProgress = 0;
-	let uploadHandle: number;
 	let typeList: { [index: string]: { [index: string]: string } } = {};
 	let promptList: { [key: string]: any[] } = {};
 	let showBottomImages = false;
@@ -95,41 +95,49 @@
 	let showTools = false;
 	let toolTile = "";
 	let uploadedImageToVideo = false;
-	let knowledgeAccess = true;
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
-		"Image Style": ["pencil sketch", "disney cartoon", "illustration", "pixar"],
+		"Image Style": [
+			"pencil sketch",
+			"disney cartoon",
+			"add fireworks",
+			"van gogh",
+			"pixar",
+			"younger",
+		],
 	};
 	let group: string[] = [];
-	const voice =
+	let knowledgeAccess = true;
+
+	$: voice =
 		$currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].identify
 			: TalkingTemplateLibrary[$currentTemplate.id].identify;
 
-				
-	$: knowledge = knowledgeAccess ? (
-		$currentTemplate.collection === CollectionType.Custom
+	$: knowledge = knowledgeAccess
+		? $currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].knowledge
 			: TalkingTemplateLibrary[$currentTemplate.id].knowledge
-	) : "default"
+		: "default";
 
-	$: console.log('knowledge', knowledge);
-	
-		
 	let showFloatImg = false;
 
 	$: placeholder =
-		chatMessages.length &&
-		chatMessages[chatMessages.length - 1].role === MessageRole.User &&
-		isImage(chatMessages[chatMessages.length - 1].type)
-			? "Ask me about..."
-			: "Upload images/Ask me about...";
-
+		$currentMode === "Text"
+			? "Message chatbot ..."
+			: $currentMode === "Search"
+			? "Find photos based on input criteria ..."
+			: $currentMode === "Photo"
+			? "Transform it into the desired style ..."
+			: $currentMode === "Video" && $videoMode === "input"
+			? "Generate a video based on the input text/voice ..."
+			: "Use input text/voice to video chat ...";
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
 	$: $currentMode !== "Photo" ? (showFloatImg = true) : (showFloatImg = false);
+	console.log("$currentMode", $currentMode);
 
 	$: {
 		if (group.length > 0) {
@@ -162,6 +170,16 @@
 			Person: `Give me ${word}'s photos`,
 		} as { [index: string]: string });
 
+	async function getPrompt() {
+		[done, typeList, promptList] = await checkProcessingImage();
+
+		const capitalizedKeys = Object.entries(promptList)
+			.filter(([_, value]) => value.length > 0)
+			.map(([key, value]) => ({
+				[key.charAt(0).toUpperCase() + key.slice(1)]: value,
+			}))
+			.reduce((acc, item) => ({ ...acc, ...item }), {});
+	}
 	onMount(async () => {
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
@@ -176,14 +194,6 @@
 			});
 		}
 
-		const capitalizedKeys = Object.entries(promptList)
-			.filter(([_, value]) => value.length > 0)
-			.map(([key, value]) => ({
-				[key.charAt(0).toUpperCase() + key.slice(1)]: value,
-			}))
-			.reduce((acc, item) => ({ ...acc, ...item }), {});
-
-		prompts = { ...prompts, ...capitalizedKeys };
 		const res = await fetchImageList();
 		if (res) imageList.set(res);
 
@@ -221,12 +231,6 @@
 			],
 		});
 		console.log($countDown);
-
-		// Only triggers the first time
-		// if ($countDown >= 1790 && window.deviceType === "mobile") {
-		// 	window.name = "loaded";
-		// 	driverObj.drive();
-		// }
 	});
 
 	function storeMessages() {
@@ -246,79 +250,54 @@
 				imgId: item.image_id,
 			}));
 		// network
-		console.log("11.6 --", checkedItems.length, $currentMode);
-		if ($currentMode === "Video" && checkedItems.length !== 1) {
-			addNotification({
-				text: "Please select one photo!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-		} else if ($photoMode === "styleTransfer" && checkedItems.length === 0) {
-			addNotification({
-				text: "Please select photos!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-		} else if ($photoMode === "photoChat"  && $imageList.length === 0) {
-			addNotification({
-				text: "Please upload photos!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-		} else {
-			let res = await ChatResponse.chatMessage(
-				query,
-				voice,
-				knowledge,
-				checkedItems,
-				uploadedImageToVideo,
-				$currentMode,
-				$videoMode,
-				$photoMode
-			);
+		let res = await ChatResponse.chatMessage(
+			query,
+			voice,
+			knowledge,
+			checkedItems,
+			uploadedImageToVideo,
+			$currentMode,
+			$videoMode,
+			$photoMode
+		);
 
-			if (res) {
-				let type: MessageType;
-				if ($currentMode === "Video") {
-					type = MessageType.singleVideo;
-					res = res.url;
-				}
-				if ($currentMode === "Photo") {
-					if (Array.isArray(res)) {
-						if (res.length === 1) {
-							res = res[0];
-							type = MessageType.SingleImage;
-						} else {
-							type = MessageType.ImageList;
-						}
+		if (res) {
+			let type: MessageType;
+			if ($currentMode === "Video") {
+				type = MessageType.singleVideo;
+				res = res.url;
+			}
+			if ($currentMode === "Photo" || $currentMode === "Search") {
+				if (Array.isArray(res)) {
+					if (res.length === 1) {
+						res = res[0];
+						type = MessageType.SingleImage;
+					} else {
+						type = MessageType.ImageList;
 					}
 				}
-
-				chatMessages = [
-					...chatMessages,
-					{
-						role: MessageRole.Assistant,
-						type,
-						content: res,
-						time: getCurrentTimeStamp(),
-					},
-				];
 			}
+
+			chatMessages = [
+				...chatMessages,
+				{
+					role: MessageRole.Assistant,
+					type,
+					content: res,
+					time: getCurrentTimeStamp(),
+				},
+			];
 		}
 		loading = false;
 	};
 
 	const callTextStream = async (query: string) => {
-		console.log('knowledge', knowledge);
-
 		const eventSource = await fetchTextStream(query, knowledge);
 
 		eventSource.addEventListener("message", (e: any) => {
-
 			let currentMsg = e.data;
+			console.log("currentMsg", currentMsg);
+
 			if (currentMsg == "[DONE]") {
 				loading = false;
 				storeMessages();
@@ -374,37 +353,82 @@
 
 				scrollToBottom(scrollToDiv);
 			} else if (currentMsg === "[DONE]") {
-				let content = chatMessages[chatMessages.length - 1].content as string[];
-				chatMessages[chatMessages.length - 1].content = [...content, "done"];
-				storeMessages();
+				setTimeout(() => {
+					let content = chatMessages[chatMessages.length - 1]
+						.content as string[];
+					chatMessages[chatMessages.length - 1].content = [...content, "done"];
+					storeMessages();
+				}, 2000);
 			}
 		});
 		eventSource.stream();
 	};
-	const handleTextSubmit = async () => {
-		loading = true;
-		showBottomPrompt = false;
-		showBottomImages = false;
-		const newMessage = {
-			role: MessageRole.User,
-			type: MessageType.Text,
-			content: query,
-			time: getCurrentTimeStamp(),
-		};
-		chatMessages = [...chatMessages, newMessage];
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-		query = "";
-
+	async function warningUser() {
+		const checkedItems = $imageList
+			.filter((_, i) => currentDragImageList[i])
+			.map((item) => ({
+				imgSrc: item.image_path,
+				imgId: item.image_id,
+			}));
 		if ($currentMode === "Text") {
-			await callTextStream(newMessage.content);
+			return true;
+		} else if ($currentMode === "Video" && checkedItems.length !== 1) {
+			addNotification({
+				text: "Please select one photo!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
+			return false;
+		} else if ($photoMode === "styleTransfer" && checkedItems.length === 0) {
+			addNotification({
+				text: "Please select photos!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
+			return false;
+		} else if ($photoMode === "photoChat" && $imageList.length === 0) {
+			addNotification({
+				text: "Please upload photos!",
+				position: "bottom-center",
+				type: "warning",
+				removeAfter: 3000,
+			});
+			return false;
 		} else {
-			await callGeneralMsg(newMessage.content);
+			return true;
 		}
+	}
 
-		scrollToBottom(scrollToDiv);
-		storeMessages();
-		uploadedImageToVideo = false;
+	const handleTextSubmit = async () => {
+		const res = await warningUser();
+
+		if (res) {
+			loading = true;
+			showBottomPrompt = false;
+			showBottomImages = false;
+			const newMessage = {
+				role: MessageRole.User,
+				type: MessageType.Text,
+				content: query,
+				time: getCurrentTimeStamp(),
+			};
+			chatMessages = [...chatMessages, newMessage];
+			scrollToBottom(scrollToDiv);
+			storeMessages();
+			query = "";
+
+			if ($currentMode === "Text") {
+				await callTextStream(newMessage.content);
+			} else {
+				await callGeneralMsg(newMessage.content);
+			}
+
+			scrollToBottom(scrollToDiv);
+			storeMessages();
+			uploadedImageToVideo = false;
+		}
 	};
 
 	const handleAudioSubmit = (audioBlob: Blob) => {
@@ -426,7 +450,7 @@
 			storeMessages();
 
 			const res = await fetchAudioText(audioBlob);
-			if (uploadedImageToVideo) {
+			if ($currentMode === "Video") {
 				await callGeneralMsg(res.asr_result);
 				uploadedImageToVideo = false;
 			} else {
@@ -449,31 +473,18 @@
 			time: getCurrentTimeStamp(),
 		};
 
-		console.log("newMessage", newMessage);
-
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
 		storeMessages();
 
 		uploadedImageToVideo = true;
 	}
-
-	function handleUploadBegin() {
-		uploadHandle = setInterval(() => {
-			if (uploadProgress < 70) uploadProgress += 5;
-			else if (uploadProgress < 90) uploadProgress += 2;
-			else if (uploadProgress < 99) uploadProgress += 1;
-		}, 500);
-	}
-
-	function handleUploadEnd() {
-		uploadProgress = 0;
-		clearInterval(uploadHandle);
-	}
 </script>
 
 <!-- <DropZone on:drop={handleImageSubmit}> -->
-<div class="h-full items-center gap-5 sm:flex sm:px-20 sm:pb-2">
+<div
+	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
+>
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-2/3">
 		<Scrollbar
 			classLayout="flex flex-col gap-1"
@@ -500,106 +511,92 @@
 				const idx = e.detail;
 				currentDragImageList[idx] = !currentDragImageList[idx];
 			}}
-			on:uploadBegin={handleUploadBegin}
-			on:uploadEnd={handleUploadEnd}
+			on:showPrompt={(e) => {
+				showBottomPrompt = e.detail;
+			}}
 		/>
 		<div
-			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 shadow-inner"
+			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0 shadow-inner"
 		>
-			{#if uploadProgress}
-				<Progressbar
-					progress={uploadProgress.toString()}
-					size="h-1"
-					color="blue"
-					class="mb-2"
-				/>
-			{/if}
-			<div class="flex w-full flex-row items-center justify-between gap-3 pt-2">
+			<div class="flex w-full flex-row items-center justify-between">
 				<!-- Textarea -->
 				<div
 					class="input-btn focus:ring-link relative flex max-h-60 w-full flex-col items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
 				>
-					<div class="flex flex-row w-full">
+					<div class="relative flex w-full flex-row">
 						<VoiceButton
 							on:done={(e) => {
 								handleAudioSubmit(e.detail);
 							}}
 						/>
-						<textarea
-							rows="2"
-							class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0"
-							{placeholder}
-							disabled={loading}
-							maxlength="1200"
-							bind:value={query}
-							on:keydown={(event) => {
-								if (event.key === "Enter" && !event.shiftKey && query) {
-									event.preventDefault();
-									handleTextSubmit();
-								}
-							}}
-						/>
+						<div class="relative w-[85%]">
+							<textarea
+								rows="3"
+								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0"
+								{placeholder}
+								disabled={loading}
+								maxlength="1200"
+								bind:value={query}
+								on:keydown={(event) => {
+									if (event.key === "Enter" && !event.shiftKey && query) {
+										event.preventDefault();
+										handleTextSubmit();
+									}
+								}}
+							/>
+						</div>
+
 						<button
-							class="absolute bottom-3 right-1"
+							class="hint-btn absolute right-0 top-5"
 							on:click={() => {
-								if (query) {
-									handleTextSubmit();
-								}
+								showBottomPrompt = !showBottomPrompt;
+								showBottomImages = false;
+								toolTile = "Hint";
+								getPrompt();
 							}}
-							type="submit"
 						>
-							<PaperAirplane />
+							<HintIcon extraClass={showBottomPrompt ? "hidden" : ""} />
+							<ArrowRight
+								extraClass={`${
+									!showBottomPrompt ? "hidden" : ""
+								} w-5 h-5 rotate-90`}
+							/>
 						</button>
 					</div>
-					<KnowledgeAccess on:change={(e) => {
-						knowledgeAccess = e.target.checked
-						if (knowledgeAccess) showSidePage.set(true)
-					}}/>
+					<button
+						class="absolute bottom-1 right-2"
+						on:click={() => {
+							if (query) {
+								handleTextSubmit();
+							}
+						}}
+						type="submit"
+					>
+						<PaperAirplane />
+					</button>
+					<KnowledgeAccessPage
+						on:change={(e) => {
+							knowledgeAccess = e.target.checked;
+						}}
+					/>
 				</div>
 				<!-- hint -->
-				<button
-					class="hint-btn"
-					on:click={() => {
-						showBottomPrompt = !showBottomPrompt;
-						showBottomImages = false;
-						toolTile = "Hint";
-					}}
-				>
-					<HintIcon extraClass={showBottomPrompt ? "hidden" : ""} />
-					<ArrowRight
-						extraClass={`${
-							!showBottomPrompt ? "hidden" : ""
-						} w-5 h-5 rotate-90`}
-					/>
-				</button>
+
 				<PopImageList
+					{currentDragImageList}
 					on:closeTool={handelCloseTool}
 					on:clickVideoImage={(e) => handleVideoSubmit(e.detail)}
 					on:clickImage={(e) => {
 						const idx = e.detail;
 						currentDragImageList[idx] = !currentDragImageList[idx];
 					}}
-					on:uploadBegin={handleUploadBegin}
-					on:uploadEnd={handleUploadEnd}
+					on:refreshPrompt={() => getPrompt()}
 				/>
 			</div>
-			<!-- under moible mode -->
-			<!-- {#if showBottomImages}
-					<ChatImageCard
-						extraClass="sm:hidden"
-						on:clickSend={handleImageListSubmit}
-						on:clickImage={(e) => {
-							const idx = e.detail;
-							currentDragImageList[idx] = !currentDragImageList[idx];
-						}}
-						on:uploadBegin={handleUploadBegin}
-						on:uploadEnd={handleUploadEnd}
-					/>
-				{/if} -->
 
 			{#if showBottomPrompt}
 				<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
-					{#each Object.entries(prompts) as [k, v]}
+					{#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
 						<p class="text-sm font-semibold text-[#15325f]">{k}</p>
 						{#if k === "Address"}
 							<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
@@ -636,21 +633,10 @@
 			{/if}
 		</div>
 	</div>
-	<!-- <ChatImageCard
-			extraClass="max-sm:hidden"
-			on:clickSend={handleImageListSubmit}
-			on:clickImage={(e) => {
-				const idx = e.detail;
-				currentDragImageList[idx] = !currentDragImageList[idx];
-			}}
-			on:uploadBegin={handleUploadBegin}
-			on:uploadEnd={handleUploadEnd}
-		/> -->
 </div>
 
-<!-- </DropZone> -->
-
-<!-- <ChatUploadImages on:uploadBegin on:uploadEnd />	 -->
-
 <style>
+	textarea::placeholder {
+		transform: translateY(1.3rem);
+	}
 </style>

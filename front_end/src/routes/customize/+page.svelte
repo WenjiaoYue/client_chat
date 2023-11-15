@@ -1,41 +1,103 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+	import {
+		currentTemplate,
+		TemplateCustom,
+		CollectionType,
+		showTemplate
+	} from "$lib/shared/stores/common/Store";
+	import { TalkingTemplateLibrary } from "$lib/shared/constant/Data";
+	import BotTemplateCard from "$lib/modules/side-page/BotTemplateCard.svelte";
+	import CreateTemplate from "$lib/modules/side-page/CreateTemplate.svelte";
+	import TemplateIcon from "$lib/assets/customize/svelte/TemplateIcon.svelte";
+	import Template from "$lib/modules/customize/Template.svelte";
 
-	const tabs = [
-		{
-			background: "bg-[url('$lib/assets/customize/img/photo.png')]",
-			title: "Photo",
-			link: "/info",
-		},
-		{
-			background: "bg-[url('$lib/assets/customize/img/avatar.jpg')]",
-			title: "Avatars",
-			link: "/avatar",
-		},
-		{
-			background: "bg-[url('$lib/assets/customize/img/voice.png')]",
-			title: "Voices",
-			link: "/voice",
-		},
-		{
-			background: "bg-[url('$lib/assets/customize/img/knowledge.jpg')]",
-			title: "Knowledge Bases",
-			link: "/knowledge",
-		},
-	];
+	const customNum = $TemplateCustom.length;
+
+	function handleTemplateDelete(i: number) {
+		console.log("i", i);
+		console.log("TemplateCustom", $TemplateCustom);
+
+		TemplateCustom.update((options) => {
+			options.splice(i, 1);
+			return options;
+		});
+	}
+
 </script>
 
-<div class="mt-8 flex h-full flex-col lg:flex-row items-center justify-end lg:justify-start lg:items-start lg:p-12 gap-3 max-width">
-	{#each tabs as tab}
-		<button
-			on:click={() => goto(tab.link)}
-			class="flex h-full w-11/12 lg:h-52 lg:w-52 items-end rounded-xl {tab.background} bg-cover bg-no-repeat"
+<div
+	class="h-full w-full overflow-auto bg-white p-16 pb-0 sm:mx-5 lg:rounded-tl-3xl"
+>
+	<div
+		class={`flex w-[15rem] flex-col gap-4 rounded-2xl border p-5
+                    ${$showTemplate ? "border-4 border-[#9fc1fb]" : ""} `}
+		style="background: url(&quot;https://cdn.heygen.com/heygen/home/home-template-bg.png&quot;) center center / cover no-repeat;"
+		on:click={() => {
+			showTemplate.set(!$showTemplate);
+		}}
+	>
+		<img
+			class="h-12 w-12"
+			src="https://imgur.com/qCPlF9s.png"
+			alt=""
+		/>
+		<div class="">
+			<div class="text-left text-lg font-bold">Customize Chatbot</div>
+		</div>
+	</div>
+
+	{#if $showTemplate}
+		<Template />
+	{:else}
+		<div
+			class="mb-1 mt-6 flex w-full flex-row flex-wrap justify-between sm:mb-0"
 		>
-			<p
-				class="w-full rounded-b-xl bg-black bg-opacity-30 pb-2 pl-2 text-left text-xl text-white"
-			>
-				{tab.title}
-			</p>
-		</button>
-	{/each}
+			<h2 class="mb-8 text-[1.3rem] font-medium leading-tight text-[#051F61]">
+				Available ChatBots
+			</h2>
+		</div>
+		<div class="gap-4 sm:flex">
+			{#each $TemplateCustom as opt, i (opt)}
+				<div class="block shrink-0">
+					<div
+						class="rounded-2xl sm:w-[15rem]"
+						class:ring={$currentTemplate.collection === CollectionType.Custom &&
+							$currentTemplate.id === i}
+					>
+						<BotTemplateCard
+							{...opt}
+							index={i}
+							bind:name={opt.name}
+							needChangeName={i >= customNum}
+							notLibrary
+							on:delete={() => handleTemplateDelete(i)}
+							on:click={() => {
+								currentTemplate.set({
+									collection: CollectionType.Custom,
+									id: i,
+								});
+							}}
+						/>
+					</div>
+				</div>
+			{/each}
+			{#each TalkingTemplateLibrary as opt, i}
+				<div
+					class="aspect-video h-full w-full sm:w-[15rem] rounded-2xl"
+					class:ring={$currentTemplate.collection === CollectionType.Library &&
+						$currentTemplate.id === i}
+				>
+					<BotTemplateCard
+						{...opt}
+						on:click={() => {
+							currentTemplate.set({
+								collection: CollectionType.Library,
+								id: i,
+							});
+						}}
+					/>
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>

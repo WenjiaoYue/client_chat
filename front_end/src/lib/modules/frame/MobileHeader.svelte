@@ -14,6 +14,8 @@
 	import { showSidePage } from "$lib/shared/stores/common/Store";
 	import SettingIcon from "$lib/assets/chat/svelte/Setting.svelte";
 	import { goto } from "$app/navigation";
+	import AlbumIcon from "$lib/assets/layout/svelte/AlbumIcon.svelte";
+	import HeaderSetting from "$lib/assets/chat/svelte/HeaderSetting.svelte";
 
 	$: activeUrl = $page.url.pathname;
 	let activeClass =
@@ -45,7 +47,10 @@
 		<!-- <h1 class="stroke-orange-50 text-xl font-semibold leading-none">
 			Neural Chat
 		</h1> -->
-		<p class="font-bold">TalkingPhotos</p>
+		<div class="flex flex-col">
+			<p class="font-bold">NeuralChat</p>
+			<span class="text-[0.75rem] text-gray-600">Create Your Own Chatbot</span>
+		</div>
 	</a>
 
 	<div class="right-0 flex flex-row gap-5">
@@ -57,9 +62,16 @@
 		>
 			<BotIcon />
 		</button>
+		<button
+			on:click={() => {
+				goto("/classify");
+			}}
+		>
+			<AlbumIcon />
+		</button>
 		<button>
 			<a href="/settings">
-				<SettingIcon />
+				<HeaderSetting />
 			</a>
 		</button>
 	</div>

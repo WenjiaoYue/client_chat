@@ -37,7 +37,7 @@
 			<img
 				alt={name}
 				src={avatar}
-				class="mx-auto w-[3rem] h-[3rem] rounded object-cover hover:border"
+				class="mx-auto w-[5rem] h-[5rem] max-sm:w-[3rem] max-sm:h-[3rem] rounded object-cover hover:border"
 			/>
 			{#if notLibrary}
 				<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />
