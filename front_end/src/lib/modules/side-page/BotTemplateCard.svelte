@@ -69,7 +69,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-	class="sm:w-[15rem]"
+	class="sm:w-[15rem] relative"
 	on:click
 >
 	{#if notLibrary}
@@ -153,7 +153,7 @@
 		<div class="">
 			<div class="text-left text-lg font-bold">{name}</div>
 			<div
-				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666]"
+				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666] w-full truncate whitespace-nowrap text-ellipsis "
 			>
 				<TemplateBook />{knowledge_name}
 			</div>

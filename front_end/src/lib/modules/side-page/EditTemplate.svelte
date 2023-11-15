@@ -194,7 +194,7 @@
 <dialog class="max-h-[90vh] w-[90vw] p-2" bind:this={insertModal}>
     <div class="mb-7">
         <h3 class="mb-2 text-[1.3rem] font-medium leading-tight text-[#051F61]">Talking Avatar</h3>
-        <div class="grid grid-cols-4 gap-5 text-[#0F172A]">
+        <div class="grid grid-cols-4 gap-5 text-[#0F172A] sm:grid-cols-9">
 			<UploadAvatar on:upload={handleAvatarUpload} />
             {#each allPhotos as opt, i (opt.name + i)}
                 <button
@@ -208,7 +208,7 @@
     </div>
     <div class="mb-7">
         <h3 class="mb-4 text-[1.3rem] font-medium leading-tight text-[#051F61]">Talking Voice</h3>
-        <div class="grid grid-cols-4 gap-3 text-[#0F172A]">
+        <div class="grid grid-cols-4 gap-3 text-[#0F172A] sm:grid-cols-9">
 			<RecordVoice on:done={handleVoiceRecord} on:fail={handleRecordFail} />
 			<UploadVoice on:upload={handleVoiceUpload} />
             {#each allVoices as opt, i (opt.name + i)}
@@ -224,7 +224,7 @@
     </div>
 	<div class="mb-7">
         <h3 class="mb-2 text-[1.3rem] font-medium leading-tight text-[#051F61]">Knowledge Base</h3>
-        <div class="grid grid-cols-4 gap-2 text-[#0F172A]">
+        <div class="grid grid-cols-4 gap-2 text-[#0F172A] sm:grid-cols-9">
             <UploadKnowledge on:upload={handleKnowledgeUpload} />
             {#each allKnowledges as opt, i (opt.name + i)}
                 <button

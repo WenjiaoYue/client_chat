@@ -282,7 +282,7 @@
 		</div>
 	</div>
 	
-	<div class="mt-7 overflow-auto">
+	<div class="mt-7 mb-16 overflow-auto">
 		<h3 class="my-2 mb-6 text-[1.2rem] leading-tight text-[#051F61]">
 			Knowledge Base
 		</h3>
@@ -307,7 +307,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="mt-10 flex justify-end gap-10 px-10">
+	<div class="mt-10 flex justify-end gap-10 px-10 fixed bottom-5 right-10">
 		<GradientButton
 			color="blue"
 			on:click={() => {
