@@ -241,7 +241,7 @@
             <UploadAvatar on:upload={handleAvatarUpload} />
             {#each allPhotos as opt, i (opt.name + i)}
                 <button
-                    class={`${i === 0 && imgBounce ? "animate-bounce" : ""}`}
+                    class={`${i === 0 && imgBounce ? "animate-bounce" : ""} mb-2`}
                     class:ring={selectAvatar === i}
                     on:click={() => {
                         selectAvatar = i;
