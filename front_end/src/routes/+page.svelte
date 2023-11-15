@@ -165,7 +165,7 @@
 
 	const fullPromptMap = (word: string) =>
 		({
-			"Image Style": `Transform it to ${word} style`,
+			"Image Style": `Convert the image into ${word} rendition`,
 			Time: `Give me photos taken on ${word}`,
 			Person: `Give me ${word}'s photos`,
 		} as { [index: string]: string });
