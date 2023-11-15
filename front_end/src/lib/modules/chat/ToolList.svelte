@@ -68,9 +68,7 @@
 					$currentMode === "Search" ? toolStyle.active : toolStyle.inactive
 				}`}
 				on:click={() => {
-					if ($imageList.length === 0) {
-						popupModal.set(true);
-					}
+					popupModal.set(true);
 					exchangeMode("Search");
 					dispatch("showPrompt", true);
 				}}

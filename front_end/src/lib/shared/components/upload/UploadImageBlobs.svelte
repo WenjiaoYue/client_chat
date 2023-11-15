@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 	import upload from "$lib/assets/home/imgs/upload.png";
+	import Upload from "$lib/assets/handel/Upload.svelte";
+
 
 	const dispatch = createEventDispatcher();
 
@@ -26,13 +28,7 @@
 <div class="relative" on:click|capture|nonpassive|stopPropagation={() => {}}>
 	<label for="image" class="h-full w-full cursor-pointer text-center">
 		<slot>
-			<div class="relative h-full w-full">
-				<img
-					src={upload}
-					alt=""
-					class="aspect-square h-[5vw] w-[5vw] object-cover p-2 max-sm:h-[28vw] max-sm:w-[28vw]"
-				/>
-			</div>
+			<Upload type="image" />
 		</slot>
 	</label>
 	<input
