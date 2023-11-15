@@ -65,10 +65,11 @@
 			{#each $imageList as image, idx}
 				<div class="block shrink-0">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<div class="relative" on:click={() => dispatch("clickImage", idx)}>
+					<div class="relative"   on:click={() => dispatch("clickImage", idx)}>
 						<input
 							type="checkbox"
 							checked={currentDragImageList[idx]}
+							on:click={e => e.stopPropagation()}	
 							on:change={() => dispatch("clickImage", idx)}
 							class="form-checkbox absolute left-2 top-2 z-50 h-3 w-3 rounded-full"
 						/>

@@ -131,8 +131,8 @@
 			: $currentMode === "Photo"
 			? "Stylize your Photos ..."
 			: $currentMode === "Video" && $videoMode === "input"
-			? "Generate a video based on the input text/voice ..."
-			: "Use input text/voice to video chat ...";
+			? "Create talking avatar based on your input[text/voice] ..."
+			: "Chat with Avatar based on your input[text/voice] ...";
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
@@ -533,7 +533,7 @@
 						<div class="relative w-[85%]">
 							<textarea
 								rows="2"
-								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0 mt-3"
+								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0 mt-5"
 								{placeholder}
 								disabled={loading}
 								maxlength="1200"
