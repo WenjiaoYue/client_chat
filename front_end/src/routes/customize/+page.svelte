@@ -12,6 +12,8 @@
 	import Template from "$lib/modules/customize/Template.svelte";
 
 	const customNum = $TemplateCustom.length;
+	console.log('TemplateCustom', $TemplateCustom);
+	
 
 	function handleTemplateDelete(i: number) {
 		console.log("i", i);
@@ -56,7 +58,7 @@
 				Available ChatBots
 			</h2>
 		</div>
-		<div class="gap-4 sm:flex">
+		<div class="gap-4 flex-wrap flex-wrap">
 			{#each $TemplateCustom as opt, i (opt)}
 				<div class="block shrink-0">
 					<div

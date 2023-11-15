@@ -22,7 +22,7 @@
 	}
 </script>
 
-<div class="h-full w-full p-5 sm:mx-5 overflow-hidden">
+<div class="h-full w-full p-5 sm:mx-5 overflow-auto">
 	<div class="mb-1 flex w-full flex-row flex-wrap justify-between sm:mb-0">
 		<h2 class="mb-8 text-[1.3rem] font-medium leading-tight text-[#051F61]">
 			My ChatBot
