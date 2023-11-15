@@ -153,9 +153,9 @@
 		<div class="">
 			<div class="text-left text-lg font-bold">{name}</div>
 			<div
-				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666] w-full truncate whitespace-nowrap text-ellipsis "
+				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666] "
 			>
-				<TemplateBook />{knowledge_name}
+				<TemplateBook /> <span class="w-full truncate whitespace-nowrap text-ellipsis ">{knowledge_name}</span> 
 			</div>
 		</div>
 	</div>
