@@ -58,7 +58,7 @@
 		</Alert>
 		<button
 			on:click={openAlert}
-			class="absolute right-5 top-6 z-20 w-2 bg-yellow-50 z-20"><ArrowDown /></button
+			class="absolute right-5 top-6 z-20 w-2 bg-yellow-50 z-20 sm:ml-10"><ArrowDown /></button
 		>
 	{:else}
 		<button

@@ -57,7 +57,7 @@
 			</h2>
 		</div>
 		<div class="gap-4 sm:flex">
-			{#each {...$TemplateCustom, ...TalkingTemplateLibrary} as opt, i (opt)}
+			{#each $TemplateCustom as opt, i (opt)}
 				<div class="block shrink-0">
 					<div
 						class="rounded-2xl sm:w-[15rem]"
@@ -81,7 +81,7 @@
 					</div>
 				</div>
 			{/each}
-			<!-- {#each TalkingTemplateLibrary as opt, i}
+			{#each TalkingTemplateLibrary as opt, i}
 				<div
 					class="aspect-video h-full w-full sm:w-[15rem] rounded-2xl"
 					class:ring={$currentTemplate.collection === CollectionType.Library &&
@@ -97,7 +97,7 @@
 						}}
 					/>
 				</div>
-			{/each} -->
+			{/each}
 		</div>
 	{/if}
 </div>
