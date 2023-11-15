@@ -155,7 +155,7 @@
 			<div
 				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666]"
 			>
-				<TemplateBook />{knowledge}
+				<TemplateBook />{knowledge_name}
 			</div>
 		</div>
 	</div>

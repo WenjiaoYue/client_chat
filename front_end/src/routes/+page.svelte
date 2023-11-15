@@ -597,8 +597,8 @@
 
 			{#if showBottomPrompt}
 				<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
-					<!-- {#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
-					{#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
+					{#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
+					<!-- {#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
 						<p class="text-sm font-semibold text-[#15325f]">{k}</p>
 						{#if k === "Address"}
 							<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
