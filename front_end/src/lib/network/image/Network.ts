@@ -56,7 +56,7 @@ export async function fetchImageList() {
 }
 
 export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: string | Blob) {
-	const url = 'http://10.165.57.68:9001/v1/talkingbot/face_animation'
+	const url = `$env.VIDEO_URL}`
 	const formData = new FormData()
 	formData.append('image', imageBlob, 'remote-image.jpg');
 	formData.append('text', query);
