@@ -179,6 +179,7 @@
 				[key.charAt(0).toUpperCase() + key.slice(1)]: value,
 			}))
 			.reduce((acc, item) => ({ ...acc, ...item }), {});
+		prompts = {...prompts, ...capitalizedKeys};		
 	}
 	onMount(async () => {
 		scrollToDiv = document
