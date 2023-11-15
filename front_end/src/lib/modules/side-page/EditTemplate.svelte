@@ -249,7 +249,7 @@
 	</slot>
 </button>
 
-<dialog class="max-sm:max-h-[90vh] max-sm:w-[90vw] p-2" bind:this={insertModal}>
+<dialog class="max-sm:max-h-[90vh] max-sm:w-[90vw] p-5" bind:this={insertModal}>
     <div class="mb-7 overflow-auto">
         <h3 class="my-2 text-[1.2rem] mb-4 leading-tight text-[#051F61]">Talking Avatar</h3>
         <div class="grid grid-cols-4 gap-5 text-[#0F172A] sm:grid-cols-9">

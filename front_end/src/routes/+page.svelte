@@ -127,9 +127,9 @@
 		$currentMode === "Text"
 			? "Message chatbot ..."
 			: $currentMode === "Search"
-			? "Find photos based on input criteria ..."
+			? "Pick up your photos based on time/location/ ..."
 			: $currentMode === "Photo"
-			? "Transform it into the desired style ..."
+			? "Stylize your Photos ..."
 			: $currentMode === "Video" && $videoMode === "input"
 			? "Generate a video based on the input text/voice ..."
 			: "Use input text/voice to video chat ...";
@@ -532,8 +532,8 @@
 						/>
 						<div class="relative w-[85%]">
 							<textarea
-								rows="3"
-								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0"
+								rows="2"
+								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0 mt-3"
 								{placeholder}
 								disabled={loading}
 								maxlength="1200"
@@ -638,7 +638,7 @@
 </div>
 
 <style>
-	textarea::placeholder {
+	/* textarea::placeholder {
 		transform: translateY(1.3rem);
-	}
+	} */
 </style>

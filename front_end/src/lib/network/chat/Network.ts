@@ -32,7 +32,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 			"max_new_tokens": 256,
 			"knowledge_base_id": "default"
 		}
-		url = `https://198.175.88.26:443/v1/askdoc/chat`;
+		url = `https://198.175.88.26:443/v1/textchat/chat`;
 	}
 
 	return new SSE(url, {
@@ -63,7 +63,7 @@ export async function fetchVideoText(query: string, knowledge_base_id: string) {
 			"max_new_tokens": 256,
 			"stream": false
 		}
-		url = `https://198.175.88.26:443/v1/askdoc/chat`;
+		url = `https://198.175.88.26:443/v1/textchat/chat`;
 	}
 
 
