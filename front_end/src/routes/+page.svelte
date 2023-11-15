@@ -484,7 +484,7 @@
 <div
 	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
 >
-	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-4/5">
+	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<Scrollbar
 			classLayout="flex flex-col gap-1"
 			className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
