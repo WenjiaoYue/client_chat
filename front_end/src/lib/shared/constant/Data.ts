@@ -120,7 +120,7 @@ export const TalkingKnowledgeLibrary = [
 export const TalkingTemplateLibrary = [
   { name: "Wei", avatar: annAvatar, audio: WeiVoice, identify: "wei", knowledge: "default", knowledge_name: "default" },
   { name: "Deepak", avatar: DeeparkAvatar, audio: DeepakVoice, identify: "deepak", knowledge: "default", knowledge_name: "default" },
-  { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default", knowledge_name: "default" },
+  // { name: "Huma", avatar: humaAvatar, audio: HumaVoice, identify: "huma", knowledge: "default", knowledge_name: "default" },
 ];
 
 export const toolList = [
