@@ -18,7 +18,9 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 			"query": query,
 			"domain": "test",
 			"max_new_tokens": 128,
-			knowledge_base_id
+			knowledge_base_id,
+			"stream": true
+
 		}
 		url = `${TEXT_URL}/chat`;
 
