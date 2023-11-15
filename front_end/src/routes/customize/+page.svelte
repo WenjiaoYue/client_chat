@@ -59,7 +59,7 @@
 				Available ChatBots
 			</h2>
 		</div>
-		<div class="gap-4 flex-wrap flex-wrap">
+		<div class="gap-4 flex-wrap flex-wrap flex flex-row">
 			{#each $TemplateCustom as opt, i (opt)}
 				<div class="block shrink-0">
 					<div
