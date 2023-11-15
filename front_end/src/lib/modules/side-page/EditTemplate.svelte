@@ -18,10 +18,12 @@
 	import UploadAvatar from "$lib/shared/components/talkbot/upload-avatar.svelte";
 	import RecordVoice from "$lib/shared/components/talkbot/RecordVoice.svelte";
 	import UploadVoice from "$lib/shared/components/talkbot/UploadVoice.svelte";
-	import { fetchAudioEmbedding, fetchKnowledgeBaseId } from "$lib/network/talkbot/Network";
+	import { fetchAudioEmbedding, fetchKnowledgeBaseId, fetchKnowledgeBaseIdByPaste } from "$lib/network/talkbot/Network";
 	import UploadKnowledge from "$lib/shared/components/talkbot/upload-knowledge.svelte";
 	import { onMount } from "svelte";
 	import { GradientButton } from "flowbite-svelte";
+	import PasteKnowledge from "$lib/shared/components/talkbot/PasteKnowledge.svelte";
+	import Loading from "$lib/assets/chat/svelte/Loading.svelte";
 
 	export let avatar_name: string;
 	export let voice_name: string
@@ -31,6 +33,10 @@
 	const { addNotification } = getNotificationsContext();
 	let loading = false;
 	let qualityMode = true;
+	let kbLoading = false;
+	let KBounce = false;
+	let imgBounce = false;
+	let VoiceBounce = false;
 
 	let insertModal: HTMLDialogElement;
 	$: allPhotos = [...$TalkingPhotoCustom, ...TalkingPhotoLibrary];
@@ -70,6 +76,11 @@
 		TalkingPhotoCustom.update((options) => {
 			return [{ name: e.detail.fileName, avatar: e.detail.src }, ...options];
 		});
+		imgBounce = true;
+
+		setTimeout(() => {
+			imgBounce = false;
+		}, 3000);
 	}
 
 	function handleAvatarDelete(i: number) {
@@ -103,6 +114,11 @@
 			type: "success",
 			removeAfter: 3000,
 		});
+		VoiceBounce = true;
+
+		setTimeout(() => {
+			VoiceBounce = false;
+		}, 3000);
 	}
 
 	async function handleVoiceRecord(e: CustomEvent<any>) {
@@ -111,7 +127,7 @@
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const res = await fetchAudioEmbedding(blob, qualityMode);
-			spk_id = res.spk_id ? res.spk_id : "default";
+			spk_id = res.voice_id ? res.voice_id : "default";
 		} catch {
 			spk_id = "default";
 		}
@@ -122,6 +138,11 @@
 			];
 		});
 		loading = false;
+		VoiceBounce = true;
+
+		setTimeout(() => {
+			VoiceBounce = false;
+		}, 3000);
 	}
 
 	function handleRecordFail() {
@@ -133,8 +154,39 @@
 		});
 	}
 
+	async function handleKnowledgePaste(e: CustomEvent<any>) {
+		let knowledge_id = "";
+		try {
+			const pasteUrlList = e.detail.pasteUrlList;
+			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList);
+
+			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
+		} catch {
+			knowledge_id = "default";
+		}
+
+		KBounce = true;
+
+		setTimeout(() => {
+			KBounce = false;
+		}, 3000);
+		addNotification({
+			text: "Uploaded successfully",
+			position: "top-left",
+			type: "success",
+			removeAfter: 3000,
+		});
+
+		TalkingKnowledgeCustom.update((options) => {
+			return [
+				{ name: "Knowledge Base", src: e.detail.src, id: knowledge_id },
+				...options,
+			];
+		});
+	}
+
 	async function handleKnowledgeUpload(e: CustomEvent<any>) {
-		loading = true;
+		kbLoading = true;
 		let knowledge_id = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
@@ -145,7 +197,13 @@
 			knowledge_id = "default";
 		}
 
-		loading = false;
+		kbLoading = false;
+		KBounce = true;
+
+		setTimeout(() => {
+			KBounce = false;
+		}, 3000);
+
 		addNotification({
 			text: "Uploaded successfully",
 			position: "bottom-center",
@@ -191,13 +249,14 @@
 	</slot>
 </button>
 
-<dialog class="max-h-[90vh] w-[90vw] p-2" bind:this={insertModal}>
-    <div class="mb-7">
-        <h3 class="mb-2 text-[1.3rem] font-medium leading-tight text-[#051F61]">Talking Avatar</h3>
+<dialog class="max-sm:max-h-[90vh] max-sm:w-[90vw] p-2" bind:this={insertModal}>
+    <div class="mb-7 overflow-auto">
+        <h3 class="my-2 text-[1.2rem] mb-4 leading-tight text-[#051F61]">Talking Avatar</h3>
         <div class="grid grid-cols-4 gap-5 text-[#0F172A] sm:grid-cols-9">
 			<UploadAvatar on:upload={handleAvatarUpload} />
             {#each allPhotos as opt, i (opt.name + i)}
                 <button
+                    class={`${i === 0 && imgBounce ? "animate-bounce" : ""}`}
                     class:ring={selectAvatar === i}
                     on:click={() => {selectAvatar = i}}
                 >
@@ -207,13 +266,20 @@
         </div>
     </div>
     <div class="mb-7">
-        <h3 class="mb-4 text-[1.3rem] font-medium leading-tight text-[#051F61]">Talking Voice</h3>
+        <h3 class="my-2 mb-6 text-[1.2rem] leading-tight text-[#051F61]">Talking Voice</h3>
         <div class="grid grid-cols-4 gap-3 text-[#0F172A] sm:grid-cols-9">
 			<RecordVoice on:done={handleVoiceRecord} on:fail={handleRecordFail} />
 			<UploadVoice on:upload={handleVoiceUpload} />
+			{#if loading}
+				<button class="aspect-square sm:w-[5rem] sm:h-[5rem] items-center ">
+					<Loading />
+				</button>
+			{/if}
             {#each allVoices as opt, i (opt.name + i)}
                 <button
-					class="w-full aspect-square"
+					class="sm:w-[5rem] sm:h-[5rem]  aspect-square w-full {`${
+						i === 0 && VoiceBounce ? 'animate-bounce' : ''
+					}`}"
                     class:ring={selectVoice === i}
                     on:click={() => {selectVoice = i}}
                 >
@@ -223,12 +289,19 @@
         </div>
     </div>
 	<div class="mb-7">
-        <h3 class="mb-2 text-[1.3rem] font-medium leading-tight text-[#051F61]">Knowledge Base</h3>
+        <h3 class="my-2 mb-6 text-[1.2rem] leading-tight text-[#051F61]">Knowledge Base</h3>
         <div class="grid grid-cols-4 gap-2 text-[#0F172A] sm:grid-cols-9">
             <UploadKnowledge on:upload={handleKnowledgeUpload} />
+			<PasteKnowledge on:paste={handleKnowledgePaste} />
+			{#if kbLoading}
+				<button class="aspect-square sm:w-[5rem] sm:h-[5rem] items-center">
+					<Loading />
+				</button>
+			{/if}
             {#each allKnowledges as opt, i (opt.name + i)}
                 <button
                     class:ring={selectKnowledge === i}
+					class={`${i === 0 && KBounce ? "animate-bounce" : ""} sm:w-[5rem] sm:h-[5rem] `}
                     on:click={() => {selectKnowledge = i}}
                 >
                     <TalkingKnowledgeCard {...opt} />

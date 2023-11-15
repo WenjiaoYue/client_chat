@@ -158,7 +158,6 @@
 	}
 
 	async function handleKnowledgePaste(e: CustomEvent<any>) {
-		// kbLoading = true;
 		let knowledge_id = "";
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
@@ -169,7 +168,6 @@
 			knowledge_id = "default";
 		}
 
-		kbLoading = false;
 		KBounce = true;
 
 		setTimeout(() => {
@@ -208,6 +206,7 @@
 		setTimeout(() => {
 			KBounce = false;
 		}, 3000);
+		
 		addNotification({
 			text: "Uploaded successfully",
 			position: "top-left",
