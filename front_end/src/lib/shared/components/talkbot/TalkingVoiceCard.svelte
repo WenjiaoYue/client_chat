@@ -79,7 +79,7 @@
 		/>
 	{:else}
 		<span
-			class="relative text-xs text-gray-600 dark:text-gray-400 text-ellipsis"
+			class="relative text-xs text-gray-600 dark:text-gray-400 text-ellipsis truncate"
 			on:dblclick|capture={changeName}
 		>
 			{name}

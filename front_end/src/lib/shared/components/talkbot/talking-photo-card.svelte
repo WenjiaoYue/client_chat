@@ -45,5 +45,5 @@
 		</span>
 	</div>
 
-	<span class="relative w-full text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">{name}</span>
+	<span class="relative truncate w-full text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">{name}</span>
 </div>

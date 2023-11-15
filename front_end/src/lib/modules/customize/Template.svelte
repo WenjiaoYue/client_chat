@@ -130,7 +130,7 @@
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const res = await fetchAudioEmbedding(blob, qualityMode);
-			spk_id = res.spk_id ? res.spk_id : "default";
+			spk_id = res.voice_id ? res.voice_id : "default";
 		} catch {
 			spk_id = "default";
 		}
