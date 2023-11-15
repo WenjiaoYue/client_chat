@@ -13,6 +13,7 @@
 
 	const customNum = $TemplateCustom.length;
 	console.log('TemplateCustom', $TemplateCustom);
+	console.log('TalkingTemplateLibrary', TalkingTemplateLibrary);
 	
 
 	function handleTemplateDelete(i: number) {
