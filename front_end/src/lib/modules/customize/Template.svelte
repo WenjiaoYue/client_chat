@@ -238,7 +238,7 @@
         >
             Talking Avatar
         </h3>
-        <div class="grid max-sm:grid-cols-4 gap-5 text-[#0F172A] grid-cols-6">
+        <div class="grid grid-cols-4 gap-5 text-[#0F172A] grid-cols-9">
             <UploadAvatar on:upload={handleAvatarUpload} />
             {#each allPhotos as opt, i (opt.name + i)}
                 <button

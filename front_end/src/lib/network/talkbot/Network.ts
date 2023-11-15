@@ -45,10 +45,10 @@ export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
 	}
 }
 
-export async function fetchAudioEmbedding(audio: string | Blob, qualityMode: boolean) {
+export async function fetchAudioEmbedding(audio: Blob, qualityMode: boolean) {
 	const url = qualityMode ? `${VOICE_FAST_URL}/create_embed` : `${VOICE_HIGH_QUALITY_URL}/create_embed`
 	const formData = new FormData()
-	formData.append('file', audio)
+	formData.append('file', audio, "tmp.mp3")
     const init: RequestInit = {
         method: "POST",
         body: formData,
