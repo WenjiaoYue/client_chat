@@ -5,7 +5,7 @@ const VOICE_HIGH_QUALITY_URL = env.VOICE_HIGH_QUALITY_URL;
 const KNOWLEDGE_BASE_URL = env.KNOWLEDGE_BASE_URL;
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
-	const url = `${KNOWLEDGE_BASE_URL}/create_kb`
+	const url = `${KNOWLEDGE_BASE_URL}/create`
 	const formData = new FormData()
 	formData.append('file', file, fileName)
     const init: RequestInit = {
