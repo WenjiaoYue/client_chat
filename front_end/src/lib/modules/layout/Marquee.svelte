@@ -53,7 +53,7 @@
 
 {#if content != ""}
 	{#if isAlertOpen}
-		<Alert color="yellow" class="-mb-3 w-full border-t-4 z-20 sm:ml-10" on:close={closeAlert}>
+		<Alert color="yellow" class="-mb-3 w-full border-t-4 z-20" on:close={closeAlert}>
 			{content}
 		</Alert>
 		<button

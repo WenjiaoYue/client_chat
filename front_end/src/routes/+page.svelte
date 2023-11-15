@@ -99,11 +99,11 @@
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
 	let prompts = {
 		"Image Style": [
-			"pencil sketch",
 			"disney cartoon",
 			"add fireworks",
 			"van gogh",
 			"pixar",
+			"pencil sketch",
 			"younger",
 		],
 	};
@@ -131,8 +131,8 @@
 			: $currentMode === "Photo"
 			? "Message chatbot to stylize your photos ..."
 			: $currentMode === "Video" && $videoMode === "input"
-			? "Message chatbot to create talking avatar for input ..."
-			: "Message chatbot to create talking avatar for response ...";
+			? "Input with Talking Avatar ..."
+			: "Response with Talking Avatar ...";
 
 	$: currentDragImageList = new Array($imageList.length).fill(false);
 
@@ -407,8 +407,6 @@
 
 		if (res) {
 			loading = true;
-			showBottomPrompt = false;
-			showBottomImages = false;
 			const newMessage = {
 				role: MessageRole.User,
 				type: MessageType.Text,
@@ -486,7 +484,7 @@
 <div
 	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
 >
-	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-2/3">
+	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-4/5">
 		<Scrollbar
 			classLayout="flex flex-col gap-1"
 			className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"

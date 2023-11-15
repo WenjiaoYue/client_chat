@@ -28,7 +28,7 @@
 		<div class="flex h-full flex-col">
 			<Marquee />
 			<Timer />
-			<div class="h-0 grow bg-white  lg:rounded-tl-3xl sm:ml-10">
+			<div class="h-0 grow bg-white  lg:rounded-tl-3xl">
 				<slot />
 			</div>
 		</div>
