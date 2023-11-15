@@ -6,6 +6,8 @@
 		TalkingKnowledgeCustom,
 		TemplateCustom,
 		showTemplate,
+		currentTemplate,
+		CollectionType,
 	} from "$lib/shared/stores/common/Store";
 	import {
 		TalkingPhotoLibrary,
@@ -67,6 +69,11 @@
 		selectAvatar = -1;
 		selectVoice = -1;
 		selectKnowledge = -1;
+
+		currentTemplate.set({
+	            collection: CollectionType.Custom,
+	            id: 0,
+	        });
 	}
 
 	function handleAvatarUpload(e: CustomEvent<any>) {
