@@ -609,7 +609,7 @@
 					<!-- {#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
 						<!-- <p class="text-sm font-semibold text-[#15325f]">{k}</p> -->
 						{#if k === "Address"}
-							<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
+							<div class="flex max-h-20 flex-wrap overflow-auto pl-2 hidden">
 								{#each v as badge}
 									<Checkbox class="mr-2" bind:group value={badge}>
 										<Badge
