@@ -72,7 +72,7 @@
 
 <VoiceWave running={isRecording}  />
 <!-- Voice button -->
-<button type="submit" on:click={toggleRecording}>
+<button type="submit" on:click={toggleRecording} class="mt-2">
 	{#if isRecording}
 		<img src={stopRecordingIcon} class="h-7 w-7" alt="" />
 	{:else}

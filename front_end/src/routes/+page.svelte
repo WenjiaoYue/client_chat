@@ -97,6 +97,8 @@
 	let uploadedImageToVideo = false;
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
+	console.log('chatMessages', chatMessages);
+	
 	let prompts = {
 		"Image Style": [
 			"disney cartoon",
@@ -531,7 +533,7 @@
 						<div class="relative w-[85%]">
 							<textarea
 								rows="2"
-								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0 mt-5"
+								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0 mt-7"
 								{placeholder}
 								disabled={loading}
 								maxlength="1200"
@@ -541,11 +543,19 @@
 										event.preventDefault();
 										handleTextSubmit();
 									}
+									showBottomPrompt = false;
+								}}
+								on:click={(e) => {
+									if (e.target.value.length === 0) {
+										showBottomPrompt = true
+										toolTile = "Hint";
+										getPrompt();
+									}
 								}}
 							/>
 						</div>
 
-						<button
+						<!-- <button
 							class="hint-btn absolute right-0 top-5"
 							on:click={() => {
 								showBottomPrompt = !showBottomPrompt;
@@ -560,7 +570,7 @@
 									!showBottomPrompt ? "hidden" : ""
 								} w-5 h-5 rotate-90`}
 							/>
-						</button>
+						</button> -->
 					</div>
 					<button
 						class="absolute bottom-1 right-2"
@@ -594,17 +604,17 @@
 			</div>
 
 			{#if showBottomPrompt}
-				<Scrollbar className="max-h-44 pb-2 w-full mt-2" classLayout="">
+				<Scrollbar className="absolute left-5  max-h-44 px-2" classLayout="">
 					{#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
 					<!-- {#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
-						<p class="text-sm font-semibold text-[#15325f]">{k}</p>
+						<!-- <p class="text-sm font-semibold text-[#15325f]">{k}</p> -->
 						{#if k === "Address"}
 							<div class="flex max-h-20 flex-wrap overflow-auto pl-2">
 								{#each v as badge}
 									<Checkbox class="mr-2" bind:group value={badge}>
 										<Badge
 											color="blue"
-											class="mb-2 mt-1 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
+											class="mb-0 mt-0 inline-block w-full whitespace-nowrap border-[#000] py-1 outline-[#000]"
 										>
 											{badge}
 										</Badge>
