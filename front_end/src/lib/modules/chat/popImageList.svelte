@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button, Modal, Progressbar } from "flowbite-svelte";
-	import { imageList, popupModal } from "$lib/shared/stores/common/Store";
+	import { currentMode, imageList, popupModal } from "$lib/shared/stores/common/Store";
 	import ChatUploadImages from "./ChatUploadImages.svelte";
 	import { createEventDispatcher } from "svelte";
 	import PictureEnlarge from "$lib/shared/components/images/PictureEnlarge.svelte";
@@ -58,10 +58,12 @@
 <Modal title="Photo Album" bind:open={$popupModal} autoclose>
 	<div class="text-center">
 		<div class="flex h-full w-full flex-row items-start">
+			{#if ($imageList.length === 0)  || ($currentMode === "Search")}
 			<ChatUploadImages
 				on:uploadBegin={handleUploadBegin}
 				on:uploadEnd={handleUploadEnd}
 			/>
+			{/if}
 			{#each $imageList as image, idx}
 				<div class="block shrink-0">
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
