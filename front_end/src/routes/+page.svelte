@@ -603,7 +603,7 @@
 				/>
 			</div>
 
-			{#if showBottomPrompt}
+			{#if showBottomPrompt && ($currentMode === "Search" || $currentMode === "Photo")}
 				<Scrollbar className="absolute left-5  max-h-44 px-2" classLayout="">
 					{#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
 					<!-- {#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
