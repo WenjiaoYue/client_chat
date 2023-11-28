@@ -107,18 +107,6 @@
 			"pixar",
 			"pencil sketch",
 			"younger",
-			"disney cartoon",
-			"vintage filter",
-			"van gogh",
-			"pixar",
-			"pencil sketch",
-			"younger",
-			"disney cartoon",
-			"vintage filter",
-			"van gogh",
-			"pixar",
-			"pencil sketch",
-			"younger",
 		],
 	};
 	let group: string[] = [];
