@@ -107,6 +107,18 @@
 			"pixar",
 			"pencil sketch",
 			"younger",
+			"disney cartoon",
+			"vintage filter",
+			"van gogh",
+			"pixar",
+			"pencil sketch",
+			"younger",
+			"disney cartoon",
+			"vintage filter",
+			"van gogh",
+			"pixar",
+			"pencil sketch",
+			"younger",
 		],
 	};
 	let group: string[] = [];
@@ -604,12 +616,11 @@
 			</div>
 
 			{#if showBottomPrompt && ($currentMode === "Search" || $currentMode === "Photo")}
-				<Scrollbar className="absolute left-5  max-h-44 px-2" classLayout="">
+				<div class="row absolute left-5 flex max-h-20 overflow-auto pl-2 w-11/12">
 					{#each $currentMode === "Search" ? Object.entries(prompts).filter(([k, v]) => k !== "Image Style") : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]}
 					<!-- {#each $currentMode === "Search" ? Object.entries(prompts) : [Object.entries(prompts).find(([k, v]) => k === "Image Style")] as [k, v]} -->
 						<!-- <p class="text-sm font-semibold text-[#15325f]">{k}</p> -->
 						{#if k === "Address"}
-							<div class="flex max-h-20 flex-wrap overflow-auto pl-2 hidden">
 								{#each v as badge}
 									<Checkbox class="mr-2" bind:group value={badge}>
 										<Badge
@@ -620,7 +631,6 @@
 										</Badge>
 									</Checkbox>
 								{/each}
-							</div>
 						{:else}
 							{#each v as badge}
 								<button
@@ -639,14 +649,22 @@
 							{/each}
 						{/if}
 					{/each}
-				</Scrollbar>
+				</div>
 			{/if}
 		</div>
 	</div>
 </div>
 
 <style>
-	/* textarea::placeholder {
-		transform: translateY(1.3rem);
-	} */
+	.row::-webkit-scrollbar {
+	display: none;
+	}
+
+	.row {
+	scrollbar-width: none;
+	}
+
+	.row {
+	-ms-overflow-style: none;
+	}
 </style>
