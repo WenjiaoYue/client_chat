@@ -102,7 +102,7 @@
 	let prompts = {
 		"Image Style": [
 			"disney cartoon",
-			"add fireworks",
+			"vintage filter",
 			"van gogh",
 			"pixar",
 			"pencil sketch",
