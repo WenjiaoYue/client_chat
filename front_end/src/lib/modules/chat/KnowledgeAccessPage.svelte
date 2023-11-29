@@ -1,22 +1,29 @@
 <script>
 	import KnowledgeAccess from "$lib/assets/chat/svelte/KnowledgeAccess.svelte";
 	import { TalkingTemplateLibrary } from "$lib/shared/constant/Data";
-	import { CollectionType, TemplateCustom, currentTemplate } from "$lib/shared/stores/common/Store";
+	import {
+		CollectionType,
+		TemplateCustom,
+		currentTemplate,
+	} from "$lib/shared/stores/common/Store";
 
-	$: knowledge = $currentTemplate.collection === CollectionType.Custom
+	$: knowledge =
+		$currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].knowledge
-			: TalkingTemplateLibrary[$currentTemplate.id].knowledge
+			: TalkingTemplateLibrary[$currentTemplate.id].knowledge;
 
-	$: knowledge_name = $currentTemplate.collection === CollectionType.Custom
+	$: knowledge_name =
+		$currentTemplate.collection === CollectionType.Custom
 			? $TemplateCustom[$currentTemplate.id].knowledge_name
-			: TalkingTemplateLibrary[$currentTemplate.id].knowledge_name
+			: TalkingTemplateLibrary[$currentTemplate.id].knowledge_name;
 </script>
 
 <div class="flex w-full flex-row items-start gap-1.5 pl-1">
-	<KnowledgeAccess />
-	{#if knowledge === 'default' && knowledge_name === 'default'}
-		<span class="text-xs text-[#611fec]">knowledge disabled</span>
+	{#if knowledge === "default" && knowledge_name === "default"}
+		<span></span>
 	{:else}
+		<KnowledgeAccess />
+
 		<span class="text-xs text-[#611fec]">knowledge</span>
 		<label class="relative inline-flex cursor-pointer items-center">
 			<input type="checkbox" value="" class="peer sr-only" checked on:change />
