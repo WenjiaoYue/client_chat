@@ -1,6 +1,6 @@
 import { env } from "$env/dynamic/public";
 
-const TRAFFIC_URL = env.TRAFFIC_URL;
+const BASE_URL = env.BASE_URL;
 
 export function scrollToBottom(scrollToDiv: HTMLElement) {
     if (scrollToDiv) {
@@ -32,13 +32,13 @@ export function formatTime(seconds) {
 }
 
 export async function trafficHint() {
-	const url = TRAFFIC_URL;
+	const url =  `${BASE_URL}/nginx_status`;
 	const init: RequestInit = {
 		method: "GET",
 	};
 
 	try {
-		let response = await fetch(url, init);
+		const response = await fetch(url, init);
 		if (!response.ok) throw response.status;
 		const data = await response.text();
         const regex = /Waiting:\s*(\d+)/;

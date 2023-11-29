@@ -1,9 +1,10 @@
 import { env } from "$env/dynamic/public";
 
-const BASE_URL = env.BASE_URL;
+const PHOTO_URL = env.PHOTO_URL;
+const FACE_ANIMATION_URL = env.FACE_ANIMATION_URL;
 
 export async function uploadImages(image_list) {
-	const url = `${BASE_URL}/uploadImages`;
+	const url = `${PHOTO_URL}/uploadImages`;
 	const init: RequestInit = {
 		method: "POST",
 		
@@ -12,7 +13,7 @@ export async function uploadImages(image_list) {
 	};
 
 	try {
-		let response = await fetch(url, init);
+		const response = await fetch(url, init);
 
 		if (!response.ok) throw response.status;
 		return await response.json();
@@ -22,31 +23,15 @@ export async function uploadImages(image_list) {
 	}
 }
 
-export async function fetchUploadProgress(images) {
-	const url = `${BASE_URL}/progress`;
-	const init: RequestInit = {
-		method: "GET",
-		
-	};
-
-	try {
-		let response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
-}
 
 export async function fetchImageList() {
-	const url = `${env.BASE_URL}/getAllImages`
+	const url = `${PHOTO_URL}/getAllImages`
 	const init: RequestInit = {
 		method: "POST",
 		
 	}
 	try {
-		let response = await fetch(url, init);
+		const response = await fetch(url, init);
 		if (!response.ok) throw response.status
 		return await response.json();
 	} catch (error) {
@@ -56,7 +41,7 @@ export async function fetchImageList() {
 }
 
 export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: string | Blob) {
-	const url = `${env.VIDEO_URL}`;
+	const url = `${FACE_ANIMATION_URL}`;
 	const formData = new FormData()
 	formData.append('image', imageBlob, 'remote-image.jpg');
 	formData.append('text', query);
@@ -82,38 +67,33 @@ export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: 
 }
 
 export async function fetchMsg(suffix, payload) {
-	const url = `${env.BASE_URL}` + suffix;
+	const url = `${PHOTO_URL}` + suffix;
 	return sendPostRequest(url, payload);
 }
 
-// chat/knowldge 
-export async function fetchTextMsg(suffix, payload) {
-	const url = `${env.KNOWLEDGE_BASE_URL}` + suffix;
-	return sendPostRequest(url, payload);
-}
 
 export async function fetchTypeList() {
-	const url = `${env.BASE_URL}/getTypeList`;
+	const url = `${PHOTO_URL}/getTypeList`;
 	return sendPostRequest(url);
 }
 
 export async function fetchImageDetail(image_id: string) {
-	const url = `${BASE_URL}/getImageDetail`;
+	const url = `${PHOTO_URL}/getImageDetail`;
 	return sendPostRequest(url, { image_id });
 }
 
 export async function fetchImagesByType(type, subtype) {
-	const url = `${BASE_URL}/getImageByType`;
+	const url = `${PHOTO_URL}/getImageByType`;
 	return sendPostRequest(url, { type, subtype });
 }
 
 export async function updateLabel(label, from, to) {
-	const url = `${BASE_URL}/updateLabel`;
+	const url = `${PHOTO_URL}/updateLabel`;
 	return sendPostRequest(url, { label_list: [{ label, from, to }] });
 }
 
 export async function updateImageInfo(image_id, payload, urlSuffix) {
-	const url = `${BASE_URL}` + urlSuffix;
+	const url = `${PHOTO_URL}` + urlSuffix;
 	let extractedObject;
 
 	if (payload) {
@@ -138,7 +118,7 @@ export async function updateImageInfo(image_id, payload, urlSuffix) {
 	};
 
 	try {
-		let response = await fetch(url, init);
+		const response = await fetch(url, init);
 		if (!response.ok) throw response.status;
 
 		return await response.json();

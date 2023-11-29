@@ -2,9 +2,9 @@ import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
 
-const BASE_URL = env.BASE_URL;
-const TALKING_URL = env.TALKING_URL;
-const TEXT_URL = env.KNOWLEDGE_BASE_URL;
+const AUDIO_URL = env.AUDIO_URL;
+const RETRIEVAL_URL = env.RETRIEVAL_URL;
+const TEXT_CHAT_URL = env.TEXT_CHAT_URL;
 
 
 export async function fetchTextStream(query: string, knowledge_base_id: string) {
@@ -22,7 +22,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 			"stream": true
 
 		}
-		url = `${TEXT_URL}/chat`;
+		url = `${RETRIEVAL_URL}/chat`;
 
 	} else {
 		payload = {
@@ -32,7 +32,7 @@ export async function fetchTextStream(query: string, knowledge_base_id: string) 
 			"max_new_tokens": 256,
 			"knowledge_base_id": "default"
 		}
-		url = `https://198.175.88.26:443/v1/textchat/chat`;
+		url = `${TEXT_CHAT_URL}/chat`;
 	}
 
 	return new SSE(url, {
@@ -53,7 +53,7 @@ export async function fetchVideoText(query: string, knowledge_base_id: string) {
 			"max_new_tokens": 256,
 			"stream": false
 		}
-		url = `${TEXT_URL}/chat`;
+		url = `${RETRIEVAL_URL}/chat`;
 
 	} else {
 		payload = {
@@ -63,7 +63,7 @@ export async function fetchVideoText(query: string, knowledge_base_id: string) {
 			"max_new_tokens": 256,
 			"stream": false
 		}
-		url = `https://198.175.88.26:443/v1/textchat/chat`;
+		url = `${TEXT_CHAT_URL}/chat`;
 	}
 
 
@@ -85,7 +85,7 @@ export async function fetchVideoText(query: string, knowledge_base_id: string) {
 }
 
 export async function fetchAudioText(file) {
-	const url = `${TALKING_URL}/asr`
+	const url = `${AUDIO_URL}/asr`
 	const formData = new FormData()
 	formData.append('file', file)
 	const init: RequestInit = {
@@ -104,27 +104,11 @@ export async function fetchAudioText(file) {
 }
 
 export async function fetchAudioStream(text: string, voice: any, knowledge_id: any) {
-	const url = `${TALKING_URL}/llm_tts`
+	const url = `${AUDIO_URL}/llm_tts`
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },
 		payload: JSON.stringify({ text, voice, knowledge_id }),
 	})
 }
 
-export async function fetchUploadProgress(images) {
-	const url = `${BASE_URL}/progress`;
-	const init: RequestInit = {
-		method: "GET",
-
-	};
-
-	try {
-		const response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
-}
 

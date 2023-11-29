@@ -1,10 +1,6 @@
 import { env } from '$env/dynamic/public';
-import { fetchMsg, fetchTextMsg, tmpVideo } from '$lib/network/image/Network';
+import { fetchMsg, tmpVideo } from '$lib/network/image/Network';
 import { fetchTextStream, fetchVideoText } from '$lib/network/chat/Network';
-
-const GETIMAGELIST_URL = env.GETIMAGELIST_URL;
-const UPLOAD_IMAGE_URL = env.UPLOAD_IMAGE_URL;
-const BASE_URL = env.BASE_URL;
 
 
 async function chatMessage(query: string, voice_id: string, knowledge_base_id: string,
