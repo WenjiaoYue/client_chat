@@ -154,6 +154,7 @@
 			<div class="text-left text-lg font-bold">{name}</div>
 			<div
 				class="flex flex-row items-center gap-3 text-[0.93rem] text-[#4e5666] "
+				class:opacity-0={knowledge_name === 'default'}
 			>
 				<TemplateBook /> <span class="w-full truncate whitespace-nowrap text-ellipsis ">{knowledge_name}</span> 
 			</div>
