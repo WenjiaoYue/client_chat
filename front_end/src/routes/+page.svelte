@@ -2,52 +2,37 @@
 	export let data;
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
-	import Close from "$lib/assets/chat/svelte/Close.svelte";
-	import ImageIcon from "$lib/assets/chat/svelte/ImageIcon.svelte";
-
-	import DropZone from "$lib/shared/components/drag-drop/DropZone.svelte";
 	import ChatResponse from "$lib/network/chat/ChatResponse";
-	import LoadingButtonSpinnerIcon from "$lib/assets/chat/svelte/LoadingButtonSpinnerIcon.svelte";
 
 	import {
 		CollectionType,
-		TalkingKnowledgeCustom,
 		TemplateCustom,
 		countDown,
 		currentMode,
 		currentTemplate,
 		ifStoreMsg,
 		imageList,
-		isLoading,
 		photoMode,
-		showSidePage,
 		videoMode,
 	} from "$lib/shared/stores/common/Store";
 	import {
 		Badge,
-		Button,
 		Checkbox,
-		Indicator,
-		Modal,
-		Progressbar,
 	} from "flowbite-svelte";
 	import { onMount } from "svelte";
-	import { fetchImageList, fetchTypeList } from "$lib/network/image/Network";
+	import { fetchImageList } from "$lib/network/image/Network";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import {
 		LOCAL_STORAGE_KEY,
 		MessageRole,
 		MessageType,
 		type Message,
-		isImage,
 	} from "$lib/shared/constant/Interface";
 	import {
 		fromTimeStampToTime,
 		getCurrentTimeStamp,
 		scrollToBottom,
 	} from "$lib/shared/Utils";
-	import ChatImageCard from "$lib/modules/chat/ChatImageCard.svelte";
-	import ArrowRight from "$lib/assets/chat/svelte/ArrowRight.svelte";
 	import {
 		fetchAudioStream,
 		fetchAudioText,
@@ -62,26 +47,15 @@
 	import "$lib/assets/layout/css/driver.css";
 	import {
 		checkProcessingImage,
-		getTypeList,
 	} from "$lib/network/image/getTypeLists.js";
-	import Add from "$lib/assets/chat/svelte/Add.svelte";
-	import ChatToolsCard from "$lib/modules/chat/ChatToolsCard.svelte";
-	import ChatVideoCard from "$lib/modules/chat/ChatVideoCard.svelte";
 	import {
 		TalkingTemplateLibrary,
-		TalkingVoiceLibrary,
 	} from "$lib/shared/constant/Data.js";
-	import HintIcon from "$lib/assets/chat/svelte/HintIcon.svelte";
-	import UploadImageBlobs from "$lib/shared/components/upload/UploadImageBlobs.svelte";
-	import ChatUploadImages from "$lib/modules/chat/ChatUploadImages.svelte";
-	import ColorImg from "$lib/assets/chat/svelte/ColorImg.svelte";
 	import ToolList from "$lib/modules/chat/ToolList.svelte";
-	import PictureEnlarge from "$lib/shared/components/images/PictureEnlarge.svelte";
 	import PopImageList from "$lib/modules/chat/popImageList.svelte";
-	import Notification from "$lib/assets/image-info/svelte/notification.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
-	import KnowledgeAccess from "$lib/modules/chat/KnowledgeAccessPage.svelte";
 	import KnowledgeAccessPage from "$lib/modules/chat/KnowledgeAccessPage.svelte";
+	import ArrowPathIcon from "$lib/assets/chat/svelte/arrow-path-icon.svelte";
 
 	let query: string = "";
 	const { addNotification } = getNotificationsContext();
@@ -92,7 +66,6 @@
 	let promptList: { [key: string]: any[] } = {};
 	let showBottomImages = false;
 	let showBottomPrompt = false;
-	let showTools = false;
 	let toolTile = "";
 	let uploadedImageToVideo = false;
 
@@ -111,6 +84,8 @@
 	};
 	let group: string[] = [];
 	let knowledgeAccess = true;
+
+	$: enableRegenerate = !loading && chatMessages.length > 2;
 
 	$: voice =
 		$currentTemplate.collection === CollectionType.Custom
@@ -480,6 +455,60 @@
 
 		uploadedImageToVideo = true;
 	}
+
+	async function handleRegenerate() {
+		let lastRole = chatMessages[chatMessages.length - 1];
+		if (lastRole.role === MessageRole.Assistant) {
+			chatMessages = chatMessages.filter(
+				(_, i: number) => i !== chatMessages.length - 1
+			);
+		}
+
+		loading = true;
+
+		const lastMsg = chatMessages[chatMessages.length - 1]
+
+		if (lastMsg.type === MessageType.Text) {
+			const content = lastMsg.content as string
+			if ($currentMode === "Text") {
+				await callTextStream(content);
+			} else {
+				await callGeneralMsg(content);
+			}
+
+			scrollToBottom(scrollToDiv);
+			storeMessages();
+			uploadedImageToVideo = false;
+		} else if (lastMsg.type === MessageType.SingleAudio) {
+			const base64Response = await fetch(lastMsg.content as string)
+			const audioBlob = await base64Response.blob()
+			let fileReader = new FileReader();
+			fileReader.onloadend = async () => {
+				let readerRes = (fileReader.result as string).split(";");
+
+				chatMessages = [
+					...chatMessages,
+					{
+						role: MessageRole.User,
+						type: MessageType.SingleAudio,
+						content: readerRes[0] + ";" + readerRes[2],
+						time: getCurrentTimeStamp(),
+					},
+				];
+				scrollToBottom(scrollToDiv);
+				storeMessages();
+
+				const res = await fetchAudioText(audioBlob);
+				if ($currentMode === "Video") {
+					await callGeneralMsg(res.asr_result);
+					uploadedImageToVideo = false;
+				} else {
+					await callAudioStream(res.asr_result);
+				}
+			};
+			fileReader.readAsDataURL(audioBlob);
+		}
+	}
 </script>
 
 <!-- <DropZone on:drop={handleImageSubmit}> -->
@@ -503,6 +532,17 @@
 		<!-- Loading text -->
 		{#if loading}
 			<LoadingAnimation />
+		{/if}
+
+		{#if enableRegenerate}
+			<button
+				on:click={handleRegenerate}
+				type="button"
+				class="mx-auto mb-1 flex w-48 items-center justify-center gap-2 self-center whitespace-nowrap rounded-md bg-white px-3 py-2 text-sm text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+			>
+				<ArrowPathIcon />
+				Regenerate response
+			</button>
 		{/if}
 
 		<ToolList
