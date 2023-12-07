@@ -8,12 +8,24 @@
 		const file = (event.target as HTMLInputElement).files![0];
 
 		if (!file) return;
-
 		const reader = new FileReader();
+
+		var img = new Image();
+		img.onload = () => {
+			if (img.width && img.height) {
+				const src = reader.result!.toString();
+				dispatch("upload", { src: src, fileName: file.name });
+			} else {
+				dispatch("error")
+			}
+		};
+		img.onerror = function() {
+			dispatch("error")
+		};
+
 		reader.onloadend = () => {
 			if (!reader.result) return;
-			const src = reader.result.toString();
-			dispatch("upload", { src: src, fileName: file.name });
+			img.src = reader.result as string;
 		};
 		reader.readAsDataURL(file);
 	}

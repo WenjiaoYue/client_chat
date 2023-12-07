@@ -87,6 +87,15 @@
 		}, 3000);
 	}
 
+	function handleAvatarError() {
+		addNotification({
+			text: "Please upload valid photos!",
+			position: "bottom-center",
+			type: "success",
+			removeAfter: 3000,
+		});
+	}
+
 	function handleAvatarDelete(i: number) {
 		TalkingPhotoCustom.update((options) => {
 			options.splice(i, 1);
@@ -157,7 +166,16 @@
 		});
 	}
 
-	async function handleKnowledgePaste(e: CustomEvent<any>) {
+	async function handleKnowledgePaste(e: CustomEvent<{pasteUrlList: string[]}>) {
+		if (e.detail.pasteUrlList.some(el => el.includes('\0'))) {
+			addNotification({
+				text: "Please upload valid links",
+				position: "top-left",
+				type: "success",
+				removeAfter: 3000,
+			});
+			return 
+		}
 		let knowledge_id = "";
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
@@ -238,7 +256,7 @@
             Talking Avatar
         </h3>
         <div class="grid grid-cols-4 gap-5 text-[#0F172A] grid-cols-9">
-            <UploadAvatar on:upload={handleAvatarUpload} />
+            <UploadAvatar on:upload={handleAvatarUpload} on:error={handleAvatarError} />
             {#each allPhotos as opt, i (opt.name + i)}
                 <button
                     class={`${i === 0 && imgBounce ? "animate-bounce" : ""} mb-2`}
