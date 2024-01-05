@@ -2,57 +2,19 @@ import { env } from "$env/dynamic/public";
 
 const BASE_URL = env.BASE_URL;
 
-export async function uploadImages(image_list) {
+export async function uploadImages(image_list: { imgSrc: string }[]) {
 	const url = `${BASE_URL}/uploadImages`;
-	const init: RequestInit = {
-		method: "POST",
-		
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ image_list }),
-	};
-
-	try {
-		let response = await fetch(url, init);
-
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
+	sendPostRequest(url, JSON.stringify({ image_list }))
 }
 
-export async function fetchUploadProgress(images) {
+export async function fetchUploadProgress() {
 	const url = `${BASE_URL}/progress`;
-	const init: RequestInit = {
-		method: "GET",
-		
-	};
-
-	try {
-		let response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
+	sendPostRequest(url);
 }
 
 export async function fetchImageList() {
-	const url = `${env.BASE_URL}/getAllImages`
-	const init: RequestInit = {
-		method: "POST",
-		
-	}
-	try {
-		let response = await fetch(url, init);
-		if (!response.ok) throw response.status
-		return await response.json();
-	} catch (error) {
-		console.error('network error: ', error);
-		return undefined
-	}
+	const url = `${env.BASE_URL}/getAllImages`;
+	sendPostRequest(url);
 }
 
 export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: string | Blob) {
@@ -63,33 +25,18 @@ export async function tmpVideo(query: string | Blob, imageBlob: Blob, voice_id: 
 	formData.append('mode', "fast");
 	formData.append('voice', voice_id);
 
-	const init: RequestInit = {
-		method: "POST",
-		body: formData,
-	};
-
-	try {
-		const response = await fetch(url, init);
-		if (!response.ok) throw response.status
-		const videoData = await response.blob();
-
-		const videoUrl = URL.createObjectURL(videoData);
-		return videoUrl;
-	} catch (error) {
-		console.error('network error: ', error);
-		return undefined
-	}
+	sendPostRequest(url, formData)
 }
 
-export async function fetchMsg(suffix, payload) {
+export async function fetchMsg(suffix: string, payload: object) {
 	const url = `${env.BASE_URL}` + suffix;
-	return sendPostRequest(url, payload);
+	return sendPostRequest(url, JSON.stringify(payload));
 }
 
 // chat/knowldge 
-export async function fetchTextMsg(suffix, payload) {
+export async function fetchTextMsg(suffix: string, payload: object) {
 	const url = `${env.KNOWLEDGE_BASE_URL}` + suffix;
-	return sendPostRequest(url, payload);
+	return sendPostRequest(url, JSON.stringify(payload));
 }
 
 export async function fetchTypeList() {
@@ -99,20 +46,20 @@ export async function fetchTypeList() {
 
 export async function fetchImageDetail(image_id: string) {
 	const url = `${BASE_URL}/getImageDetail`;
-	return sendPostRequest(url, { image_id });
+	return sendPostRequest(url, image_id);
 }
 
-export async function fetchImagesByType(type, subtype) {
+export async function fetchImagesByType(type: string, subtype: string) {
 	const url = `${BASE_URL}/getImageByType`;
-	return sendPostRequest(url, { type, subtype });
+	return sendPostRequest(url, JSON.stringify({ type, subtype }));
 }
 
-export async function updateLabel(label, from, to) {
+export async function updateLabel(label: string, from: string, to: string) {
 	const url = `${BASE_URL}/updateLabel`;
-	return sendPostRequest(url, { label_list: [{ label, from, to }] });
+	return sendPostRequest(url, JSON.stringify({ label_list: [{ label, from, to }] }));
 }
 
-export async function updateImageInfo(image_id, payload, urlSuffix) {
+export async function updateImageInfo(image_id: number | string, payload: object | undefined, urlSuffix: string) {
 	const url = `${BASE_URL}` + urlSuffix;
 	let extractedObject;
 
@@ -131,32 +78,17 @@ export async function updateImageInfo(image_id, payload, urlSuffix) {
 		};
 	}
 
-	const init: RequestInit = {
-		method: "POST",
-		
-		body: JSON.stringify(extractedObject),
-	};
-
-	try {
-		let response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-
-		return await response.json();
-	} catch (error) {
-		console.error("network error: ", error);
-
-		return undefined;
-	}
+	sendPostRequest(url, JSON.stringify(extractedObject))
 }
 
-async function sendPostRequest(url: string, payload: Object = {}) {
+export async function sendPostRequest(url: string, payload?: BodyInit | null | undefined) {
 	try {
 		const response = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify(payload),
+			body: payload,
 		});
 
 		if (!response.ok) throw response.status;

@@ -1,7 +1,7 @@
 import { fetchTypeList } from "./Network";
 
 export async function getTypeList() {
-    let res = await fetchTypeList()
+    const res = await fetchTypeList()
     // let originTypeList = res.type_list as {[index: string]: {[index: string]: string}[]};
     // let newTypeList: {[index: string]: {[index: string]: string}} = {}
     // for(let key in originTypeList) {
@@ -15,6 +15,6 @@ export async function getTypeList() {
 }
 
 export async function checkProcessingImage() {
-    let res = await fetchTypeList()
+    const res = await fetchTypeList()
     return [res.process_status.processing_image === 0, res.type_list, res.prompt_list]
 }
