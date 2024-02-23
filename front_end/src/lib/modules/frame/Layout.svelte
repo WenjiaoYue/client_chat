@@ -3,8 +3,6 @@
 	import { page } from "$app/stores";
 	import { browser } from "$app/environment";
 	import { open } from "$lib/shared/stores/common/Store";
-	import TopNavigation from "$lib/modules/frame/TopNavigation.svelte";
-	import SideNavigation from "$lib/modules/frame/SideNavigation.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 
 	let root: HTMLElement
@@ -25,10 +23,8 @@
 
 <div bind:this={root} class='h-full overflow-hidden relative'>
 	<div class="h-full flex items-start">
-		<SideNavigation />
-		<div class='relative flex flex-col h-full pl-0 w-full lg:pl-64 bg-white'>
-			<TopNavigation />
-			<Scrollbar className="h-0 grow max-sm:mt-16 bg-[#252e47]" classLayout="h-full" alwaysVisible={false}>
+		<div class='relative flex flex-col h-full pl-0 w-full  bg-white'>
+			<Scrollbar className="h-0 grow " classLayout="h-full" alwaysVisible={false}>
 				<slot />
 			</Scrollbar>
 		</div>

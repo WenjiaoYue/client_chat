@@ -1,7 +1,3 @@
-import { env } from "$env/dynamic/public";
-
-const TRAFFIC_URL = env.TRAFFIC_URL;
-
 export function scrollToBottom(scrollToDiv: HTMLElement) {
     if (scrollToDiv) {
         setTimeout(
@@ -31,31 +27,3 @@ export function formatTime(seconds) {
     return `${hours}:${minutes}:${remainingSeconds}`;
 }
 
-export async function trafficHint() {
-	const url = TRAFFIC_URL;
-	const init: RequestInit = {
-		method: "GET",
-	};
-
-	try {
-		let response = await fetch(url, init);
-		if (!response.ok) throw response.status;
-		const data = await response.text();
-        const regex = /Waiting:\s*(\d+)/;
-        if (data) {
-            const match = data.match(regex);
-
-            if (match) {
-                const waitingValue = parseInt(match[1], 10);
-                return waitingValue;
-            } else {
-                console.error('could not find "Waiting" value');
-                return null;
-            }
-        }
-
-	} catch (error) {
-		console.error("network error: ", error);
-		return undefined;
-	}
-}
