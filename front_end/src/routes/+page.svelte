@@ -1,15 +1,8 @@
 <script lang="ts">
 	export let data;
-	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
 	import {
-		CollectionType,
 		TalkingKnowledgeCustom,
-		TemplateCustom,
-		currentMode,
-		currentTemplate,
 		ifStoreMsg,
-		imageList,
-		photoMode,
 	} from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
@@ -31,20 +24,16 @@
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
-	import { TalkingTemplateLibrary } from "$lib/shared/constant/Data.js";
-	import { getNotificationsContext } from "svelte-notifications";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
+	import Previous from "$lib/assets/upload/previous.svelte";
+	import Next from "$lib/assets/upload/next.svelte";
 
 	let query: string = "";
-	const { addNotification } = getNotificationsContext();
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
+	let chatMessagesMap = {};
 
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-
-	let knowledgeAccess = true;
-
-	console.log("222", $TalkingKnowledgeCustom);
 
 	$: knowledge = $TalkingKnowledgeCustom[0]
 		? $TalkingKnowledgeCustom[0].id
@@ -65,52 +54,32 @@
 		}
 	}
 
-	const callTextStream = async (query: string) => {
-		const eventSource = await fetchTextStream(query, knowledge);
-
-		eventSource.addEventListener("message", (e: any) => {
-			let currentMsg = e.data;
-			console.log("currentMsg", currentMsg, chatMessages);
-
-			if (currentMsg == "[DONE]") {
-				loading = false;
-				storeMessages();
-			} else {
-				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
-					chatMessages = [
-						...chatMessages,
-						{
-							role: MessageRole.Assistant,
-							type: MessageType.Text,
-							content: currentMsg,
-							time: getCurrentTimeStamp(),
-						},
-					];
-				} else {
-					let content = chatMessages[chatMessages.length - 1].content as string;
-					chatMessages[chatMessages.length - 1].content =
-						content + " " + currentMsg;
-				}
-				scrollToBottom(scrollToDiv);
-			}
-		});
-		eventSource.stream();
-	};
-
-	const callTextNoStream = async (query: string) => {
+	const callTextNoStream = async (query: string, id: number) => {
+		const startTime = new Date();
 		const eventSource = await fetchTextNoStream(query, knowledge);
-		console.log("eventSource", eventSource.OUTPUT0, chatMessages, knowledge);
+		const endTime = new Date();
+		const elapsedTime = (endTime - startTime) / 1000;
 
 		if (eventSource.OUTPUT0) {
-			chatMessages = [
-				...chatMessages,
-				{
-					role: MessageRole.Assistant,
-					type: MessageType.Text,
-					content: eventSource.OUTPUT0,
-					time: getCurrentTimeStamp(),
-				},
-			];
+			const newMessage = {
+				role: MessageRole.Assistant,
+				type: MessageType.Text,
+				content: eventSource.OUTPUT0,
+				time: getCurrentTimeStamp(),
+			};
+
+			items.forEach((item) => {
+				if (item.id === id) {
+					item.content.push(newMessage);
+					item.time = `${elapsedTime}s`;
+
+					if (!chatMessagesMap[id]) {
+						chatMessagesMap[id] = [newMessage];
+					} else {
+						chatMessagesMap[id].push(newMessage);
+					}
+				}
+			});
 		}
 
 		loading = false;
@@ -118,66 +87,47 @@
 		scrollToBottom(scrollToDiv);
 	};
 
-	async function warningUser() {
-		const checkedItems = $imageList
-			.filter((_, i) => currentDragImageList[i])
-			.map((item) => ({
-				imgSrc: item.image_path,
-				imgId: item.image_id,
-			}));
-		if ($currentMode === "Text") {
-			return true;
-		} else if ($currentMode === "Video" && checkedItems.length !== 1) {
-			addNotification({
-				text: "Please select one photo!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-			return false;
-		} else if ($photoMode === "styleTransfer" && checkedItems.length === 0) {
-			addNotification({
-				text: "Please select photos!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-			return false;
-		} else if ($photoMode === "photoChat" && $imageList.length === 0) {
-			addNotification({
-				text: "Please upload photos!",
-				position: "bottom-center",
-				type: "warning",
-				removeAfter: 3000,
-			});
-			return false;
-		} else {
-			return true;
-		}
+	async function handleSubmit() {
+		await handleTextSubmit(1);
+		await handleTextSubmit(2);
 	}
 
-	const handleTextSubmit = async () => {
-		const res = await warningUser();
+	const handleTextSubmit = async (id: number) => {
+		loading = true;
+		const newMessage = {
+			role: MessageRole.User,
+			type: MessageType.Text,
+			content: query,
+			time: getCurrentTimeStamp(),
+		};
+		chatMessages = [...chatMessages, newMessage];
+		scrollToBottom(scrollToDiv);
+		storeMessages();
+		query = "";
 
-		if (res) {
-			loading = true;
-			const newMessage = {
-				role: MessageRole.User,
-				type: MessageType.Text,
-				content: query,
-				time: getCurrentTimeStamp(),
-			};
-			chatMessages = [...chatMessages, newMessage];
-			scrollToBottom(scrollToDiv);
-			storeMessages();
-			query = "";
+		await callTextNoStream(newMessage.content, id);
 
-			await callTextNoStream(newMessage.content);
-
-			scrollToBottom(scrollToDiv);
-			storeMessages();
-		}
+		scrollToBottom(scrollToDiv);
+		storeMessages();
 	};
+
+	// gallery
+	let currentIndex = 0;
+	let items = [
+		{ id: 1, content: [], time: "0s" },
+		{ id: 2, content: [], time: "0s" },
+	];
+
+	function nextItem() {
+		currentIndex = (currentIndex + 1) % items.length;
+	}
+
+	function prevItem() {
+		currentIndex = (currentIndex - 1 + items.length) % items.length;
+	}
+
+	$: currentItem = items[currentIndex];
+	// gallery
 </script>
 
 <!-- <DropZone on:drop={handleImageSubmit}> -->
@@ -190,49 +140,100 @@
 			<UploadFile />
 		</div>
 		<div
-			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0 "
+			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0"
 		>
-		<div class="relative flex w-full flex-row justify-center my-4">
-			<div class="relative w-[85%]">
-				<input
-					class="block w-full rounded-lg border-0 border-b-2 border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-					type="text"
-					placeholder="Enter prompt here"
-					disabled={loading}
-					maxlength="1200"
-					bind:value={query}
-					on:keydown={(event) => {
-						if (event.key === "Enter" && !event.shiftKey && query) {
-							event.preventDefault();
-							handleTextSubmit();
-						}
-					}}
-				/>
-				<button
-					on:click={() => {
-						if (query) {
-							handleTextSubmit();
-						}
-					}}
-					type="submit"
-					class="absolute bottom-2.5 end-2.5 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-					>Send</button
-				>
+			<div class="relative my-4 flex w-full flex-row justify-center">
+				<div class="relative w-[85%]">
+					<input
+						class="block w-full rounded-lg border-0 border-b-2 border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+						type="text"
+						placeholder="Enter prompt here"
+						disabled={loading}
+						maxlength="1200"
+						bind:value={query}
+						on:keydown={(event) => {
+							if (event.key === "Enter" && !event.shiftKey && query) {
+								event.preventDefault();
+								handleSubmit();
+							}
+						}}
+					/>
+					<button
+						on:click={() => {
+							if (query) {
+								handleSubmit();
+							}
+						}}
+						type="submit"
+						class="absolute bottom-2.5 end-2.5 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						>Send</button
+					>
+				</div>
 			</div>
 		</div>
-		</div>
-		<Scrollbar
-			classLayout="flex flex-col gap-1"
-			className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
+
+		<!-- gallery -->
+		<div
+			id="custom-controls-gallery"
+			class="relative mt-3 h-0 w-full w-full grow px-2 pt-2"
+			data-carousel="slide"
 		>
-			{#each chatMessages as message, i}
-				<ChatMessage msg={message} />
-			{/each}
-		</Scrollbar>
-		<!-- Loading text -->
-		{#if loading}
-			<LoadingAnimation />
-		{/if}
+			<!-- Carousel wrapper -->
+			<!-- Display current item -->
+			{#if currentItem}
+				<Scrollbar
+					classLayout="flex flex-col gap-1"
+					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
+				>
+					{#each chatMessages as message, i}
+						<ChatMessage msg={message} />
+					{/each}
+				</Scrollbar>
+				<!-- Loading text -->
+				{#if loading}
+					<LoadingAnimation />
+				{/if}
+			{/if}
+			<div class="flex items-center justify-between">
+				<div class="justify-left ml-2 flex items-center">
+					<!-- Previous button -->
+					<button
+						type="button"
+						class="group absolute start-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+						on:click={prevItem}
+					>
+						<span
+							class="text-gray-400 hover:text-gray-900 group-focus:text-gray-900 dark:hover:text-white dark:group-focus:text-white"
+						>
+							<Previous />
+							<span class="sr-only">Previous</span>
+						</span>
+					</button>
+					<!-- Next button -->
+
+					<button
+						type="button"
+						class="group absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+						on:click={nextItem}
+					>
+						<span
+							class="text-gray-400 hover:text-gray-900 group-focus:text-gray-900 dark:hover:text-white dark:group-focus:text-white"
+						>
+							<Next />
+							<span class="sr-only">Next</span>
+						</span>
+					</button>
+				</div>
+				<div class="flex h-full justify-center pr-2">
+					<!-- Display end to end time -->
+					<label for="" class="mr-2 text-base font-bold text-blue-700"
+						>End to End Time:
+					</label>
+					<label for="">{currentItem.time}</label>
+				</div>
+			</div>
+		</div>
+		<!-- gallery -->
 	</div>
 </div>
 
