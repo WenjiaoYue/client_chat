@@ -21,7 +21,10 @@
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 
 	import { getCurrentTimeStamp, scrollToBottom } from "$lib/shared/Utils";
-	import { fetchTextStream } from "$lib/network/chat/Network";
+	import {
+		fetchTextNoStream,
+		fetchTextStream,
+	} from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import { browser } from "$app/environment";
 	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
@@ -66,7 +69,7 @@
 
 		eventSource.addEventListener("message", (e: any) => {
 			let currentMsg = e.data;
-			console.log("currentMsg", currentMsg);
+			console.log("currentMsg", currentMsg, chatMessages);
 
 			if (currentMsg == "[DONE]") {
 				loading = false;
@@ -91,6 +94,27 @@
 			}
 		});
 		eventSource.stream();
+	};
+
+	const callTextNoStream = async (query: string) => {
+		const eventSource = await fetchTextNoStream(query, knowledge);
+		console.log("eventSource", eventSource.OUTPUT0, chatMessages);
+
+		if (eventSource.OUTPUT0) {
+			chatMessages = [
+				...chatMessages,
+				{
+					role: MessageRole.Assistant,
+					type: MessageType.Text,
+					content: eventSource.OUTPUT0,
+					time: getCurrentTimeStamp(),
+				},
+			];
+		}
+
+		loading = false;
+		storeMessages();
+		scrollToBottom(scrollToDiv);
 	};
 
 	async function warningUser() {
@@ -147,7 +171,7 @@
 			storeMessages();
 			query = "";
 
-			await callTextStream(newMessage.content);
+			await callTextNoStream(newMessage.content);
 
 			scrollToBottom(scrollToDiv);
 			storeMessages();
@@ -163,7 +187,7 @@
 		<div class="flex justify-between p-2">
 			<p class="mt-2 tracking-tight sm:text-4xl">Neural Chat</p>
 			<UploadFile />
-		  </div>
+		</div>
 		<div
 			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0 shadow-inner"
 		>
