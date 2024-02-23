@@ -14,25 +14,16 @@
 	}
 </script>
 
-<div class="aspect-square w-full sm:h-[5rem] sm:w-[5rem]">
-	<label for="file" class="h-full w-full text-center">
-		<button
-			on:click={() => (formModal = true)}
-			class="flex h-full w-full cursor-pointer flex-col justify-center rounded-md"
-		>
-			<Paste />
-		</button>
-	</label>
-</div>
 
-<Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
-	<Label class="space-y-2">
-		<span>Paste URL</span>
-		<Input type="text" name="text" placeholder="URL" bind:value={urlValue} />
-		<Helper>Use semicolons (;) to separate multiple URLs.</Helper>
-	</Label>
-
-	<Button type="submit" class="w-full" on:click={() => handelPasteURL()}
+<Label class="space-y-1 my-10">
+	<div class="grid grid-cols-3">
+	  <Input class="col-span-2 rounded-none rounded-l-lg focus:border-blue-700 focus:ring-blue-700 " type="text" name="text" placeholder="URL" />
+	  <Button type="submit" class="w-full rounded-none rounded-r-lg bg-blue-700" on:click={() => handelPasteURL()}
 		>Confirm</Button
-	>
-</Modal>
+	  >
+	</div>
+	<!-- bind:value={urlValue} -->
+   
+	<Helper>Use semicolons (;) to separate multiple URLs.</Helper>
+  </Label>
+  

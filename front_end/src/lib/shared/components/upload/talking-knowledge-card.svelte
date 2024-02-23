@@ -3,7 +3,7 @@
 	import DeleteIcon from "$lib/assets/avatar/svelte/Delete.svelte";
 
 	export let name: string;
-
+	
 	export let needChangeName = false;
 
 	const dispatch = createEventDispatcher();
@@ -28,14 +28,12 @@
 	}
 </script>
 
-<div
-	class="flex h-full w-full items-center justify-center rounded-xl pt-1 shadow-[0_2px_30px_0_rgba(0,0,0,0.1)]"
->
+<div class="relative">
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="flex w-full flex-col items-center justify-center">
 			<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />
 		<span
-			class="relative w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-600 truncate"
+			class="relative w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-bold text-gray-600 truncate my-2 border-b-2 p-1"
 		>
 			{name}
 		</span>

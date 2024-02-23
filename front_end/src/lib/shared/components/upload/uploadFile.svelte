@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Drawer, Button, CloseButton } from "flowbite-svelte";
+	import { Drawer, Button, CloseButton, Tabs, TabItem } from "flowbite-svelte";
 	import { InfoCircleSolid } from "flowbite-svelte-icons";
 	import { sineIn } from "svelte/easing";
 	import UploadFile from "./upload-knowledge.svelte";
@@ -7,12 +7,16 @@
 	import { TalkingKnowledgeCustom } from "$lib/shared/stores/common/Store";
 	import TalkingKnowledgeCard from "./talking-knowledge-card.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
-	import { fetchKnowledgeBaseId, fetchKnowledgeBaseIdByPaste } from "$lib/network/upload/Network";
+	import {
+		fetchKnowledgeBaseId,
+		fetchKnowledgeBaseIdByPaste,
+	} from "$lib/network/upload/Network";
 
 	const { addNotification } = getNotificationsContext();
 	$: allKnowledges = [...$TalkingKnowledgeCustom];
 
 	let hidden6 = true;
+	let selectKnowledge = -1;
 	let transitionParamsRight = {
 		x: 320,
 		duration: 200,
@@ -22,22 +26,6 @@
 	async function handleKnowledgePaste(
 		e: CustomEvent<{ pasteUrlList: string[] }>
 	) {
-		if (
-			e.detail.pasteUrlList.some((el) => {
-				const regex =
-					/^([\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*$/;
-
-				return regex.test(el);
-			})
-		) {
-			addNotification({
-				text: "Please upload valid links",
-				position: "top-left",
-				type: "success",
-				removeAfter: 3000,
-			});
-			return;
-		}
 		let knowledge_id = "";
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
@@ -141,9 +129,29 @@
 		Please upload your local file or paste a remote file link, and Chat will
 		respond based on the content of the uploaded file.
 	</p>
-	<UploadFile on:upload={handleKnowledgeUpload} />
-	<PasteURL on:paste={handleKnowledgePaste} />
+	<Tabs
+		style="full"
+		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700"
+	>
+		<TabItem class="w-full" open>
+			<span slot="title">Upload File</span>
+			<UploadFile on:upload={handleKnowledgeUpload} />
+		</TabItem>
+		<TabItem class="w-full">
+			<span slot="title">Paste Link</span>
+			<PasteURL on:paste={handleKnowledgePaste} />
+		</TabItem>
+	</Tabs>
 	{#each allKnowledges as opt, i (opt.name + i)}
-		<TalkingKnowledgeCard {...opt} />
-	{/each}
+	<button
+		class:ring={selectKnowledge === i}
+		class={`sm:w-[5rem] sm:h-[5rem] `}
+		on:click={() => {
+			selectKnowledge = i;
+		}}
+	>
+		<TalkingKnowledgeCard {...opt}/>
+	</button>
+{/each}
+
 </Drawer>

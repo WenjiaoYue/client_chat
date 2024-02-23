@@ -3,6 +3,7 @@
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
 	import {
 		CollectionType,
+		TalkingKnowledgeCustom,
 		TemplateCustom,
 		currentMode,
 		currentTemplate,
@@ -43,10 +44,10 @@
 
 	let knowledgeAccess = true;
 
-	$: knowledge = knowledgeAccess
-		? $currentTemplate.collection === CollectionType.Custom
-			? $TemplateCustom[$currentTemplate.id].knowledge
-			: TalkingTemplateLibrary[$currentTemplate.id].knowledge
+	console.log("222", $TalkingKnowledgeCustom);
+
+	$: knowledge = $TalkingKnowledgeCustom[0]
+		? $TalkingKnowledgeCustom[0].id
 		: "default";
 
 	onMount(async () => {
@@ -98,7 +99,7 @@
 
 	const callTextNoStream = async (query: string) => {
 		const eventSource = await fetchTextNoStream(query, knowledge);
-		console.log("eventSource", eventSource.OUTPUT0, chatMessages);
+		console.log("eventSource", eventSource.OUTPUT0, chatMessages, knowledge);
 
 		if (eventSource.OUTPUT0) {
 			chatMessages = [
@@ -189,45 +190,36 @@
 			<UploadFile />
 		</div>
 		<div
-			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0 shadow-inner"
+			class="fixed relative flex w-full flex-col items-center justify-between bg-white p-2 pb-0 "
 		>
-			<div class="flex w-full flex-row items-center justify-between">
-				<!-- Textarea -->
-				<div
-					class="input-btn focus:ring-link relative flex max-h-60 w-full flex-col items-center rounded-lg border border-gray-300 p-1 focus:border-transparent focus:outline-none focus:ring-1"
+		<div class="relative flex w-full flex-row justify-center my-4">
+			<div class="relative w-[85%]">
+				<input
+					class="block w-full rounded-lg border-0 border-b-2 border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+					type="text"
+					placeholder="Enter prompt here"
+					disabled={loading}
+					maxlength="1200"
+					bind:value={query}
+					on:keydown={(event) => {
+						if (event.key === "Enter" && !event.shiftKey && query) {
+							event.preventDefault();
+							handleTextSubmit();
+						}
+					}}
+				/>
+				<button
+					on:click={() => {
+						if (query) {
+							handleTextSubmit();
+						}
+					}}
+					type="submit"
+					class="absolute bottom-2.5 end-2.5 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+					>Send</button
 				>
-					<div class="relative flex w-full flex-row">
-						<div class="relative w-[85%]">
-							<textarea
-								rows="1"
-								class="focus:none mx-2 mr-6 inline-block w-full resize-none border-none p-0 text-sm text-gray-600 focus:ring-0"
-								placeholder="prompt here"
-								disabled={loading}
-								maxlength="1200"
-								bind:value={query}
-								on:keydown={(event) => {
-									if (event.key === "Enter" && !event.shiftKey && query) {
-										event.preventDefault();
-										handleTextSubmit();
-									}
-								}}
-							/>
-						</div>
-					</div>
-					<button
-						class="absolute bottom-1 right-2"
-						on:click={() => {
-							if (query) {
-								handleTextSubmit();
-							}
-						}}
-						type="submit"
-					>
-						<PaperAirplane />
-					</button>
-				</div>
-				<!-- hint -->
 			</div>
+		</div>
 		</div>
 		<Scrollbar
 			classLayout="flex flex-col gap-1"
