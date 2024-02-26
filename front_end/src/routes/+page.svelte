@@ -45,6 +45,8 @@
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
 
+		console.log("scrollToDiv", scrollToDiv);
+
 		const storedChatMessagesMap = localStorage.getItem(
 			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY
 		);
@@ -103,6 +105,7 @@
 		loading = false;
 		storeMessages();
 		scrollToBottom(scrollToDiv);
+		console.log("scrollToDiv", scrollToDiv);
 	};
 
 	async function handleSubmit() {
@@ -138,6 +141,8 @@
 		await callTextNoStream(newMessage.content, id);
 
 		scrollToBottom(scrollToDiv);
+		console.log("scrollToDiv", scrollToDiv);
+
 		storeMessages();
 	};
 
@@ -166,7 +171,7 @@
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<div class="flex justify-between p-2">
-			<p class="mt-2 text-[1.7rem] text-bold">Neural Chat</p>
+			<p class="text-bold mt-2 text-[1.7rem]">Neural Chat</p>
 			<UploadFile />
 		</div>
 		<div
@@ -201,71 +206,78 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- gallery -->
-		<div
-			id="custom-controls-gallery"
-			class="relative h-0 w-full w-full grow border px-2 shadow"
-			data-carousel="slide"
-		>
-			<!-- Carousel wrapper -->
-			<!-- Display current item -->
-			{#if currentItem}
-				<Scrollbar
-					classLayout="flex flex-col gap-1"
-					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 ml-10"
-				>
-					{#each currentItem.content as message, i}
-						<ChatMessage msg={message} />
-					{/each}
-
-					{#if loading}
-						<LoadingAnimation />
-					{/if}
-
-				</Scrollbar>
-				<!-- Loading text -->
-				<div class="radius absolute left-0 top-0 bg-white p-2 shadow">
-					<!-- Display end to end time -->
-					<label for="" class="mr-2 text-base font-bold text-blue-700"
-						>End to End Time:
-					</label>
-					<label for="">{currentItem.time}</label>
-				</div>
-			{/if}
-
-			<div class="flex items-center justify-between">
-				<div class="justify-left ml-2 flex items-center">
-					<!-- Previous button -->
-					<button
-						type="button"
-						class="group absolute start-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-						on:click={prevItem}
+		<div class="mx-auto mt-4 flex h-full w-full flex-col">
+			<div class="flex grid h-full grid-cols-2 flex-col gap-4 divide-x">
+				<div class="flex h-full flex-col rounded border p-2 shadow">
+					<!-- gallery -->
+					<div
+						id="custom-controls-gallery"
+						class="chat-scrollbar relative mb-8 h-0 w-full w-full grow px-2"
+						data-carousel="slide"
 					>
-						<span
-							class="text-gray-400 hover:text-gray-900 group-focus:text-gray-900 dark:hover:text-white dark:group-focus:text-white"
-						>
-							<Previous />
-							<span class="sr-only">Previous</span>
-						</span>
-					</button>
-					<!-- Next button -->
+						<!-- Carousel wrapper -->
+						<!-- Display current item -->
+						{#if currentItem}
+							<Scrollbar
+								classLayout="flex flex-col gap-5"
+								className="chat-scrollbar h-0 w-full grow px-2 mt-3 ml-10"
+							>
+								{#each currentItem.content as message, i}
+									<ChatMessage msg={message} />
+								{/each}
 
-					<button
-						type="button"
-						class="group absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
-						on:click={nextItem}
-					>
-						<span
-							class="text-gray-400 hover:text-gray-900 group-focus:text-gray-900 dark:hover:text-white dark:group-focus:text-white"
-						>
-							<Next />
-							<span class="sr-only">Next</span>
-						</span>
-					</button>
+								{#if loading}
+									<LoadingAnimation />
+								{/if}
+							</Scrollbar>
+							<!-- Loading text -->
+						{/if}
+						<div class="radius absolute right-0 p-2">
+							<!-- Display end to end time -->
+							<label for="" class="mr-2 text-xs font-bold text-blue-700"
+								>End to End Time:
+							</label>
+							<label for="" class="text-xs">{currentItem.time}</label>
+						</div>
+
+						<div class="flex items-center justify-between">
+							<div class="justify-left ml-2 flex items-center">
+								<!-- Previous button -->
+								<button
+									type="button"
+									class="group absolute start-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+									on:click={prevItem}
+								>
+									<span
+										class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray/30 group-hover:bg-gray/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-gray dark:bg-gray-800/30 dark:group-hover:bg-gray-800/60 dark:group-focus:ring-gray-800/70"
+									>
+										<Previous />
+										<span class="sr-only">Previous</span>
+									</span>
+								</button>
+								<!-- Next button -->
+
+								<button
+									type="button"
+									class="group absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+									on:click={nextItem}
+								>
+									<span
+										class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray/30 group-hover:bg-gray/50 group-focus:outline-none group-focus:ring-4 group-focus:ring-gray dark:bg-gray-800/30 dark:group-hover:bg-gray-800/60 dark:group-focus:ring-gray-800/70"
+									>
+										<Next />
+										<span class="sr-only">Next</span>
+									</span>
+								</button>
+							</div>
+						</div>
+					</div>
 				</div>
+				<div class="rounded border p-2 shadow">22</div>
 			</div>
 		</div>
+		<!-- gallery -->
+
 		<!-- gallery -->
 	</div>
 </div>
