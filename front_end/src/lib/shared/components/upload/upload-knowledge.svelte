@@ -20,7 +20,7 @@
 	}
   </script>
   
-  <div class="my-10">
+  <div>
 	<Label class="space-y-2 mb-2">
 	  <Fileupload
 		bind:value

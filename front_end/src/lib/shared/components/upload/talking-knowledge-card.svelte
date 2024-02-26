@@ -28,10 +28,10 @@
 	}
 </script>
 
-<div class="relative">
+<div class="relative w-full">
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div class="flex w-full flex-col items-center justify-center">
-			<DeleteIcon on:DeleteAvatar={() => dispatch("delete")} />
+			<!-- <DeleteIcon on:DeleteAvatar={() => dispatch("delete")} /> -->
 		<span
 			class="relative w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-bold text-gray-600 truncate my-2 border-b-2 p-1"
 		>

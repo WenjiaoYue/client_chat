@@ -143,15 +143,6 @@
 		</TabItem>
 	</Tabs>
 	{#each allKnowledges as opt, i (opt.name + i)}
-	<button
-		class:ring={selectKnowledge === i}
-		class={`sm:w-[5rem] sm:h-[5rem] `}
-		on:click={() => {
-			selectKnowledge = i;
-		}}
-	>
-		<TalkingKnowledgeCard {...opt}/>
-	</button>
-{/each}
-
+		<TalkingKnowledgeCard {...opt} />
+	{/each}
 </Drawer>

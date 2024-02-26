@@ -31,9 +31,10 @@
 	let query: string = "";
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
+	// ·········
 	let chatMessagesMap = {};
-
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
+	// ··············
 
 	$: knowledge = $TalkingKnowledgeCustom[0]
 		? $TalkingKnowledgeCustom[0].id
@@ -43,13 +44,26 @@
 		scrollToDiv = document
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
+
+		const storedChatMessagesMap = localStorage.getItem(
+			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY
+		);
+		if (storedChatMessagesMap) {
+			chatMessagesMap = JSON.parse(storedChatMessagesMap);
+			items.forEach((item) => {
+				if (chatMessagesMap[item.id]) {
+					item.content = chatMessagesMap[item.id];
+				}
+			});
+			console.log("chatMessagesMap", chatMessagesMap, items);
+		}
 	});
 
 	function storeMessages() {
 		if ($ifStoreMsg && browser) {
 			localStorage.setItem(
 				LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-				JSON.stringify(chatMessages)
+				JSON.stringify(chatMessagesMap)
 			);
 		}
 	}
@@ -59,6 +73,7 @@
 		const eventSource = await fetchTextNoStream(query, knowledge);
 		const endTime = new Date();
 		const elapsedTime = (endTime - startTime) / 1000;
+		console.log(eventSource.OUTPUT0);
 
 		if (eventSource.OUTPUT0) {
 			const newMessage = {
@@ -68,18 +83,21 @@
 				time: getCurrentTimeStamp(),
 			};
 
+			const messages = chatMessagesMap[id] || [];
+			messages.push(newMessage);
+			chatMessagesMap[id] = messages;
+
 			items.forEach((item) => {
 				if (item.id === id) {
-					item.content.push(newMessage);
+					item.content = messages;
 					item.time = `${elapsedTime}s`;
-
-					if (!chatMessagesMap[id]) {
-						chatMessagesMap[id] = [newMessage];
-					} else {
-						chatMessagesMap[id].push(newMessage);
-					}
 				}
 			});
+			items = [...items];
+
+			loading = false;
+			storeMessages();
+			scrollToBottom(scrollToDiv);
 		}
 
 		loading = false;
@@ -88,8 +106,8 @@
 	};
 
 	async function handleSubmit() {
-		await handleTextSubmit(1);
-		await handleTextSubmit(2);
+		await Promise.all([handleTextSubmit(1), handleTextSubmit(2)]);
+		query = "";
 	}
 
 	const handleTextSubmit = async (id: number) => {
@@ -100,10 +118,22 @@
 			content: query,
 			time: getCurrentTimeStamp(),
 		};
-		chatMessages = [...chatMessages, newMessage];
+
+		const messages = chatMessagesMap[id] || [];
+		messages.push(newMessage);
+		chatMessagesMap[id] = messages;
+
+		items.forEach((item) => {
+			if (item.id === id) {
+				item.content = messages;
+			}
+		});
+		items = [...items];
+
+		console.log(items, chatMessagesMap);
+
 		scrollToBottom(scrollToDiv);
 		storeMessages();
-		query = "";
 
 		await callTextNoStream(newMessage.content, id);
 
@@ -136,7 +166,7 @@
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<div class="flex justify-between p-2">
-			<p class="mt-2 tracking-tight sm:text-4xl">Neural Chat</p>
+			<p class="mt-2 text-[1.7rem] text-bold">Neural Chat</p>
 			<UploadFile />
 		</div>
 		<div
@@ -175,7 +205,7 @@
 		<!-- gallery -->
 		<div
 			id="custom-controls-gallery"
-			class="relative mt-3 h-0 w-full w-full grow px-2 pt-2"
+			class="relative h-0 w-full w-full grow border px-2 shadow"
 			data-carousel="slide"
 		>
 			<!-- Carousel wrapper -->
@@ -183,17 +213,27 @@
 			{#if currentItem}
 				<Scrollbar
 					classLayout="flex flex-col gap-1"
-					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
+					className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 ml-10"
 				>
-					{#each chatMessages as message, i}
+					{#each currentItem.content as message, i}
 						<ChatMessage msg={message} />
 					{/each}
+
+					{#if loading}
+						<LoadingAnimation />
+					{/if}
+
 				</Scrollbar>
 				<!-- Loading text -->
-				{#if loading}
-					<LoadingAnimation />
-				{/if}
+				<div class="radius absolute left-0 top-0 bg-white p-2 shadow">
+					<!-- Display end to end time -->
+					<label for="" class="mr-2 text-base font-bold text-blue-700"
+						>End to End Time:
+					</label>
+					<label for="">{currentItem.time}</label>
+				</div>
 			{/if}
+
 			<div class="flex items-center justify-between">
 				<div class="justify-left ml-2 flex items-center">
 					<!-- Previous button -->
@@ -223,13 +263,6 @@
 							<span class="sr-only">Next</span>
 						</span>
 					</button>
-				</div>
-				<div class="flex h-full justify-center pr-2">
-					<!-- Display end to end time -->
-					<label for="" class="mr-2 text-base font-bold text-blue-700"
-						>End to End Time:
-					</label>
-					<label for="">{currentItem.time}</label>
 				</div>
 			</div>
 		</div>
