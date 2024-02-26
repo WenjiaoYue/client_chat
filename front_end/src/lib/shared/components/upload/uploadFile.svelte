@@ -14,6 +14,8 @@
 
 	const { addNotification } = getNotificationsContext();
 	$: allKnowledges = [...$TalkingKnowledgeCustom];
+	console.log('allKnowledges', allKnowledges);
+	
 
 	let hidden6 = true;
 	let selectKnowledge = -1;
@@ -74,6 +76,8 @@
 				...options,
 			];
 		});
+		console.log('TalkingKnowledgeCustom', $TalkingKnowledgeCustom);
+		
 	}
 
 	function handleKnowledgeDelete(i: number) {

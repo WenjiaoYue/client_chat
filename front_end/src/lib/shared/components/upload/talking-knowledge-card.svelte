@@ -6,6 +6,9 @@
 	
 	export let needChangeName = false;
 
+	console.log('name', name, i);
+	
+
 	const dispatch = createEventDispatcher();
 	let inputEl: HTMLInputElement;
 

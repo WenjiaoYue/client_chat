@@ -23,5 +23,6 @@ export interface Message {
 
 export enum LOCAL_STORAGE_KEY {
 	STORAGE_CHAT_KEY = 'chatMessages',
+	STORAGE_CHAT_KEY2 = 'chatMessages2',
 	STORAGE_TIME_KEY = 'initTime',
 }
