@@ -25,7 +25,7 @@
 	  <Fileupload
 		bind:value
 		on:change={handleInput}
-		class="focus:border-blue-700 ring-blue-700"
+		class="focus:border-blue-700 foucs:ring-0"
 	  />
 	</Label>
   </div>

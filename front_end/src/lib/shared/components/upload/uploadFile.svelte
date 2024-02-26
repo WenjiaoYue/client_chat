@@ -91,7 +91,7 @@
 <div class="text-center">
 	<Button
 		on:click={() => (hidden6 = false)}
-		class="bg-transparent focus-within:ring-gray-300 hover:bg-transparent"
+		class="bg-transparent focus-within:ring-gray-300 hover:bg-transparent focus:ring-0"
 	>
 		<svg
 			aria-hidden="true"
@@ -135,7 +135,7 @@
 	</p>
 	<Tabs
 		style="full"
-		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700"
+		defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-200 shadow dark:divide-gray-700 foucs:ring-0"
 	>
 		<TabItem class="w-full" open>
 			<span slot="title">Upload File</span>
@@ -146,7 +146,7 @@
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
-	{#each allKnowledges as opt, i (opt.name + i)}
+	<!-- {#each allKnowledges as opt, i (opt.name + i)}
 		<TalkingKnowledgeCard {...opt} />
-	{/each}
+	{/each} -->
 </Drawer>
