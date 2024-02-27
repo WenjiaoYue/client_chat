@@ -41,14 +41,14 @@
 		: [
 				{ id: 1, content: [], time: "0s" },
 				{ id: 2, content: [], time: "0s" },
-		  ];
+			];
 	let chatMessagesMap2 = data.Msg2?.chatMsg ? data.Msg2.chatMsg : {};
 	let items2 = data.Msg2?.chatItems
 		? data.Msg2?.chatItems
 		: [
 				{ id: 1, content: [], time: "0s" },
 				{ id: 2, content: [], time: "0s" },
-		  ];
+			];
 	// ··············
 	console.log("data", data);
 
@@ -75,12 +75,9 @@
 		// }
 	});
 
-	function storeMessages(chatMessagesMap) {
+	function storeMessages(key, chatMessagesMap) {
 		if ($ifStoreMsg && browser) {
-			localStorage.setItem(
-				LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-				JSON.stringify(chatMessagesMap)
-			);
+			localStorage.setItem(key, JSON.stringify(chatMessagesMap));
 		}
 	}
 
@@ -89,51 +86,63 @@
 		id: number,
 		chatMessagesMap,
 		items,
-		group
+		group,
 	) => {
 		const startTime = new Date();
 		let eventSource;
-		// if (group == '1') {
-		// 	eventSource = await fetchTextNoStream(query, knowledge, id);
-		// } else if (group == '2') {
-		// 	eventSource = await fetchTextNoStream2(query, knowledge, id);
-		// }
+		let answer = "";
+		if (group == "1") {
+			eventSource = await fetchTextNoStream(query, knowledge, id);
+			if (eventSource.OUTPUT0) {
+				answer = eventSource.OUTPUT0;
+			}
+		} else if (group == "2") {
+			eventSource = await fetchTextNoStream2(query, knowledge, id);
+			if (eventSource.outputs) {
+				answer = eventSource.outputs[0].data[0];
+			}
+		}
 
-		eventSource = await fetchTextNoStream(query, knowledge, id);
+		// eventSource = await fetchTextNoStream(query, knowledge, id);
 
 		console.log("group 2", eventSource);
 
 		const endTime = new Date();
 		const elapsedTime = (endTime - startTime) / 1000;
-		console.log(eventSource.OUTPUT0);
 
-		if (eventSource.OUTPUT0) {
-			const newMessage = {
-				role: MessageRole.Assistant,
-				type: MessageType.Text,
-				content: eventSource.OUTPUT0,
-				time: getCurrentTimeStamp(),
-			};
+		const newMessage = {
+			role: MessageRole.Assistant,
+			type: MessageType.Text,
+			content: answer,
+			time: getCurrentTimeStamp(),
+		};
 
-			const messages = chatMessagesMap[id] || [];
-			messages.push(newMessage);
-			chatMessagesMap[id] = messages;
+		const messages = chatMessagesMap[id] || [];
+		messages.push(newMessage);
+		chatMessagesMap[id] = messages;
 
-			items.forEach((item) => {
-				if (item.id === id) {
-					item.content = messages;
-					item.time = `${elapsedTime}s`;
-				}
-			});
-			items = [...items];
-
-			loading = false;
-			storeMessages(chatMessagesMap);
-			scrollToBottom(scrollToDiv);
-		}
+		items.forEach((item) => {
+			if (item.id === id) {
+				item.content = messages;
+				item.time = `${elapsedTime}s`;
+			}
+		});
+		items = [...items];
 
 		loading = false;
-		storeMessages(chatMessagesMap);
+		if (group == "1") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
+		} else if (group == "2") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
+		}
+		scrollToBottom(scrollToDiv);
+
+		loading = false;
+		if (group == "1") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
+		} else if (group == "2") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
+		}
 		scrollToBottom(scrollToDiv);
 	};
 
@@ -142,7 +151,7 @@
 			handleTextSubmit(1, chatMessagesMap1, items1, "1"),
 			handleTextSubmit(2, chatMessagesMap1, items1, "1"),
 			handleTextSubmit(1, chatMessagesMap2, items2, "2"),
-			handleTextSubmit(2, chatMessagesMap2.items2, "2"),
+			handleTextSubmit(2, chatMessagesMap2, items2, "2"),
 		]);
 		query = "";
 	}
@@ -151,7 +160,7 @@
 		id: number,
 		chatMessagesMap,
 		items,
-		group
+		group,
 	) => {
 		loading = true;
 		const newMessage = {
@@ -175,19 +184,27 @@
 		console.log(items, chatMessagesMap);
 
 		scrollToBottom(scrollToDiv);
-		storeMessages(chatMessagesMap);
+		if (group == "1") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
+		} else if (group == "2") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
+		}
 
 		await callTextNoStream(
 			newMessage.content,
 			id,
 			chatMessagesMap,
 			items,
-			group
+			group,
 		);
 
 		scrollToBottom(scrollToDiv);
 
-		storeMessages(chatMessagesMap);
+		if (group == "1") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
+		} else if (group == "2") {
+			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
+		}
 	};
 
 	function isEmptyObject(obj: any): boolean {
@@ -215,7 +232,7 @@
 			<div class="relative my-4 flex w-full flex-row justify-center">
 				<div class="foucs:border-none relative w-full">
 					<input
-						class="text-md block w-full border-0 border-b-2 border-gray-300 p-4 ps-10
+						class="text-md block w-full border-0 border-b-2 border-gray-300 py-4 px-1
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 						type="text"
 						placeholder="Enter prompt here"

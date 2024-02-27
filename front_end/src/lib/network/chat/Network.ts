@@ -58,9 +58,12 @@ export async function fetchTextNoStream(
 
 export async function fetchTextNoStream2(
 	query: string,
-	knowledge_base_id: string
+	knowledge_base_id: string,
+	id
 ) {
 	const url = `http://10.112.228.151:80/v2/rag/chat`;
+	let requestId = "request_id" + id;
+
 
 	const postData = {
 		inputs: [
@@ -80,7 +83,7 @@ export async function fetchTextNoStream2(
 				name: "request_id",
 				datatype: "BYTES",
 				shape: [1],
-				data: ["request_id_111"],
+				data: [requestId],
 			},
 		],
 	};
