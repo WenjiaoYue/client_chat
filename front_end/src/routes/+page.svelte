@@ -50,7 +50,11 @@
 				{ id: 2, content: [], time: "0s" },
 			];
 	// ··············
-	console.log("data", data);
+
+	$: items1 = [...items1];
+	$: console.log('items1', items1);
+	
+	$: items2 = [...items2];
 
 	$: knowledge = $TalkingKnowledgeCustom[0]
 		? $TalkingKnowledgeCustom[0].id
@@ -97,15 +101,15 @@
 				answer = eventSource.OUTPUT0;
 			}
 		} else if (group == "2") {
-			eventSource = await fetchTextNoStream2(query, knowledge, id);
-			if (eventSource.outputs) {
-				answer = eventSource.outputs[0].data[0];
-			}
+			eventSource = await fetchTextNoStream(query, knowledge, id);
+			// if (eventSource.outputs) {
+				answer = eventSource.OUTPUT0;
+				// answer = eventSource.outputs[0].data[0];
+			// }
 		}
 
 		// eventSource = await fetchTextNoStream(query, knowledge, id);
 
-		console.log("group 2", eventSource);
 
 		const endTime = new Date();
 		const elapsedTime = (endTime - startTime) / 1000;
@@ -181,7 +185,6 @@
 		});
 		items = [...items];
 
-		console.log(items, chatMessagesMap);
 
 		scrollToBottom(scrollToDiv);
 		if (group == "1") {
