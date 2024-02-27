@@ -28,15 +28,14 @@ export async function fetchTextStream(
 
 export async function fetchTextNoStream(
 	query: string,
-	knowledge_base_id: string,
-
+	knowledge_base_id: string
 ) {
 	const url = `http://10.7.4.144:80/v2/rag/chat`;
 	console.log("query knowledge_base_id", query, knowledge_base_id);
 
 	const postData = {
 		prompt: query,
-		request_id: 'kb_1111',
+		request_id: "kb_1111",
 		kb_id: "default",
 		stream: false,
 	};
@@ -59,44 +58,31 @@ export async function fetchTextNoStream(
 
 export async function fetchTextNoStream2(
 	query: string,
-	knowledge_base_id: string,
+	knowledge_base_id: string
 ) {
 	const url = `http://10.112.228.151:80/v2/rag/chat`;
-	console.log("query knowledge_base_id", query, knowledge_base_id);
 
 	const postData = {
-		"inputs": [
+		inputs: [
 			{
-				"name": "prompt",
-				"datatype": "BYTES",
-				"shape": [
-					1
-				],
-				"data": [
-					"How many people will attend CES?"
-				]
+				name: "prompt",
+				datatype: "BYTES",
+				shape: [1],
+				data: ["How many people will attend CES?"],
 			},
 			{
-				"name": "kb_id",
-				"datatype": "BYTES",
-				"shape": [
-					1
-				],
-				"data": [
-					"kb_fbccb93a"
-				]
+				name: "kb_id",
+				datatype: "BYTES",
+				shape: [1],
+				data: ["kb_fbccb93a"],
 			},
 			{
-				"name": "request_id",
-				"datatype": "BYTES",
-				"shape": [
-					1
-				],
-				"data": [
-					"request_id_111"
-				]
-			}
-		]
+				name: "request_id",
+				datatype: "BYTES",
+				shape: [1],
+				data: ["request_id_111"],
+			},
+		],
 	};
 
 	const init: RequestInit = {

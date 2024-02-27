@@ -17,6 +17,7 @@
 	import { getCurrentTimeStamp, scrollToBottom } from "$lib/shared/Utils";
 	import {
 		fetchTextNoStream,
+		fetchTextNoStream2,
 		fetchTextStream,
 	} from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
@@ -34,14 +35,20 @@
 	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
 	// ·········
-	let chatMessagesMap = data.chatMsg ? data.chatMsg : {};
-	let items = data.chatItems
-		? data.chatItems
+	let chatMessagesMap1 = data.Msg1?.chatMsg ? data.Msg1.chatMsg : {};
+	let items1 = data.Msg1?.chatItems
+		? data.Msg1?.chatItems
 		: [
 				{ id: 1, content: [], time: "0s" },
 				{ id: 2, content: [], time: "0s" },
 		  ];
-		  
+	let chatMessagesMap2 = data.Msg2?.chatMsg ? data.Msg2.chatMsg : {};
+	let items2 = data.Msg2?.chatItems
+		? data.Msg2?.chatItems
+		: [
+				{ id: 1, content: [], time: "0s" },
+				{ id: 2, content: [], time: "0s" },
+		  ];
 	// ··············
 	console.log("data", data);
 
@@ -54,21 +61,21 @@
 			.querySelector(".chat-scrollbar")
 			?.querySelector(".svlr-viewport")!;
 
-		const storedChatMessagesMap = localStorage.getItem(
-			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY
-		);
-		if (storedChatMessagesMap) {
-			chatMessagesMap = JSON.parse(storedChatMessagesMap);
-			items.forEach((item) => {
-				if (chatMessagesMap[item.id]) {
-					item.content = chatMessagesMap[item.id];
-				}
-			});
-			console.log("chatMessagesMap", chatMessagesMap, items);
-		}
+		// const storedChatMessagesMap = localStorage.getItem(
+		// 	LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY
+		// );
+		// if (storedChatMessagesMap) {
+		// 	chatMessagesMap = JSON.parse(storedChatMessagesMap);
+		// 	items.forEach((item) => {
+		// 		if (chatMessagesMap[item.id]) {
+		// 			item.content = chatMessagesMap[item.id];
+		// 		}
+		// 	});
+		// 	console.log("chatMessagesMap", chatMessagesMap, items);
+		// }
 	});
 
-	function storeMessages() {
+	function storeMessages(chatMessagesMap) {
 		if ($ifStoreMsg && browser) {
 			localStorage.setItem(
 				LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
@@ -77,9 +84,25 @@
 		}
 	}
 
-	const callTextNoStream = async (query: string, id: number) => {
+	const callTextNoStream = async (
+		query: string,
+		id: number,
+		chatMessagesMap,
+		items,
+		group
+	) => {
 		const startTime = new Date();
-		const eventSource = await fetchTextNoStream(query, knowledge);
+		let eventSource;
+		// if (group == '1') {
+		// 	eventSource = await fetchTextNoStream(query, knowledge, id);
+		// } else if (group == '2') {
+		// 	eventSource = await fetchTextNoStream2(query, knowledge, id);
+		// }
+
+		eventSource = await fetchTextNoStream(query, knowledge, id);
+
+		console.log("group 2", eventSource);
+
 		const endTime = new Date();
 		const elapsedTime = (endTime - startTime) / 1000;
 		console.log(eventSource.OUTPUT0);
@@ -105,21 +128,31 @@
 			items = [...items];
 
 			loading = false;
-			storeMessages();
+			storeMessages(chatMessagesMap);
 			scrollToBottom(scrollToDiv);
 		}
 
 		loading = false;
-		storeMessages();
+		storeMessages(chatMessagesMap);
 		scrollToBottom(scrollToDiv);
 	};
 
 	async function handleSubmit() {
-		await Promise.all([handleTextSubmit(1), handleTextSubmit(2)]);
+		await Promise.all([
+			handleTextSubmit(1, chatMessagesMap1, items1, "1"),
+			handleTextSubmit(2, chatMessagesMap1, items1, "1"),
+			handleTextSubmit(1, chatMessagesMap2, items2, "2"),
+			handleTextSubmit(2, chatMessagesMap2.items2, "2"),
+		]);
 		query = "";
 	}
 
-	const handleTextSubmit = async (id: number) => {
+	const handleTextSubmit = async (
+		id: number,
+		chatMessagesMap,
+		items,
+		group
+	) => {
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
@@ -142,13 +175,19 @@
 		console.log(items, chatMessagesMap);
 
 		scrollToBottom(scrollToDiv);
-		storeMessages();
+		storeMessages(chatMessagesMap);
 
-		await callTextNoStream(newMessage.content, id);
+		await callTextNoStream(
+			newMessage.content,
+			id,
+			chatMessagesMap,
+			items,
+			group
+		);
 
 		scrollToBottom(scrollToDiv);
 
-		storeMessages();
+		storeMessages(chatMessagesMap);
 	};
 
 	function isEmptyObject(obj: any): boolean {
@@ -203,26 +242,27 @@
 				</div>
 			</div>
 		</div>
-		{#if !isEmptyObject(chatMessagesMap)}
-			<div class="mx-auto mt-4 flex h-full w-full flex-col">
-				<div class="flex grid h-full grid-cols-2 flex-col gap-4 divide-x">
+
+		<div class="mx-auto mt-4 flex h-full w-full flex-col">
+			<div class="flex grid h-full grid-cols-2 flex-col gap-4 divide-x">
+				{#if !isEmptyObject(chatMessagesMap1)}
 					<div class="flex h-full flex-col rounded border p-2 shadow">
 						<!-- gallery -->
-						<Gallery {items} />
+						<Gallery items={items1} />
 					</div>
+				{/if}
+				{#if !isEmptyObject(chatMessagesMap2)}
 					<div class="flex h-full flex-col rounded border p-2 shadow">
 						<!-- gallery -->
-						<Gallery {items} />
+						<Gallery items={items2} />
 					</div>
-				</div>
-				{#if loading}
-					<LoadingAnimation />
 				{/if}
 			</div>
-		{/if}
-		<!-- gallery -->
+			{#if loading}
+				<LoadingAnimation />
+			{/if}
+		</div>
 
+		<!-- gallery -->
 	</div>
 </div>
-
-
