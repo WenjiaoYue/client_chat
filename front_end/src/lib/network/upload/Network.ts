@@ -42,11 +42,11 @@ export async function fetchKnowledgeBaseId2(file: Blob, fileName: string) {
 
 export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
   let url = ''
-  if (urlType === '1') {
+  // if (urlType === '1') {
     url = `${KNOWLEDGE_BASE_URL}/upload_link`;
-  } else if (urlType === '2') {
-    url = `${KNOWLEDGE_BASE_URL2}/upload_link`;
-  }
+  // } else if (urlType === '2') {
+    // url = `${KNOWLEDGE_BASE_URL2}/upload_link`;
+  // }
   const data = {
     link_list: pasteUrlList,
   };

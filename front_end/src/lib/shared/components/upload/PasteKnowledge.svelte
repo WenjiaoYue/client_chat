@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Button, Helper, Input, Label, Modal } from "flowbite-svelte";
 	import { createEventDispatcher } from "svelte";
-	import Paste from "$lib/assets/handel/Paste.svelte";
 
 	const dispatch = createEventDispatcher();
 	let formModal = false;
@@ -14,16 +13,21 @@
 	}
 </script>
 
-
 <Label class="space-y-1">
 	<div class="grid grid-cols-3">
-	  <Input class="col-span-2 rounded-none rounded-l-lg focus:border-blue-700 focus:ring-blue-700 " type="text" name="text" placeholder="URL"/>
-	  <Button type="submit" class="w-full rounded-none rounded-r-lg bg-blue-700" on:click={() => handelPasteURL()}
-		>Confirm</Button
-	  >
+		<Input
+			class="col-span-2 rounded-none rounded-l-lg focus:border-blue-700 focus:ring-blue-700"
+			type="text"
+			name="text"
+			placeholder="URL"
+			bind:value={urlValue}
+		/>
+		<Button
+			type="submit"
+			class="w-full rounded-none rounded-r-lg bg-blue-700"
+			on:click={() => handelPasteURL()}>Confirm</Button
+		>
 	</div>
-	<!-- bind:value={urlValue} -->
-   
+
 	<Helper>Use semicolons (;) to separate multiple URLs.</Helper>
-  </Label>
-  
+</Label>

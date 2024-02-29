@@ -6,8 +6,6 @@ export enum MessageType {
 	Text, SingleAudio, AudioList, SingleImage, ImageList, singleVideo
 }
 
-export const isAudio = (T: MessageType) => (T === MessageType.SingleAudio || T === MessageType.AudioList)
-export const isImage = (T: MessageType) => (T === MessageType.SingleImage || T === MessageType.ImageList)
 
 type Map<T> = T extends MessageType.Text | MessageType.SingleAudio ? string :
 				T extends MessageType.AudioList ? string[] :

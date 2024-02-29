@@ -5,7 +5,6 @@
 	import UploadFile from "./upload-knowledge.svelte";
 	import PasteURL from "./PasteKnowledge.svelte";
 	import {
-		TalkingKnowledgeCustom,
 		knowledge1,
 		knowledge2,
 		knowledgeName,
@@ -46,7 +45,7 @@
 			// knowledge_id2 = "default";
 		}
 		knowledge1.set({ id: knowledge_id });
-		knowledgeName.set(e.detail.fileName);
+		knowledgeName.set('knowledge_base');
 		// knowledge2.set({ id: knowledge_id2 })
 
 		addNotification({
@@ -150,7 +149,7 @@
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
-	{#if $knowledgeName !== ""}
+	{#if ($knowledgeName) && ($knowledgeName !== "")}
 		<div class="relative">
 			<p class="border-b p-6 pb-2">{$knowledgeName}</p>
 			<DeleteIcon on:DeleteAvatar={() => handleKnowledgeDelete()} />
