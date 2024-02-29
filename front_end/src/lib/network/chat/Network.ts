@@ -1,37 +1,14 @@
 import { env } from "$env/dynamic/public";
-import { SSE } from "sse.js";
 
-const TEXT_URL = env.KNOWLEDGE_BASE_URL;
-
-export async function fetchTextStream(
-	query: string,
-	knowledge_base_id: string
-) {
-	let payload = {};
-	let url = "";
-
-	payload = {
-		query: query,
-		translated: query,
-		knowledge_base_id: knowledge_base_id,
-		stream: true,
-		max_new_tokens: 128,
-		return_link: false,
-	};
-	url = `http://10.7.4.144:8007/v1/askdoc/chat`;
-
-	return new SSE(url, {
-		headers: { "Content-Type": "application/json" },
-		payload: JSON.stringify(payload),
-	});
-}
+const CHAT_GAUDI2_URL = env.CHAT_GAUDI2_URL;
+const CHAT_A100_URL = env.CHAT_A100_URL;
 
 export async function fetchTextNoStream(
 	query: string,
 	knowledge_base_id: string,
 	id
 ) {
-	const url = `http://10.7.4.144:80/v2/rag/chat`;
+	const url = CHAT_GAUDI2_URL;
 	console.log("query knowledge_base_id", query, knowledge_base_id);
 	let requestId = "request_id" + id;
 
@@ -63,9 +40,8 @@ export async function fetchTextNoStream2(
 	knowledge_base_id: string,
 	id
 ) {
-	const url = `http://10.112.228.151:80/v2/rag/chat`;
+	const url = CHAT_A100_URL;
 	let requestId = "request_id" + id;
-
 
 	const postData = {
 		inputs: [

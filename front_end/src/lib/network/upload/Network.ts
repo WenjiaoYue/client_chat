@@ -1,9 +1,10 @@
-const KNOWLEDGE_BASE_URL2 = "http://10.112.228.151:80/v2/rag";
-const KNOWLEDGE_BASE_URL = "http://10.7.4.144:8007/v1/askdoc";
-// const KNOWLEDGE_BASE_URL = "http://10.112.228.151:8007/v1/askdoc";
+import { env } from "$env/dynamic/public";
+
+const KNOWLEDGE_GAUDI2_URL = env.KNOWLEDGE_GAUDI2_URL;
+const KNOWLEDGE_A100_URL = env.KNOWLEDGE_A100_URL;
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
-  const url = `${KNOWLEDGE_BASE_URL}/create`;
+  const url = `${KNOWLEDGE_GAUDI2_URL}/create`;
   const formData = new FormData();
   formData.append("file", file, fileName);
   const init: RequestInit = {
@@ -22,7 +23,7 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 }
 
 export async function fetchKnowledgeBaseId2(file: Blob, fileName: string) {
-  const url = `${KNOWLEDGE_BASE_URL}/upload`;
+  const url = `${KNOWLEDGE_A100_URL}/upload`;
   const formData = new FormData();
   formData.append("file", file, fileName);
   const init: RequestInit = {
@@ -43,9 +44,9 @@ export async function fetchKnowledgeBaseId2(file: Blob, fileName: string) {
 export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
   let url = ''
   // if (urlType === '1') {
-    url = `${KNOWLEDGE_BASE_URL}/upload_link`;
+    url = `${KNOWLEDGE_GAUDI2_URL}/upload_link`;
   // } else if (urlType === '2') {
-    // url = `${KNOWLEDGE_BASE_URL2}/upload_link`;
+    // url = `${KNOWLEDGE_A100_URL}/upload_link`;
   // }
   const data = {
     link_list: pasteUrlList,
