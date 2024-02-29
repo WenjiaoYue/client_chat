@@ -95,6 +95,15 @@ export let currentTemplate = writable<{
   id: 0
 });
 
+export const knowledge1 = writable<{
+  id: string;
+}>();
+
+export const knowledge2 = writable<{
+  id: string;
+}>();
+
+export const knowledgeName = writable('');
 
 export const popupModal = writable(false);
 

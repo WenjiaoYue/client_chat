@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MessageAvatar from "$lib/modules/chat/MessageAvatar.svelte";
-	import { MessageRole, type Message } from "$lib/shared/constant/Interface";
+	import { type Message } from "$lib/shared/constant/Interface";
 
 	export let msg: Message;
 </script>
@@ -13,8 +13,8 @@ class={msg.role === 0
 >
 	<div
 		class={msg.role === 0
-			? "flex aspect-square w-[0.1rem]  items-center justify-center rounded bg-[#0068B5] max-sm:hidden"
-			: "flex aspect-square h-10 w-[0.1rem] items-center justify-center rounded bg-[#000] max-sm:hidden"}
+			? "flex aspect-square w-[1px]  items-center justify-center rounded bg-[#0068B5] max-sm:hidden"
+			: "flex aspect-square h-10 w-[1px] items-center justify-center rounded bg-[#000] max-sm:hidden"}
 	>
 		<MessageAvatar role={msg.role} />
 	</div>

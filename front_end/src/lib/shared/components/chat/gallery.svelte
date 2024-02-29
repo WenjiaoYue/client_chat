@@ -1,51 +1,30 @@
 <script lang="ts">
-	import {
-		TalkingKnowledgeCustom,
-		ifStoreMsg,
-	} from "$lib/shared/stores/common/Store";
-	import { onMount } from "svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
-	import {
-		LOCAL_STORAGE_KEY,
-		MessageRole,
-		MessageType,
-		type Message,
-	} from "$lib/shared/constant/Interface";
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
-
-	import { getCurrentTimeStamp, scrollToBottom } from "$lib/shared/Utils";
-	import {
-		fetchTextNoStream,
-		fetchTextStream,
-	} from "$lib/network/chat/Network";
-	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
-	import { browser } from "$app/environment";
-	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import Previous from "$lib/assets/upload/previous.svelte";
 	import Next from "$lib/assets/upload/next.svelte";
-	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
+	import { scrollToBottom } from "$lib/shared/Utils";
+	import { onMount } from "svelte";
 
-	let query: string = "";
-	let loading: boolean = false;
 	let scrollToDiv: HTMLDivElement;
+
 	export let items;
-	// ·········
+	export let label: string;
+	export let scrollName: string;	
 
-	$: knowledge = $TalkingKnowledgeCustom[0]
-		? $TalkingKnowledgeCustom[0].id
-		: "default";
-
-	function isEmptyObject(obj: any): boolean {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
+	onMount(async () => {
+		scrollToDiv = document
+			.querySelector(scrollName)
+			?.querySelector(".svlr-viewport")!;
+		console.log(
+			"scrollToDiv",
+			scrollName,
+			document,
+			document.querySelector("chat-scrollbar1")
+		);
+	});
 	// gallery
 	let currentIndex = 0;
 
@@ -60,14 +39,18 @@
 	}
 
 	$: currentItem = items[currentIndex];
-	console.log("currentItem", currentItem, items, currentIndex, items[0]);
 
+	$: {
+		if (items) {
+			scrollToBottom(scrollToDiv);
+		}
+	}
 	// gallery
 </script>
 
 <div
 	id="custom-controls-gallery"
-	class="chat-scrollbar relative mb-8 h-0 w-full w-full grow px-2"
+	class="relative mb-8 h-0 w-full w-full grow px-2 {scrollName}"
 	data-carousel="slide"
 >
 	<!-- Carousel wrapper -->
@@ -75,7 +58,7 @@
 	{#if currentItem}
 		<Scrollbar
 			classLayout="flex flex-col gap-5"
-			className="chat-scrollbar h-0 w-full grow px-2 mt-3 ml-10"
+			className="  h-0 w-full grow px-2 mt-3 ml-10"
 		>
 			{#each currentItem.content as message, i}
 				<ChatMessage msg={message} />
@@ -84,6 +67,10 @@
 		<!-- Loading text -->
 	{/if}
 
+	<div class="radius absolute left-0 p-2">
+		<!-- Display end to end time -->
+		<label for="" class="mr-2 text-xs font-bold text-blue-700">{label} </label>
+	</div>
 	{#if currentItem.time !== "0s"}
 		<div class="radius absolute right-0 p-2">
 			<!-- Display end to end time -->
@@ -99,13 +86,13 @@
 			<button
 				type="button"
 				class="group absolute start-0 top-0 z-30 flex h-full
-									cursor-pointer items-center justify-center px-4
+									cursor-pointer items-center justify-center
 									focus:outline-none"
 				on:click={prevItem}
 			>
 				<span
-					class="group-focus:ring-gray dark:group-hover:bg-[#000]-800/60 dark:group-focus:ring-[#000]-800/70 inline-flex h-10
-										 w-10 items-center justify-center
+					class="group-focus:ring-gray dark:group-hover:bg-[#000]-800/60 dark:group-focus:ring-[#000]-800/70 inline-flex h-7
+										 w-7 items-center justify-center
 										 rounded-full bg-[#000]/10
 										 group-hover:bg-[#000]/50 group-focus:bg-[#000]/50
 										 group-focus:outline-none
@@ -119,12 +106,12 @@
 
 			<button
 				type="button"
-				class="group absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4 focus:outline-none"
+				class="group absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center focus:outline-none"
 				on:click={nextItem}
 			>
 				<span
-					class="group-focus:ring-gray dark:group-hover:bg-[#000]-800/60 dark:group-focus:ring-[#000]-800/70 inline-flex h-10
-									w-10 items-center justify-center
+					class="group-focus:ring-gray dark:group-hover:bg-[#000]-800/60 dark:group-focus:ring-[#000]-800/70 inline-flex h-7
+									w-7 items-center justify-center
 									rounded-full bg-[#000]/10
 									group-hover:bg-[#000]/50 group-focus:bg-[#000]/50
 									group-focus:outline-none

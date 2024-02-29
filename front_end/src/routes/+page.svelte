@@ -3,80 +3,61 @@
 	import {
 		TalkingKnowledgeCustom,
 		ifStoreMsg,
+		knowledge1,
+		knowledge2,
 	} from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
-	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
 	import {
 		LOCAL_STORAGE_KEY,
 		MessageRole,
 		MessageType,
-		type Message,
 	} from "$lib/shared/constant/Interface";
-	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
-
 	import { getCurrentTimeStamp, scrollToBottom } from "$lib/shared/Utils";
 	import {
 		fetchTextNoStream,
 		fetchTextNoStream2,
-		fetchTextStream,
 	} from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import { browser } from "$app/environment";
-	// import BadgesRow from "$lib/modules/chat/BadgesRow.svelte";
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
-	import Previous from "$lib/assets/upload/previous.svelte";
-	import Next from "$lib/assets/upload/next.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
 	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 
 	let query: string = "";
 	let loading: boolean = false;
-	let scrollToDiv: HTMLDivElement;
+	let scrollToDiv1: HTMLDivElement;
+	let scrollToDiv2: HTMLDivElement;
 	// ·········
 	let chatMessagesMap1 = data.Msg1?.chatMsg ? data.Msg1.chatMsg : {};
+	let displayMsg = false;
 	let items1 = data.Msg1?.chatItems
 		? data.Msg1?.chatItems
 		: [
-				{ id: 1, content: [], time: "0s" },
-				{ id: 2, content: [], time: "0s" },
-			];
+				{ id: 1, content: [], time: "0s"},
+				{ id: 2, content: [], time: "0s"},
+		  ];
 	let chatMessagesMap2 = data.Msg2?.chatMsg ? data.Msg2.chatMsg : {};
 	let items2 = data.Msg2?.chatItems
 		? data.Msg2?.chatItems
 		: [
 				{ id: 1, content: [], time: "0s" },
 				{ id: 2, content: [], time: "0s" },
-			];
+		  ];
 	// ··············
 
-	$: items1 = [...items1];
-	$: console.log('items1', items1);
-	
-	$: items2 = [...items2];
-
-	$: knowledge = $TalkingKnowledgeCustom[0]
-		? $TalkingKnowledgeCustom[0].id
-		: "default";
+	$: knowledge_1 = $knowledge1?.id ? $knowledge1.id : "default";
+	$: knowledge_2 = $knowledge2?.id ? $knowledge2.id : "default";
 
 	onMount(async () => {
-		scrollToDiv = document
-			.querySelector(".chat-scrollbar")
+		scrollToDiv1 = document
+			.querySelector(".chat-scrollbar1")
 			?.querySelector(".svlr-viewport")!;
-
-		// const storedChatMessagesMap = localStorage.getItem(
-		// 	LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY
-		// );
-		// if (storedChatMessagesMap) {
-		// 	chatMessagesMap = JSON.parse(storedChatMessagesMap);
-		// 	items.forEach((item) => {
-		// 		if (chatMessagesMap[item.id]) {
-		// 			item.content = chatMessagesMap[item.id];
-		// 		}
-		// 	});
-		// 	console.log("chatMessagesMap", chatMessagesMap, items);
-		// }
+		scrollToDiv2 = document
+			.querySelector(".chat-scrollbar2")
+			?.querySelector(".svlr-viewport")!;			
+					
 	});
 
 	function storeMessages(key, chatMessagesMap) {
@@ -90,26 +71,25 @@
 		id: number,
 		chatMessagesMap,
 		items,
-		group,
+		group
 	) => {
 		const startTime = new Date();
 		let eventSource;
 		let answer = "";
 		if (group == "1") {
-			eventSource = await fetchTextNoStream(query, knowledge, id);
+			eventSource = await fetchTextNoStream(query, knowledge_1, id);
 			if (eventSource.OUTPUT0) {
 				answer = eventSource.OUTPUT0;
 			}
 		} else if (group == "2") {
-			eventSource = await fetchTextNoStream(query, knowledge, id);
+			eventSource = await fetchTextNoStream(query, knowledge_2, id);
 			// if (eventSource.outputs) {
-				answer = eventSource.OUTPUT0;
-				// answer = eventSource.outputs[0].data[0];
+			answer = eventSource.OUTPUT0;
+			// answer = eventSource.outputs[0].data[0];
 			// }
 		}
 
 		// eventSource = await fetchTextNoStream(query, knowledge, id);
-
 
 		const endTime = new Date();
 		const elapsedTime = (endTime - startTime) / 1000;
@@ -131,7 +111,8 @@
 				item.time = `${elapsedTime}s`;
 			}
 		});
-		items = [...items];
+		items1 = [...items1];
+		items2 = [...items2];
 
 		loading = false;
 		if (group == "1") {
@@ -139,7 +120,8 @@
 		} else if (group == "2") {
 			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
 		}
-		scrollToBottom(scrollToDiv);
+		scrollToBottom(scrollToDiv1);
+		scrollToBottom(scrollToDiv2);
 
 		loading = false;
 		if (group == "1") {
@@ -147,7 +129,8 @@
 		} else if (group == "2") {
 			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
 		}
-		scrollToBottom(scrollToDiv);
+		scrollToBottom(scrollToDiv1);
+		scrollToBottom(scrollToDiv2);
 	};
 
 	async function handleSubmit() {
@@ -158,13 +141,15 @@
 			handleTextSubmit(2, chatMessagesMap2, items2, "2"),
 		]);
 		query = "";
+		scrollToBottom(scrollToDiv1);
+		scrollToBottom(scrollToDiv2);
 	}
 
 	const handleTextSubmit = async (
 		id: number,
 		chatMessagesMap,
 		items,
-		group,
+		group
 	) => {
 		loading = true;
 		const newMessage = {
@@ -183,25 +168,32 @@
 				item.content = messages;
 			}
 		});
-		items = [...items];
+		items1 = [...items1];
+		items2 = [...items2];
+		console.log('items1', items1);
+		console.log('items2', items2);
 
-
-		scrollToBottom(scrollToDiv);
+		scrollToBottom(scrollToDiv1);
+		scrollToBottom(scrollToDiv2);
+		displayMsg = true;
 		if (group == "1") {
 			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
 		} else if (group == "2") {
 			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY2, chatMessagesMap);
 		}
+		console.log('chatMessagesMap1', chatMessagesMap);
+
 
 		await callTextNoStream(
 			newMessage.content,
 			id,
 			chatMessagesMap,
 			items,
-			group,
+			group
 		);
 
-		scrollToBottom(scrollToDiv);
+		scrollToBottom(scrollToDiv1);
+		scrollToBottom(scrollToDiv2);
 
 		if (group == "1") {
 			storeMessages(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY, chatMessagesMap);
@@ -235,7 +227,7 @@
 			<div class="relative my-4 flex w-full flex-row justify-center">
 				<div class="foucs:border-none relative w-full">
 					<input
-						class="text-md block w-full border-0 border-b-2 border-gray-300 py-4 px-1
+						class="text-md block w-full border-0 border-b-2 border-gray-300 px-1 py-4
 						text-gray-900 focus:border-gray-300 focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
 						type="text"
 						placeholder="Enter prompt here"
@@ -256,7 +248,7 @@
 							}
 						}}
 						type="submit"
-						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 						><PaperAirplane /></button
 					>
 				</div>
@@ -265,16 +257,16 @@
 
 		<div class="mx-auto mt-4 flex h-full w-full flex-col">
 			<div class="flex grid h-full grid-cols-2 flex-col gap-4 divide-x">
-				{#if !isEmptyObject(chatMessagesMap1)}
+				{#if !isEmptyObject(chatMessagesMap1) || displayMsg}
 					<div class="flex h-full flex-col rounded border p-2 shadow">
 						<!-- gallery -->
-						<Gallery items={items1} />
+						<Gallery items={items1} scrollName={"chat-scrollbar1"} label={"Gaudi2"}/>
 					</div>
 				{/if}
-				{#if !isEmptyObject(chatMessagesMap2)}
+				{#if !isEmptyObject(chatMessagesMap2) || displayMsg}
 					<div class="flex h-full flex-col rounded border p-2 shadow">
 						<!-- gallery -->
-						<Gallery items={items2} />
+						<Gallery items={items2} scrollName={"chat-scrollbar2"} label={"A100"}/>
 					</div>
 				{/if}
 			</div>
@@ -282,7 +274,20 @@
 				<LoadingAnimation />
 			{/if}
 		</div>
-
 		<!-- gallery -->
 	</div>
 </div>
+
+<style>
+	.row::-webkit-scrollbar {
+		display: none;
+	}
+
+	.row {
+		scrollbar-width: none;
+	}
+
+	.row {
+		-ms-overflow-style: none;
+	}
+</style>

@@ -13,7 +13,7 @@ export async function fetchTextStream(
 	payload = {
 		query: query,
 		translated: query,
-		knowledge_base_id: "default",
+		knowledge_base_id: knowledge_base_id,
 		stream: true,
 		max_new_tokens: 128,
 		return_link: false,
@@ -38,7 +38,7 @@ export async function fetchTextNoStream(
 	const postData = {
 		prompt: query,
 		request_id: requestId,
-		kb_id: "default",
+		kb_id: knowledge_base_id,
 		stream: false,
 	};
 
@@ -79,7 +79,7 @@ export async function fetchTextNoStream2(
 				name: "kb_id",
 				datatype: "BYTES",
 				shape: [1],
-				data: ["kb_fbccb93a"],
+				data: [knowledge_base_id],
 			},
 			{
 				name: "request_id",

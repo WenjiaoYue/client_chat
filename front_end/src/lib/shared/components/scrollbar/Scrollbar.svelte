@@ -17,4 +17,16 @@
     :global(.svlr-contents) {
         height: 100%;
     }
+
+    .row::-webkit-scrollbar {
+		display: none;
+	}
+
+	.row {
+		scrollbar-width: none;
+	}
+
+	.row {
+		-ms-overflow-style: none;
+	}
 </style>

@@ -4,18 +4,22 @@
 	import { sineIn } from "svelte/easing";
 	import UploadFile from "./upload-knowledge.svelte";
 	import PasteURL from "./PasteKnowledge.svelte";
-	import { TalkingKnowledgeCustom } from "$lib/shared/stores/common/Store";
-	import TalkingKnowledgeCard from "./talking-knowledge-card.svelte";
+	import {
+		TalkingKnowledgeCustom,
+		knowledge1,
+		knowledge2,
+		knowledgeName,
+	} from "$lib/shared/stores/common/Store";
+	import DeleteIcon from "$lib/assets/avatar/svelte/Delete.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
 	import {
 		fetchKnowledgeBaseId,
+		fetchKnowledgeBaseId2,
 		fetchKnowledgeBaseIdByPaste,
 	} from "$lib/network/upload/Network";
 
 	const { addNotification } = getNotificationsContext();
-	$: allKnowledges = [...$TalkingKnowledgeCustom];
-	console.log('allKnowledges', allKnowledges);
-	
+	console.log("allKnowledges", $knowledgeName);
 
 	let hidden6 = true;
 	let selectKnowledge = -1;
@@ -29,62 +33,62 @@
 		e: CustomEvent<{ pasteUrlList: string[] }>
 	) {
 		let knowledge_id = "";
+		// let knowledge_id2 = "";
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
-			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList);
-
+			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url1");
+			const res2 = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url2");
+			// sihan
 			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
+			// knowledge_id2 = res2.knowledge_base_id ? res2.knowledge_base_id : "default";
 		} catch {
 			knowledge_id = "default";
+			// knowledge_id2 = "default";
 		}
+		knowledge1.set({ id: knowledge_id });
+		knowledgeName.set(e.detail.fileName);
+		// knowledge2.set({ id: knowledge_id2 })
 
 		addNotification({
 			text: "Uploaded successfully",
 			position: "top-left",
 			type: "success",
 			removeAfter: 3000,
-		});
-
-		TalkingKnowledgeCustom.update((options) => {
-			return [
-				{ name: "Knowledge Base", src: e.detail.src, id: knowledge_id },
-				...options,
-			];
 		});
 	}
 
 	async function handleKnowledgeUpload(e: CustomEvent<any>) {
 		let knowledge_id = "";
+		// let knowledge_id2 = "";
 		try {
 			const blob = await fetch(e.detail.src).then((r) => r.blob());
 			const fileName = e.detail.fileName;
+			// letong
 			const res = await fetchKnowledgeBaseId(blob, fileName);
+			// const res2 = await fetchKnowledgeBaseId2(blob, fileName);
+			// sihan
 			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
+			// knowledge_id2 = res2.knowledge_base_id ? res2.knowledge_base_id : "default";
+			console.log("knowledge_id", knowledge_id);
 		} catch {
 			knowledge_id = "default";
+			// knowledge_id2 = "default";
 		}
+		knowledge1.set({ id: knowledge_id });
+		knowledgeName.set(e.detail.fileName);
+		// knowledge2.set({ id: knowledge_id2 })
 		addNotification({
 			text: "Uploaded successfully",
 			position: "top-left",
 			type: "success",
 			removeAfter: 3000,
 		});
-
-		TalkingKnowledgeCustom.update((options) => {
-			return [
-				{ name: e.detail.fileName, src: e.detail.src, id: knowledge_id },
-				...options,
-			];
-		});
-		console.log('TalkingKnowledgeCustom', $TalkingKnowledgeCustom);
-		
 	}
 
-	function handleKnowledgeDelete(i: number) {
-		TalkingKnowledgeCustom.update((options) => {
-			options.splice(i, 1);
-			return options;
-		});
+	function handleKnowledgeDelete() {
+		knowledge1.set({ id: "default" });
+		knowledge2.set({ id: "default" });
+		knowledgeName.set("");
 	}
 </script>
 
@@ -146,7 +150,10 @@
 			<PasteURL on:paste={handleKnowledgePaste} />
 		</TabItem>
 	</Tabs>
-	<!-- {#each allKnowledges as opt, i (opt.name + i)}
-		<TalkingKnowledgeCard {...opt} />
-	{/each} -->
+	{#if $knowledgeName !== ""}
+		<div class="relative">
+			<p class="border-b p-6 pb-2">{$knowledgeName}</p>
+			<DeleteIcon on:DeleteAvatar={() => handleKnowledgeDelete()} />
+		</div>
+	{/if}
 </Drawer>

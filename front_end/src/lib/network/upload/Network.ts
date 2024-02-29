@@ -1,7 +1,27 @@
-const KNOWLEDGE_BASE_URL = "http://10.112.228.151:80/v2/rag";
+const KNOWLEDGE_BASE_URL2 = "http://10.112.228.151:80/v2/rag";
+const KNOWLEDGE_BASE_URL = "http://10.7.4.144:8007/v1/askdoc";
 // const KNOWLEDGE_BASE_URL = "http://10.112.228.151:8007/v1/askdoc";
 
 export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
+  const url = `${KNOWLEDGE_BASE_URL}/create`;
+  const formData = new FormData();
+  formData.append("file", file, fileName);
+  const init: RequestInit = {
+    method: "POST",
+    body: formData,
+  };
+
+  try {
+    const response = await fetch(url, init);
+    if (!response.ok) throw response.status;
+    return await response.json();
+  } catch (error) {
+    console.error("network error: ", error);
+    return undefined;
+  }
+}
+
+export async function fetchKnowledgeBaseId2(file: Blob, fileName: string) {
   const url = `${KNOWLEDGE_BASE_URL}/upload`;
   const formData = new FormData();
   formData.append("file", file, fileName);
@@ -20,8 +40,13 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
   }
 }
 
-export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any) {
-  const url = `${KNOWLEDGE_BASE_URL}/upload_link`;
+export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
+  let url = ''
+  if (urlType === '1') {
+    url = `${KNOWLEDGE_BASE_URL}/upload_link`;
+  } else if (urlType === '2') {
+    url = `${KNOWLEDGE_BASE_URL2}/upload_link`;
+  }
   const data = {
     link_list: pasteUrlList,
   };
