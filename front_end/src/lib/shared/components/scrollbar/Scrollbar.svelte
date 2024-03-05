@@ -5,13 +5,13 @@
     export let alwaysVisible = true;
 </script>
 
-<!-- <div class={className}> -->
+<div class={className}>
     <Svroller height="100%" width="100%" {alwaysVisible}>
         <div class={classLayout}>
             <slot></slot>
         </div>
     </Svroller>	
-<!-- </div> -->
+</div>
 
 <style>
     :global(.svlr-contents) {

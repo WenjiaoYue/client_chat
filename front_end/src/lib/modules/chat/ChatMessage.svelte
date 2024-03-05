@@ -1,8 +1,10 @@
 <script lang="ts">
 	import MessageAvatar from "$lib/modules/chat/MessageAvatar.svelte";
-	import { type Message } from "$lib/shared/constant/Interface";
+	import type { Message } from "$lib/shared/constant/Interface";
 
 	export let msg: Message;
+	console.log('msg', msg);
+	
 </script>
 
 <div
@@ -21,7 +23,7 @@ class={msg.role === 0
 	<div class="group relative items-center">
 		<div>
 			<p
-				class="max-w-[60vw] items-center whitespace-pre-line break-keep text-[0.8rem] leading-5 sm:max-w-[32rem]"
+				class="items-center whitespace-pre-line break-keep text-[0.8rem] leading-5"
 			>
 				{@html msg.content}
 			</p>

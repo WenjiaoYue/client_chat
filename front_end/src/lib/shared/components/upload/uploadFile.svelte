@@ -6,14 +6,12 @@
 	import PasteURL from "./PasteKnowledge.svelte";
 	import {
 		knowledge1,
-		knowledge2,
 		knowledgeName,
 	} from "$lib/shared/stores/common/Store";
 	import DeleteIcon from "$lib/assets/avatar/svelte/Delete.svelte";
 	import { getNotificationsContext } from "svelte-notifications";
 	import {
 		fetchKnowledgeBaseId,
-		fetchKnowledgeBaseId2,
 		fetchKnowledgeBaseIdByPaste,
 	} from "$lib/network/upload/Network";
 
@@ -36,17 +34,13 @@
 		try {
 			const pasteUrlList = e.detail.pasteUrlList;
 			const res = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url1");
-			const res2 = await fetchKnowledgeBaseIdByPaste(pasteUrlList, "url2");
 			// sihan
 			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
-			// knowledge_id2 = res2.knowledge_base_id ? res2.knowledge_base_id : "default";
 		} catch {
 			knowledge_id = "default";
-			// knowledge_id2 = "default";
 		}
 		knowledge1.set({ id: knowledge_id });
 		knowledgeName.set('knowledge_base');
-		// knowledge2.set({ id: knowledge_id2 })
 
 		addNotification({
 			text: "Uploaded successfully",
@@ -64,7 +58,6 @@
 			const fileName = e.detail.fileName;
 			// letong
 			const res = await fetchKnowledgeBaseId(blob, fileName);
-			// const res2 = await fetchKnowledgeBaseId2(blob, fileName);
 			// sihan
 			knowledge_id = res.knowledge_base_id ? res.knowledge_base_id : "default";
 			// knowledge_id2 = res2.knowledge_base_id ? res2.knowledge_base_id : "default";
@@ -75,7 +68,6 @@
 		}
 		knowledge1.set({ id: knowledge_id });
 		knowledgeName.set(e.detail.fileName);
-		// knowledge2.set({ id: knowledge_id2 })
 		addNotification({
 			text: "Uploaded successfully",
 			position: "top-left",
@@ -86,7 +78,6 @@
 
 	function handleKnowledgeDelete() {
 		knowledge1.set({ id: "default" });
-		knowledge2.set({ id: "default" });
 		knowledgeName.set("");
 	}
 </script>
