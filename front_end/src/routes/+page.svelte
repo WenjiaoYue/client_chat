@@ -152,11 +152,11 @@
 			</div>
 		</div>
 
-		<div class="mx-auto mt-4 flex h-full w-full flex-col">
+		<div class="mx-auto flex h-full w-full flex-col">
 			<Scrollbar
 				classLayout="flex flex-col gap-1"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
-				>
+			>
 				{#each chatMessages as message, i}
 					<ChatMessage
 						msg={message}
