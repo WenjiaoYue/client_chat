@@ -8,7 +8,12 @@
 		MessageType,
 		type Message,
 	} from "$lib/shared/constant/Interface";
-	import { getCurrentTimeStamp, scrollToBottom } from "$lib/shared/Utils";
+	import {
+		fromTimeStampToTime,
+		getCurrentTimeStamp,
+		scrollToBottom,
+		scrollToTop,
+	} from "$lib/shared/Utils";
 	import { fetchTextStream } from "$lib/network/chat/Network";
 	import LoadingAnimation from "$lib/shared/components/loading/Loading.svelte";
 	import { browser } from "$app/environment";
@@ -25,8 +30,8 @@
 	let scrollToDiv: HTMLDivElement;
 	// ·········
 	let chatMessages: Message[] = data.chatMsg ? data.chatMsg : [];
-	console.log('chatMessages', chatMessages);
-	
+	console.log("chatMessages", chatMessages);
+
 	// ··············
 
 	$: knowledge_1 = $knowledge1?.id ? $knowledge1.id : "default";
@@ -37,13 +42,19 @@
 			?.querySelector(".svlr-viewport")!;
 	});
 
+	function handleTop() {
+		console.log("top");
+
+		scrollToTop(scrollToDiv);
+	}
+
 	function storeMessages() {
-		if ($ifStoreMsg && browser) {
-			localStorage.setItem(
-				LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
-				JSON.stringify(chatMessages)
-			);
-		}
+		console.log('localStorage', chatMessages);
+		
+		localStorage.setItem(
+			LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY,
+			JSON.stringify(chatMessages)
+		);
 	}
 
 	const callTextStream = async (query: string) => {
@@ -52,12 +63,28 @@
 		eventSource.addEventListener("message", (e: any) => {
 			let currentMsg = e.data;
 			console.log("currentMsg", currentMsg);
-
 			if (currentMsg == "[DONE]") {
+				console.log("done getCurrentTimeStamp", getCurrentTimeStamp);
+				let startTime = chatMessages[chatMessages.length - 1].time;
+
 				loading = false;
+				let totalTime = getCurrentTimeStamp() - startTime;
+				console.log("done totalTime", totalTime);
+				console.log(
+					"chatMessages[chatMessages.length - 1]",
+					chatMessages[chatMessages.length - 1]
+				);
+
+				if (chatMessages.length - 1 !== -1) {
+					chatMessages[chatMessages.length - 1].time = totalTime;
+				}
+				console.log("done chatMessages", chatMessages);
+
 				storeMessages();
 			} else {
 				if (chatMessages[chatMessages.length - 1].role == MessageRole.User) {
+					console.log("?", getCurrentTimeStamp());
+
 					chatMessages = [
 						...chatMessages,
 						{
@@ -67,6 +94,7 @@
 							time: getCurrentTimeStamp(),
 						},
 					];
+					console.log("? chatMessages", chatMessages);
 				} else {
 					let content = chatMessages[chatMessages.length - 1].content as string;
 					chatMessages[chatMessages.length - 1].content =
@@ -79,14 +107,14 @@
 	};
 
 	const handleTextSubmit = async () => {
-		console.log('handleTextSubmit');
-		
+		console.log("handleTextSubmit");
+
 		loading = true;
 		const newMessage = {
 			role: MessageRole.User,
 			type: MessageType.Text,
 			content: query,
-			time: getCurrentTimeStamp(),
+			time: 0,
 		};
 		chatMessages = [...chatMessages, newMessage];
 		scrollToBottom(scrollToDiv);
@@ -98,6 +126,11 @@
 		scrollToBottom(scrollToDiv);
 		storeMessages();
 	};
+
+	function handelClearHistory() {
+		localStorage.removeItem(LOCAL_STORAGE_KEY.STORAGE_CHAT_KEY);
+		chatMessages = [];
+	}
 
 	function isEmptyObject(obj: any): boolean {
 		for (let key in obj) {
@@ -115,7 +148,7 @@
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<div class="flex justify-between p-2">
-			<p class="mt-2 text-[1.7rem] font-bold tracking-tight">Neural Chat</p>
+			<p class="text-[1.7rem] font-bold tracking-tight">Chat With Your PDF</p>
 			<UploadFile />
 		</div>
 		<div
@@ -152,14 +185,42 @@
 			</div>
 		</div>
 
+		<!-- clear -->
+		{#if Array.isArray(chatMessages) && chatMessages.length > 0 && !loading}
+			<div class="flex w-full justify-between pr-5">
+				<div class="flex items-center">
+					<button
+						class="bg-primary text-primary-foreground hover:bg-primary/90 group flex items-center justify-center space-x-2 p-2"
+						type="button"
+						on:click={() => handelClearHistory()}
+						><svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							width="24"
+							height="24"
+							class="fill-[#0597ff] group-hover:fill-[#0597ff]"
+							><path
+								d="M12.6 12 10 9.4 7.4 12 6 10.6 8.6 8 6 5.4 7.4 4 10 6.6 12.6 4 14 5.4 11.4 8l2.6 2.6zm7.4 8V2q0-.824-.587-1.412A1.93 1.93 0 0 0 18 0H2Q1.176 0 .588.588A1.93 1.93 0 0 0 0 2v12q0 .825.588 1.412Q1.175 16 2 16h14zm-3.15-6H2V2h16v13.125z"
+							/></svg
+						><span class="font-medium text-[#0597ff]">CLEAR</span></button
+					>
+				</div>
+			</div>
+		{/if}
+		<!-- clear -->
+
 		<div class="mx-auto flex h-full w-full flex-col">
 			<Scrollbar
 				classLayout="flex flex-col gap-1"
-				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3"
+				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
 			>
 				{#each chatMessages as message, i}
 					<ChatMessage
+						on:scrollTop={() => handleTop()}
 						msg={message}
+						time={i === 0 || (message.time > 0 && message.time < 100)
+							? message.time
+							: ""}
 					/>
 				{/each}
 			</Scrollbar>

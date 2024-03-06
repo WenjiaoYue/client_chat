@@ -116,7 +116,7 @@
 			id="drawer-label"
 			class="mb-4 inline-flex items-center text-base font-semibold text-gray-500 dark:text-gray-400"
 		>
-			<InfoCircleSolid class="me-2.5 h-4 w-4" />Upload File
+			<InfoCircleSolid class="me-2.5 h-4 w-4" />Data Source
 		</h5>
 		<CloseButton
 			on:click={() => (hidden6 = true)}

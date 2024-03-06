@@ -11,9 +11,23 @@ export function scrollToBottom(scrollToDiv: HTMLElement) {
     }
 }
 
+export function scrollToTop(scrollToDiv: HTMLElement) {
+    if (scrollToDiv) {
+        setTimeout(
+            () =>
+                scrollToDiv.scroll({
+                    behavior: "auto",
+                    top: 0,
+                }),
+            100
+        );
+    }
+}
+
 export function getCurrentTimeStamp() {
     return Math.floor(new Date().getTime() / 1000)
 }
+
 
 export function fromTimeStampToTime(timeStamp: number) {
     return new Date(timeStamp * 1000).toTimeString().slice(0, 8)
