@@ -68,7 +68,7 @@
 				let startTime = chatMessages[chatMessages.length - 1].time;
 
 				loading = false;
-				let totalTime = getCurrentTimeStamp() - startTime;
+				let totalTime = parseFloat(((getCurrentTimeStamp() - startTime) / 1000).toFixed(2));
 				console.log("done totalTime", totalTime);
 				console.log(
 					"chatMessages[chatMessages.length - 1]",
@@ -211,7 +211,7 @@
 
 		<div class="mx-auto flex h-full w-full flex-col">
 			<Scrollbar
-				classLayout="flex flex-col gap-1"
+				classLayout="flex flex-col gap-1 mr-4"
 				className="chat-scrollbar h-0 w-full grow px-2 pt-2 mt-3 mr-5"
 			>
 				{#each chatMessages as message, i}

@@ -105,10 +105,12 @@
 </div>
 
 <Drawer
+	backdrop={false}
 	placement="right"
 	transitionType="fly"
 	transitionParams={transitionParamsRight}
 	bind:hidden={hidden6}
+	class=" shadow border-2 border-r-0 border-b-0"
 	id="sidebar6"
 >
 	<div class="flex items-center">

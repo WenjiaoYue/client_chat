@@ -25,7 +25,7 @@ export function scrollToTop(scrollToDiv: HTMLElement) {
 }
 
 export function getCurrentTimeStamp() {
-    return Math.floor(new Date().getTime() / 1000)
+    return Math.floor(new Date().getTime())
 }
 
 

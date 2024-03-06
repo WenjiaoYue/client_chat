@@ -13,13 +13,9 @@ export async function fetchTextStream(
 
 	payload = {
 		query: query,
-		translated: "What is PAE?",
 		knowledge_base_id: knowledge_base_id,
-		stream: true,
-		max_new_tokens: 128,
-		return_link: false,
 	};
-	url = `${PDF_BASE_URL}/chat`;
+	url = `${PDF_BASE_URL}/chat_stream`;
 
 	return new SSE(url, {
 		headers: { "Content-Type": "application/json" },

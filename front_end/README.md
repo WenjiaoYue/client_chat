@@ -1,20 +1,23 @@
 <h1 align="center" id="title"><img align="center" src="./static/favicon.png" alt="project-image" width="50" height="50">
-Side By Side</h1>
+Neural Chat</h1>
 
 ### 📸 Project Screenshots
 
-![project-screenshot](https://imgur.com/6mf33rM.png)
-![project-screenshot](https://imgur.com/DJCXwNL.png)
-![project-screenshot](https://imgur.com/1XhrYdA.png)
+![project-screenshot](https://imgur.com/SmhJSmC.png)
+![project-screenshot](https://imgur.com/iGTDcwU.png)
+![project-screenshot](https://imgur.com/cbJi5gj.png)
 
 
 <h2>🧐 Features</h2>
 
 Here're some of the project's features:
 
-- Start a Talking Chat：Compare the performance in output quality and response time between Gaudi2 and A100 using textual conversations.
-- Compare Concurrency Across Machines：One machine concurrently processes multiple requests and compares the time taken for each chat processing.
+- Start a Text Chat：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
 - Upload File: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
+- Clear: Clear the record of the current dialog box without retaining the contents of the dialog box.
+- Chat history: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
+- Scroll to Bottom / Top: The chat automatically slides to the bottom. Users can also click the top icon to slide to the top of the chat record.
+- End to End Time: Shows the time spent on the current conversation.
 
 <h2>🛠️ Get it Running:</h2>
 
@@ -24,10 +27,7 @@ Here're some of the project's features:
 
 3. Modify the required .env variables.
     ```
-    CHAT_A100_URL = ''
-    CHAT_GAUDI2_URL = ''
-    KNOWLEDGE_A100_URL = ''
-    KNOWLEDGE_GAUDI2_URL = ''
+    PDF_BASE_URL = ''
     ```
 4. Execute `npm install` to install the corresponding dependencies.
 
