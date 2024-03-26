@@ -7,6 +7,7 @@ const PDF_BASE_URL = env.PDF_BASE_URL;
 export async function fetchTextStream(
 	query: string,
 	knowledge_base_id: string,
+	isCheckedStore: boolean
 ) {
 	let payload = {};
 	let url = "";

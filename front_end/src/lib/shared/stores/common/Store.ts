@@ -16,6 +16,8 @@ export let newUploadNum = writable(0);
 
 export let ifStoreMsg = writable(true);
 
+export let isCheckedStore = writable(false);
+
 export const resetControl = writable(false);
 
 export const knowledge1 = writable<{

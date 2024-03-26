@@ -1,7 +1,8 @@
 <script lang="ts">
 	export let data;
-	import { ifStoreMsg, knowledge1 } from "$lib/shared/stores/common/Store";
+	import { ifStoreMsg, isCheckedStore, knowledge1 } from "$lib/shared/stores/common/Store";
 	import { onMount } from "svelte";
+	import Header from "$lib/shared/components/header/header.svelte";
 	import {
 		LOCAL_STORAGE_KEY,
 		MessageRole,
@@ -20,6 +21,7 @@
 	import "driver.js/dist/driver.css";
 	import "$lib/assets/layout/css/driver.css";
 	import UploadFile from "$lib/shared/components/upload/uploadFile.svelte";
+	import WebSearch from "$lib/shared/components/webSearch/webSearch.svelte";
 	import PaperAirplane from "$lib/assets/chat/svelte/PaperAirplane.svelte";
 	import Gallery from "$lib/shared/components/chat/gallery.svelte";
 	import Scrollbar from "$lib/shared/components/scrollbar/Scrollbar.svelte";
@@ -58,7 +60,7 @@
 	}
 
 	const callTextStream = async (query: string) => {
-		const eventSource = await fetchTextStream(query, knowledge_1);
+		const eventSource = await fetchTextStream(query, knowledge_1, $isCheckedStore);
 
 		eventSource.addEventListener("message", (e: any) => {
 			let currentMsg = e.data;
@@ -143,12 +145,14 @@
 </script>
 
 <!-- <DropZone on:drop={handleImageSubmit}> -->
+<Header />	
 <div
 	class="h-full items-center gap-5 bg-white sm:flex sm:pb-2 lg:rounded-tl-3xl"
 >
 	<div class="mx-auto flex h-full w-full flex-col sm:mt-0 sm:w-[72%]">
 		<div class="flex justify-between p-2">
-			<p class="text-[1.7rem] font-bold tracking-tight">Chat With Your PDF</p>
+			<!-- web search -->
+			<WebSearch />
 			<UploadFile />
 		</div>
 		<div
