@@ -64,8 +64,20 @@
   }
 
   function handleSubmit() {
-    
+
   }
+
+
+  import hljs from 'highlight.js';
+
+// 在需要展示代码的地方设置要高亮显示的代码
+let code = `function helloWorld() {
+  console.log('Hello, World!');
+}`;
+
+// 使用 highlight.js 进行代码高亮
+let highlightedCode = hljs.highlightAuto(code).value;
+
 </script>
 
 <div class="h-full">
@@ -74,4 +86,5 @@
     <InputAirPlane on:handelSubmit={handleSubmit}/>
     <Summary chatMessage={messages} />
   </div>
+  <pre><code>{@html `<span class="hljs">${highlightedCode}</span>`}</code></pre>
 </div>

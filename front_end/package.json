@@ -47,6 +47,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
+    "highlight.js": "^11.9.0",
     "sse.js": "^0.6.1",
     "svelte-notifications": "^0.9.98"
   }
